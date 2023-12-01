@@ -4,7 +4,10 @@
     "Slope": 0,
     "HeightNN": [0 , "m"],
     "NDeposition": 30,
-		
+    "NumberOfLayers": 42,
+    "_NumberOfLayers": 20,
+    "LayerThickness": [0.05, "m"],
+    "_LayerThickness": [0.1, "m"],
     "SoilProfileParameters": []
   },
 	

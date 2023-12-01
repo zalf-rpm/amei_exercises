@@ -144,7 +144,8 @@ def run_producer(server=None, port=None):
     for treatment_id, t_data in treatment_csv.items():
         start_setup_time = time.perf_counter()
 
-        env_template["params"]["siteParameters"]["SoilProfileParameters"] = soil_profiles[t_data["SOIL_ID"]]
+        soil_profile = soil_profiles[t_data["SOIL_ID"]]
+        env_template["params"]["siteParameters"]["SoilProfileParameters"] = soil_profile
         env_template["params"]["siteParameters"]["Latitude"] = float(weather_metadata_csv[t_data["WST_ID"]]["XLAT"])
         env_template["csvViaHeaderOptions"] = sim_json["climate.csv-options"]
         env_template["pathToClimateCSV"] = f"{paths['monica-path-to-climate-dir']}/{t_data['WST_DATASET']}.WTH"
@@ -161,6 +162,8 @@ def run_producer(server=None, port=None):
             "soil": t_data["SOIL_ID"],
             "lai": f"L{t_data['LAID']}",
             "aw": f"AW{t_data['AWC']}",
+            "layerThickness": site_json["SiteParameters"]["LayerThickness"][0],
+            "profileLTs": list(map(lambda layer: layer["Thickness"][0], soil_profile))
         }
 
         socket.send_json(env_template)

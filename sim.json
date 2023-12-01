@@ -36,13 +36,10 @@
 			"daily", [
 				"Date",
 				"SurfTemp",
-				["STemp", [1, 20]]
+				["STemp", [1, 42]]
 			]
 		]
 	},
-
-	"NumberOfLayers": 20,
-	"LayerThickness": [0.1, "m"],
 
 	"UseSecondaryYields": false,
 	"NitrogenResponseOn": true,
