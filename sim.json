@@ -12,13 +12,15 @@
 			"TMIN": "tmin",
 			"TMAX": "tmax",
 			"RAIN": "precip",
-			"SRAD": "globrad"
+			"SRAD": "globrad",
+			"EOAD": "et0"
 		}
     },
 	
 	"debug?": false,
 	"path-to-output": "./",
-	"include-file-base-path": "/home/berg/GitHub/monica-parameters/",
+	"_include-file-base-path": "/home/berg/GitHub/monica-parameters/",
+	"include-file-base-path": "C:/Users/berg.ZALF-AD/GitHub/monica-parameters/",
 	
 	"output": { 
 	  	"write-file?": false,
@@ -35,8 +37,10 @@
 		"events": [
 			"daily", [
 				"Date",
-				"SurfTemp",
-				["STemp", [1, 42]]
+				"AMEI_Monica_SurfTemp",
+				["AMEI_Monica_SoilTemp", [1, 42]],
+				"AMEI_DSSAT_ST_standalone_SurfTemp",
+				["AMEI_DSSAT_ST_standalone_SoilTemp", [1, 10]]
 			]
 		]
 	},

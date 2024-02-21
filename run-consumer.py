@@ -87,19 +87,20 @@ def run_consumer(server=None, port=None):
                 plts_cm = list(map(lambda lt_m: int(lt_m*100), custom_id["profileLTs"]))
 
                 for data in msg.get("data", []):
+
                     with open(f"{path_to_out_file}/SoilTemperature_MO_MO_{loc}_{soil}_{lai}_{aw}.txt", "w") as _:
                         _.write(f"DATE, SLLT, SLLB, TSLD, TSLX, TSLN\n")
 
                         results = data.get("results", [])
                         for vals in results:
-                            _.write(f"{vals['Date']}, 0, 0, {vals['SurfTemp']}, na, na\n")
+                            _.write(f"{vals['Date']}, 0, 0, {vals['AMEI_Monica_SurfTemp']}, na, na\n")
                             sum_lt_cm: int = 0
                             sum_s_temp: float = 0
 
                             plt_iter = iter(plts_cm)
                             plt = next(plt_iter)
                             i_plt = 1
-                            for i, s_temp in enumerate(vals["STemp"]):
+                            for i, s_temp in enumerate(vals["AMEI_Monica_SoilTemp"]):
                                 sum_lt_cm += lt_cm
                                 sum_s_temp += s_temp
                                 if sum_lt_cm >= plt:
@@ -112,6 +113,32 @@ def run_consumer(server=None, port=None):
                                         i_plt += 1
                                     sum_lt_cm = 0
                                     sum_s_temp = 0.0
+
+                    with open(f"{path_to_out_file}/SoilTemperature_MO_DS_{loc}_{soil}_{lai}_{aw}.txt", "w") as _:
+                        _.write(f"DATE, SLLT, SLLB, TSLD, TSLX, TSLN\n")
+
+                        results = data.get("results", [])
+                        for vals in results:
+                            _.write(f"{vals['Date']}, 0, 0, {vals['AMEI_DSSAT_ST_standalone_SurfTemp']}, na, na\n")
+                            upper_cm = 0
+                            for i, s_temp in enumerate(vals["AMEI_DSSAT_ST_standalone_SoilTemp"]):
+                                lt_cm = plts_cm[i]
+                                lower_cm = upper_cm + lt_cm
+                                _.write(f"{vals['Date']}, {upper_cm}, {lower_cm}, {s_temp}, na, na\n")
+                                upper_cm = lower_cm
+
+                    with open(f"{path_to_out_file}/SoilTemperature_MO_DE_{loc}_{soil}_{lai}_{aw}.txt", "w") as _:
+                        _.write(f"DATE, SLLT, SLLB, TSLD, TSLX, TSLN\n")
+
+                        results = data.get("results", [])
+                        for vals in results:
+                            _.write(f"{vals['Date']}, 0, 0, {vals['AMEI_DSSAT_EPICST_standalone_SurfTemp']}, na, na\n")
+                            upper_cm = 0
+                            for i, s_temp in enumerate(vals["AMEI_DSSAT_EPICST_standalone_SoilTemp"]):
+                                lt_cm = plts_cm[i]
+                                lower_cm = upper_cm + lt_cm
+                                _.write(f"{vals['Date']}, {upper_cm}, {lower_cm}, {s_temp}, na, na\n")
+                                upper_cm = lower_cm    
 
             if no_of_envs_expected == envs_received:
                 print("last expected env received")
