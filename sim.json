@@ -40,7 +40,11 @@
 				"AMEI_Monica_SurfTemp",
 				["AMEI_Monica_SoilTemp", [1, 42]],
 				"AMEI_DSSAT_ST_standalone_SurfTemp",
-				["AMEI_DSSAT_ST_standalone_SoilTemp", [1, 10]]
+				["AMEI_DSSAT_ST_standalone_SoilTemp", [1, 10]],
+				"AMEI_DSSAT_EPICST_standalone_SurfTemp",
+				["AMEI_DSSAT_EPICST_standalone_SoilTemp", [1, 10]],
+				"AMEI_Simplace_Soil_Temperature_SurfTemp",
+				["AMEI_Simplace_Soil_Temperature_SoilTemp", [1, 10]]
 			]
 		]
 	},

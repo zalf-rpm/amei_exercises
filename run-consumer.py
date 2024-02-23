@@ -45,18 +45,18 @@ def run_consumer(server=None, port=None):
         "port": port if port else "7777",
         "server": server if server else "localhost",  # "login01.cluster.zalf.de",
         "writer_sr": None,
-        "path_to_out": "out/",
+        "path_to_out": "out",
         "timeout": 600000  # 10min
     }
 
     common.update_config(config, sys.argv, print_config=True, allow_new_keys=False)
 
-    path_to_out_file = config["path_to_out"]
-    if not os.path.exists(config["path_to_out"]):
+    path_to_out = config["path_to_out"]
+    if not os.path.exists(path_to_out):
         try:
-            os.makedirs(config["path_to_out"])
+            os.makedirs(path_to_out)
         except OSError:
-            print("run-consumer.py: Couldn't create dir:", config["path_to_out"], "!")
+            print("run-consumer.py: Couldn't create dir:", path_to_out, "!")
 
     context = zmq.Context()
     socket = context.socket(zmq.PULL)
@@ -88,7 +88,7 @@ def run_consumer(server=None, port=None):
 
                 for data in msg.get("data", []):
 
-                    with open(f"{path_to_out_file}/SoilTemperature_MO_MO_{loc}_{soil}_{lai}_{aw}.txt", "w") as _:
+                    with open(f"{path_to_out}/SoilTemperature_MO_MOC_{loc}_{soil}_{lai}_{aw}.txt", "w") as _:
                         _.write(f"DATE, SLLT, SLLB, TSLD, TSLX, TSLN\n")
 
                         results = data.get("results", [])
@@ -114,7 +114,7 @@ def run_consumer(server=None, port=None):
                                     sum_lt_cm = 0
                                     sum_s_temp = 0.0
 
-                    with open(f"{path_to_out_file}/SoilTemperature_MO_DS_{loc}_{soil}_{lai}_{aw}.txt", "w") as _:
+                    with open(f"{path_to_out}/SoilTemperature_MO_DSC_{loc}_{soil}_{lai}_{aw}.txt", "w") as _:
                         _.write(f"DATE, SLLT, SLLB, TSLD, TSLX, TSLN\n")
 
                         results = data.get("results", [])
@@ -127,7 +127,7 @@ def run_consumer(server=None, port=None):
                                 _.write(f"{vals['Date']}, {upper_cm}, {lower_cm}, {s_temp}, na, na\n")
                                 upper_cm = lower_cm
 
-                    with open(f"{path_to_out_file}/SoilTemperature_MO_DE_{loc}_{soil}_{lai}_{aw}.txt", "w") as _:
+                    with open(f"{path_to_out}/SoilTemperature_MO_DEC_{loc}_{soil}_{lai}_{aw}.txt", "w") as _:
                         _.write(f"DATE, SLLT, SLLB, TSLD, TSLX, TSLN\n")
 
                         results = data.get("results", [])
@@ -139,6 +139,19 @@ def run_consumer(server=None, port=None):
                                 lower_cm = upper_cm + lt_cm
                                 _.write(f"{vals['Date']}, {upper_cm}, {lower_cm}, {s_temp}, na, na\n")
                                 upper_cm = lower_cm    
+
+                    with open(f"{path_to_out}/SoilTemperature_SI_SAC_{loc}_{soil}_{lai}_{aw}.txt", "w") as _:
+                        _.write(f"DATE, SLLT, SLLB, TSLD, TSLX, TSLN\n")
+
+                        results = data.get("results", [])
+                        for vals in results:
+                            _.write(f"{vals['Date']}, 0, 0, {vals['AMEI_Simplace_Soil_Temperature_SurfTemp']}, na, na\n")
+                            upper_cm = 0
+                            for i, s_temp in enumerate(vals["AMEI_Simplace_Soil_Temperature_SoilTemp"]):
+                                lt_cm = plts_cm[i]
+                                lower_cm = upper_cm + lt_cm
+                                _.write(f"{vals['Date']}, {upper_cm}, {lower_cm}, {s_temp}, na, na\n")
+                                upper_cm = lower_cm
 
             if no_of_envs_expected == envs_received:
                 print("last expected env received")

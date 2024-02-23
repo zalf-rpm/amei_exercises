@@ -157,7 +157,7 @@ def run_producer(server=None, port=None):
         env_template["params"]["simulationParameters"]["customData"] = {
             "LAI": float(t_data["LAID"]),
             "AWC": float(t_data["AWC"]),
-            "CAWD": float(t_data["CAWD"]),
+            "CWAD": float(t_data["CWAD"]),
             "IRVAL": float(t_data["IRVAL"]),
             "MLTHK": float(t_data["MLTHK"]),
             "SALB": float(soil_metadata_csv[soil_id]["SALB"]),
