@@ -37,6 +37,8 @@
 		"events": [
 			"daily", [
 				"Date",
+				"SurfTemp",
+				["SoilTemp", [1, 42]],
 				"AMEI_Monica_SurfTemp",
 				["AMEI_Monica_SoilTemp", [1, 42]],
 				"AMEI_DSSAT_ST_standalone_SurfTemp",
