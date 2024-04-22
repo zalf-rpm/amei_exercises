@@ -13,14 +13,16 @@
 			"TMAX": "tmax",
 			"RAIN": "precip",
 			"SRAD": "globrad",
-			"EOAD": "et0"
+			"EOAD": "et0",
+			"DAYLD": "sunhours",
+			"G": "o3"
 		}
     },
 	
 	"debug?": false,
 	"path-to-output": "./",
-	"_include-file-base-path": "/home/berg/GitHub/monica-parameters/",
-	"include-file-base-path": "C:/Users/berg.ZALF-AD/GitHub/monica-parameters/",
+	"include-file-base-path": "/home/berg/GitHub/monica-parameters/",
+	"_include-file-base-path": "C:/Users/berg.ZALF-AD/GitHub/monica-parameters/",
 	
 	"output": { 
 	  	"write-file?": false,
@@ -37,6 +39,8 @@
 		"events": [
 			"daily", [
 				"Date",
+				"SurfTemp",
+				["STemp|SoilTemp", [1, 42]],
 				"AMEI_Monica_SurfTemp",
 				["AMEI_Monica_SoilTemp", [1, 42]],
 				"AMEI_DSSAT_ST_standalone_SurfTemp",
@@ -44,7 +48,12 @@
 				"AMEI_DSSAT_EPICST_standalone_SurfTemp",
 				["AMEI_DSSAT_EPICST_standalone_SoilTemp", [1, 10]],
 				"AMEI_Simplace_Soil_Temperature_SurfTemp",
-				["AMEI_Simplace_Soil_Temperature_SoilTemp", [1, 10]]
+				["AMEI_Simplace_Soil_Temperature_SoilTemp", [1, 10]],
+				"AMEI_Stics_soil_temperature_SurfTemp",
+				["AMEI_Stics_soil_temperature_SoilTemp", [1, 10]],
+				"AMEI_SQ_Soil_Temperature_SoilTemp_deep",
+				"AMEI_SQ_Soil_Temperature_SoilTemp_min",
+				"AMEI_SQ_Soil_Temperature_SoilTemp_max"
 			]
 		]
 	},

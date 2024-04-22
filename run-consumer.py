@@ -87,10 +87,34 @@ def run_consumer(server=None, port=None):
                 plts_cm = list(map(lambda lt_m: int(lt_m*100), custom_id["profileLTs"]))
 
                 for data in msg.get("data", []):
+                    with open(f"{path_to_out}/SoilTemperature_MO_MOO_{loc}_{soil}_{lai}_{aw}.txt", "w") as _:
+                        _.write(f"DATE, SLLT, SLLB, TSLD, TSLX, TSLN\n")
+
+                        results = data.get("results", [])
+                        for vals in results:
+                            _.write(f"{vals['Date']}, 0, 0, {vals['SurfTemp']}, na, na\n")
+                            sum_lt_cm: int = 0
+                            sum_s_temp: float = 0
+
+                            plt_iter = iter(plts_cm)
+                            plt = next(plt_iter)
+                            i_plt = 1
+                            for i, s_temp in enumerate(vals["SoilTemp"]):
+                                sum_lt_cm += lt_cm
+                                sum_s_temp += s_temp
+                                if sum_lt_cm >= plt:
+                                    avg_s_temp = round(sum_s_temp / (sum_lt_cm / lt_cm), 1)
+                                    lower = (i + 1) * lt_cm
+                                    upper = lower - sum_lt_cm
+                                    _.write(f"{vals['Date']}, {upper}, {lower}, {avg_s_temp}, na, na\n")
+                                    if i_plt < len(plts_cm):
+                                        plt = next(plt_iter)
+                                        i_plt += 1
+                                    sum_lt_cm = 0
+                                    sum_s_temp = 0.0
 
                     with open(f"{path_to_out}/SoilTemperature_MO_MOC_{loc}_{soil}_{lai}_{aw}.txt", "w") as _:
                         _.write(f"DATE, SLLT, SLLB, TSLD, TSLX, TSLN\n")
-
                         results = data.get("results", [])
                         for vals in results:
                             _.write(f"{vals['Date']}, 0, 0, {vals['AMEI_Monica_SurfTemp']}, na, na\n")
@@ -104,7 +128,7 @@ def run_consumer(server=None, port=None):
                                 sum_lt_cm += lt_cm
                                 sum_s_temp += s_temp
                                 if sum_lt_cm >= plt:
-                                    avg_s_temp = round(sum_s_temp / (sum_lt_cm / lt_cm), 2)
+                                    avg_s_temp = round(sum_s_temp / (sum_lt_cm / lt_cm), 1)
                                     lower = (i + 1) * lt_cm
                                     upper = lower - sum_lt_cm
                                     _.write(f"{vals['Date']}, {upper}, {lower}, {avg_s_temp}, na, na\n")
@@ -116,7 +140,6 @@ def run_consumer(server=None, port=None):
 
                     with open(f"{path_to_out}/SoilTemperature_MO_DSC_{loc}_{soil}_{lai}_{aw}.txt", "w") as _:
                         _.write(f"DATE, SLLT, SLLB, TSLD, TSLX, TSLN\n")
-
                         results = data.get("results", [])
                         for vals in results:
                             _.write(f"{vals['Date']}, 0, 0, {vals['AMEI_DSSAT_ST_standalone_SurfTemp']}, na, na\n")
@@ -129,7 +152,6 @@ def run_consumer(server=None, port=None):
 
                     with open(f"{path_to_out}/SoilTemperature_MO_DEC_{loc}_{soil}_{lai}_{aw}.txt", "w") as _:
                         _.write(f"DATE, SLLT, SLLB, TSLD, TSLX, TSLN\n")
-
                         results = data.get("results", [])
                         for vals in results:
                             _.write(f"{vals['Date']}, 0, 0, {vals['AMEI_DSSAT_EPICST_standalone_SurfTemp']}, na, na\n")
@@ -140,9 +162,8 @@ def run_consumer(server=None, port=None):
                                 _.write(f"{vals['Date']}, {upper_cm}, {lower_cm}, {s_temp}, na, na\n")
                                 upper_cm = lower_cm    
 
-                    with open(f"{path_to_out}/SoilTemperature_SI_SAC_{loc}_{soil}_{lai}_{aw}.txt", "w") as _:
+                    with open(f"{path_to_out}/SoilTemperature_MO_SAC_{loc}_{soil}_{lai}_{aw}.txt", "w") as _:
                         _.write(f"DATE, SLLT, SLLB, TSLD, TSLX, TSLN\n")
-
                         results = data.get("results", [])
                         for vals in results:
                             _.write(f"{vals['Date']}, 0, 0, {vals['AMEI_Simplace_Soil_Temperature_SurfTemp']}, na, na\n")
@@ -152,6 +173,19 @@ def run_consumer(server=None, port=None):
                                 lower_cm = upper_cm + lt_cm
                                 _.write(f"{vals['Date']}, {upper_cm}, {lower_cm}, {s_temp}, na, na\n")
                                 upper_cm = lower_cm
+
+                    with open(f"{path_to_out}/SoilTemperature_MO_SQC_{loc}_{soil}_{lai}_{aw}.txt", "w") as _:
+                        _.write(f"DATE, SLLT, SLLB, TSLD, TSLX, TSLN\n")
+                        results = data.get("results", [])
+                        for vals in results:
+                            _.write(f"{vals['Date']}, 0, 0, na, na, na\n")
+                            st_min = vals["AMEI_SQ_Soil_Temperature_SoilTemp_min"]
+                            st_max = vals["AMEI_SQ_Soil_Temperature_SoilTemp_max"]
+                            _.write(f"{vals['Date']}, 0, 0, {round((st_min + st_max)/2.0, 1)}, {st_min}, {st_max}\n")
+                            layer_depths = [(5, 15), (15, 30), (30, 45), (45, 60),
+                                            (60, 90), (90, 120), (120, 150), (150, 180), (180, 210)]
+                            for upper_cm, lower_cm in layer_depths:
+                                _.write(f"{vals['Date']}, {upper_cm}, {lower_cm}, {vals['AMEI_SQ_Soil_Temperature_SoilTemp_deep']}, na, na\n")
 
             if no_of_envs_expected == envs_received:
                 print("last expected env received")
