@@ -207,11 +207,37 @@ def run_consumer(server=None, port=None):
                             _.write(f"{vals['Date']}, 0, 0, na, na, na\n")
                             st_min = vals["AMEI_SQ_Soil_Temperature_SoilTemp_min"]
                             st_max = vals["AMEI_SQ_Soil_Temperature_SoilTemp_max"]
-                            _.write(f"{vals['Date']}, 0, 0, {round((st_min + st_max)/2.0, 1)}, {st_min}, {st_max}\n")
+                            _.write(f"{vals['Date']}, 0, 0, {round((st_min + st_max)/2.0, 1)}, {st_max}, {st_min}\n")
                             layer_depths = [(5, 15), (15, 30), (30, 45), (45, 60),
                                             (60, 90), (90, 120), (120, 150), (150, 180), (180, 210)]
                             for upper_cm, lower_cm in layer_depths:
                                 _.write(f"{vals['Date']}, {upper_cm}, {lower_cm}, {vals['AMEI_SQ_Soil_Temperature_SoilTemp_deep']}, na, na\n")
+
+                    with open(f"{path_to_out}/SoilTemperature_MO_PSC_{loc}_{soil}_{lai}_{aw}.txt", "w") as _:
+                        _.write(f"DATE, SLLT, SLLB, TSLD, TSLX, TSLN\n")
+                        results = data.get("results", [])
+                        for vals in results:
+                            _.write(
+                                f"{vals['Date']}, 0, 0, {vals['AMEI_BiomaSurfacePartonSoilSWATC_SurfTemp']}, {vals['AMEI_BiomaSurfacePartonSoilSWATC_SurfTemp_max']}, {vals['AMEI_BiomaSurfacePartonSoilSWATC_SurfTemp_min']}\n")
+                            upper_cm = 0
+                            for i, s_temp in enumerate(vals["AMEI_BiomaSurfacePartonSoilSWATC_SoilTemp"]):
+                                lt_cm = plts_cm[i]
+                                lower_cm = upper_cm + lt_cm
+                                _.write(f"{vals['Date']}, {upper_cm}, {lower_cm}, {s_temp}, na, na\n")
+                                upper_cm = lower_cm
+
+                    with open(f"{path_to_out}/SoilTemperature_MO_SWC_{loc}_{soil}_{lai}_{aw}.txt", "w") as _:
+                        _.write(f"DATE, SLLT, SLLB, TSLD, TSLX, TSLN\n")
+                        results = data.get("results", [])
+                        for vals in results:
+                            _.write(
+                                f"{vals['Date']}, 0, 0, {vals['AMEI_BiomaSurfaceSWATSoilSWATC_SurfTemp']}, na, na\n")
+                            upper_cm = 0
+                            for i, s_temp in enumerate(vals["AMEI_BiomaSurfaceSWATPartonSoilSWATC_SoilTemp"]):
+                                lt_cm = plts_cm[i]
+                                lower_cm = upper_cm + lt_cm
+                                _.write(f"{vals['Date']}, {upper_cm}, {lower_cm}, {s_temp}, na, na\n")
+                                upper_cm = lower_cm
 
             if no_of_envs_expected == envs_received:
                 print("last expected env received")

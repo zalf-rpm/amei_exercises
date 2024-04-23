@@ -15,7 +15,8 @@
 			"SRAD": "globrad",
 			"EOAD": "et0",
 			"DAYLD": "sunhours",
-			"G": "o3"
+			"G": "o3",
+			"SNOW": "precipOrig"
 		}
     },
 	
@@ -53,7 +54,13 @@
 				["AMEI_Stics_soil_temperature_SoilTemp", [1, 10]],
 				"AMEI_SQ_Soil_Temperature_SoilTemp_deep",
 				"AMEI_SQ_Soil_Temperature_SoilTemp_min",
-				"AMEI_SQ_Soil_Temperature_SoilTemp_max"
+				"AMEI_SQ_Soil_Temperature_SoilTemp_max",
+				"AMEI_BiomaSurfacePartonSoilSWATC_SurfTemp",
+				"AMEI_BiomaSurfacePartonSoilSWATC_SurfTemp_min",
+				"AMEI_BiomaSurfacePartonSoilSWATC_SurfTemp_max",
+				["AMEI_BiomaSurfacePartonSoilSWATC_SoilTemp", [1, 10]],
+				"AMEI_BiomaSurfaceSWATSoilSWATC_SurfTemp",
+				["AMEI_BiomaSurfaceSWATSoilSWATC_SoilTemp", [1, 10]]
 			]
 		]
 	},

@@ -161,6 +161,7 @@ def run_producer(server=None, port=None):
             "IRVAL": float(t_data["IRVAL"]),
             "MLTHK": float(t_data["MLTHK"]),
             "SALB": float(soil_metadata_csv[soil_id]["SALB"]),
+            "SLDP": float(soil_metadata_csv[soil_id]["SLDP"]),
             "SABDM": float(soil_metadata_csv[soil_id]["SABDM"]),
             "XLAT": float(weather_metadata_csv[wst_id]["XLAT"]),
             "XLONG": float(weather_metadata_csv[wst_id]["XLONG"]),
