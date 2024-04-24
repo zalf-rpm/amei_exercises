@@ -233,7 +233,7 @@ def run_consumer(server=None, port=None):
                             _.write(
                                 f"{vals['Date']}, 0, 0, {vals['AMEI_BiomaSurfaceSWATSoilSWATC_SurfTemp']}, na, na\n")
                             upper_cm = 0
-                            for i, s_temp in enumerate(vals["AMEI_BiomaSurfaceSWATPartonSoilSWATC_SoilTemp"]):
+                            for i, s_temp in enumerate(vals["AMEI_BiomaSurfaceSWATSoilSWATC_SoilTemp"]):
                                 lt_cm = plts_cm[i]
                                 lower_cm = upper_cm + lt_cm
                                 _.write(f"{vals['Date']}, {upper_cm}, {lower_cm}, {s_temp}, na, na\n")
