@@ -154,9 +154,12 @@ def run_producer(server=None, port=None):
         env_template["pathToClimateCSV"] = f"{paths['monica-path-to-climate-dir']}/{t_data['WST_DATASET']}.WTH"
         # print("pathToClimateCSV:", env_template["pathToClimateCSV"])
 
+        awc = float(t_data["AWC"])
+        env_template["params"]["userSoilTemperatureParameters"]["PlantAvailableWaterContentConst"] = awc
+
         env_template["params"]["simulationParameters"]["customData"] = {
             "LAI": float(t_data["LAID"]),
-            "AWC": float(t_data["AWC"]),
+            "AWC": awc,
             "CWAD": float(t_data["CWAD"]),
             "IRVAL": float(t_data["IRVAL"]),
             "MLTHK": float(t_data["MLTHK"]),
