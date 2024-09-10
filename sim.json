@@ -22,9 +22,8 @@
 	
 	"debug?": false,
 	"path-to-output": "./",
-	"include-file-base-path": "/home/berg/GitHub/monica-parameters/",
-	"_include-file-base-path": "C:/Users/berg.ZALF-AD/GitHub/monica-parameters/",
-	
+	"include-file-base-path": "${MONICA_PARAMETERS}",
+
 	"output": { 
 	  	"write-file?": false,
 		"file-name": "out.csv",

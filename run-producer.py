@@ -27,18 +27,12 @@ import zmq
 
 import monica_run_lib
 
-PATH_TO_REPO = Path(os.path.realpath(__file__)).parent
-PATH_TO_MAS_INFRASTRUCTURE_REPO = PATH_TO_REPO / "../mas-infrastructure"
-PATH_TO_PYTHON_CODE = PATH_TO_MAS_INFRASTRUCTURE_REPO / "src/python"
-if str(PATH_TO_PYTHON_CODE) not in sys.path:
-    sys.path.insert(1, str(PATH_TO_PYTHON_CODE))
+from zalfmas_common import common
+from zalfmas_common.model import monica_io
+import zalfmas_capnpschemas
 
-from pkgs.common import common
-from pkgs.model import monica_io3
-
-PATH_TO_CAPNP_SCHEMAS = (PATH_TO_MAS_INFRASTRUCTURE_REPO / "capnproto_schemas").resolve()
-abs_imports = [str(PATH_TO_CAPNP_SCHEMAS)]
-fbp_capnp = capnp.load(str(PATH_TO_CAPNP_SCHEMAS / "fbp.capnp"), imports=abs_imports)
+sys.path.append(os.path.dirname(zalfmas_capnpschemas.__file__))
+import fbp_capnp
 
 PATHS = {
     # adjust the local path to your environment
@@ -49,7 +43,7 @@ PATHS = {
         "path-debug-write-folder": "./debug-out/",
     },
     "mbm-win-local-local": {
-        "monica-path-to-climate-dir": "C:/Users/berg.ZALF-AD/GitHub/amei_monica_soil_temperature_sensitivity_analysis/input_data/WeatherData/",
+        "monica-path-to-climate-dir": "C:/Users/berg/GitHub/amei_monica_soil_temperature_sensitivity_analysis/input_data/WeatherData/",
         # mounted path to archive accessable by monica executable
         "path-to-data-dir": "./data/",  # mounted path to archive or hard drive with data
         "path-debug-write-folder": "./debug-out/",
@@ -74,7 +68,7 @@ def run_producer(server=None, port=None):
     socket = context.socket(zmq.PUSH)  # pylint: disable=no-member
 
     config = {
-        "mode": "mbm-local-local",
+        "mode": "mbm-win-local-local",
         "server-port": port if port else "6666",
         "server": server if server else "localhost",  # "login01.cluster.zalf.de",
         "sim.json": "sim.json",
@@ -133,7 +127,7 @@ def run_producer(server=None, port=None):
     with open(config["crop.json"]) as _:
         crop_json = json.load(_)
     # create environment template from json templates
-    env_template = monica_io3.create_env_json_from_json_config({
+    env_template = monica_io.create_env_json_from_json_config({
         "crop": crop_json,
         "site": site_json,
         "sim": sim_json,

@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "amei-monica-soil-temperature-sensitivity-analysis"
+version = "0.1.0"
+description = ""
+authors = ["Michael Berg-Mohnicke <michael.berg@zalf.de>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+zalfmas-common = "^0.1.3"
+pyzmq = "^26.2.0"
+pandas = "^2.2.2"
+openpyxl = "^3.1.5"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
