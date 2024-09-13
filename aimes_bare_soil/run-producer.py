@@ -19,6 +19,7 @@ import capnp
 from collections import defaultdict
 from datetime import date, timedelta, datetime
 import json
+import numpy as np
 import os
 import pandas
 from pathlib import Path
@@ -106,22 +107,20 @@ def run_producer(server=None, port=None):
     soils = defaultdict(dict)
     soil_meta_dfs = dfs["Soil_metadata"]
     for i in soil_meta_dfs.axes[0]:
-        sid = soil_meta_dfs["SOIL_ID"][i]
+        sid = str(soil_meta_dfs["SOIL_ID"][i])
         soils[sid]["layers"] = {} # (SLLT, SLLB) -> dict
-        soils[sid]["SLDP"] = soil_meta_dfs["SLDP"][i] # cm
-        soils[sid]["SLOBS"] = soil_meta_dfs["SLOBS"][i]  # cm
-        soils[sid]["SLTOP"] = soil_meta_dfs["SLTOP"][i] # cm
-        soils[sid]["SADR"] = soil_meta_dfs["SADR"][i] # 1/day
-        soils[sid]["SAWC"] = soil_meta_dfs["SAWC"][i]  # cm
-        soils[sid]["SALB"] = soil_meta_dfs["SALB"][i]  # cm
+        soils[sid]["SLDP"] = int(soil_meta_dfs["SLDP"][i]) # cm
+        soils[sid]["SLOBS"] = int(soil_meta_dfs["SLOBS"][i])  # cm
+        soils[sid]["SLTOP"] = int(soil_meta_dfs["SLTOP"][i]) # cm
+        soils[sid]["SADR"] = float(soil_meta_dfs["SADR"][i]) # 1/day
+        soils[sid]["SAWC"] = int(soil_meta_dfs["SAWC"][i])  # cm
+        soils[sid]["SALB"] = int(soil_meta_dfs["SALB"][i])  # cm
 
     soil_profiles_dfs = dfs["Soil_profile_layers"]
     for i in soil_profiles_dfs.axes[0]:
-        sid = soil_profiles_dfs["SOIL_ID"][i]
-        sllt_str = soil_profiles_dfs["SLLT"][i]
-        sllt = float(sllt_str) if sllt_str else 0
-        sllb_str = soil_profiles_dfs["SLLB"][i]
-        sllb = float(sllb_str) if sllb_str else 0
+        sid = str(soil_profiles_dfs["SOIL_ID"][i])
+        sllt = int(soil_profiles_dfs["SLLT"][i]) # cm
+        sllb = int(soil_profiles_dfs["SLLB"][i]) # cm
         soils[sid]["layers"][(sllt, sllb)] = {
             "Thickness": [(sllb - sllt) / 100, "m"],
             "SoilOrganicCarbon": [float(soil_profiles_dfs["SLOC"][i]), "% (g[C]/100g[soil])"],
@@ -131,64 +130,66 @@ def run_producer(server=None, port=None):
             "PermanentWiltingPoint": [float(soil_profiles_dfs["SLLL"][i]), "m3/m3"],
             "Clay": [float(soil_profiles_dfs["SLCLY"][i]), "%"],
             "Sand": [float(soil_profiles_dfs["SLSND"][i]), "%"],
-            "PH": [float(soil_profiles_dfs["SLPHW"][i]), ""],
-            "CN": [float(soil_profiles_dfs["SLCN"][i]), ""],
-            # "Lambda": [float(sps["SLDRL"][i]), ""],
+            "pH": [float(soil_profiles_dfs["SLPHW"][i]), ""],
+            "CN": [float(soil_profiles_dfs["C_N"][i]), ""],
+            "Lambda": [float(soil_profiles_dfs["SLDRL"][i]), ""],
         }
 
     # load fields
     fields_df = dfs["Fields"]
     fields = {}
     for i in fields_df.axes[0]:
-        fid = fields_df["FIELD_ID"][i]
-        fields["FIELD_ID"] = fid
-        fields["FL_LAT"] = fields_df["FL_LAT"][i]
-        fields["FL_LONG"] = fields_df["FL_LONG"][i]
-        fields["FLELE"] = fields_df["FLELE"][i]
-        fields["FLSL"] = fields_df["FLSL"][i]
+        fid = str(fields_df["FIELD_ID"][i])
+        fields[fid] = {
+            "FIELD_ID": fid,
+            "FL_LAT": float(fields_df["FL_LAT"][i]),
+            "FL_LONG": float(fields_df["FL_LONG"][i]),
+            "FLELE": float(fields_df["FLELE"][i]),
+            "FLSL": float(fields_df["FLSL"][i]),
+        }
 
     # load experiments
     exp_desc_df = dfs["Experiment_description"]
     experiments = defaultdict(dict)
     for i in exp_desc_df.axes[0]:
-        eid = exp_desc_df["EID"][i]
+        eid = str(exp_desc_df["EID"][i])
         experiments[eid]["EID"] = eid
-        experiments[eid]["PLYR"] = exp_desc_df["PLYR"][i]
-        experiments[eid]["HAYR"] = exp_desc_df["HAYR"][i]
+        experiments[eid]["PLYR"] = int(exp_desc_df["PLYR"][i])
+        experiments[eid]["HAYR"] = int(exp_desc_df["HAYR"][i])
         experiments[eid]["treatments"] = {}
 
     # load treatments of experiments
     treatments_df = dfs["Treatments"]
     for i in treatments_df.axes[0]:
-        eid = treatments_df["EID"][i]
-        tid = treatments_df["TREAT_ID"][i]
-        field_id = treatments_df["FIELD_ID"][i]
+        eid = str(treatments_df["EID"][i])
+        tid = str(treatments_df["TREAT_ID"][i])
+        field_id = str(treatments_df["FIELD_ID"][i])
 
         experiments[eid]["treatments"][tid] = {
             "TREAT_ID": tid,
             "EID": eid,
             "field": fields[field_id],
-            "wst_id": treatments_df["wst_id"][i],
-            "WST_DATASET": treatments_df["WST_DATASET"][i],
-            "SDAT": datetime.strptime(treatments_df["SDAT"][i], "%Y.%m.%d").isoformat(),
-            "ENDAT": datetime.strptime(treatments_df["ENDAT"][i], "%Y.%m.%d").isoformat(),
+            "wst_id": str(treatments_df["wst_id"][i]),
+            "WST_DATASET": str(treatments_df["WST_DATASET"][i]),
+            "SDAT": str(treatments_df["SDAT"][i])[:10],
+            "ENDAT": str(treatments_df["ENDAT"][i])[:10],
             "plots": {},
             "residue": {},
             "initial_conditions": {},
         }
 
     # load treatments of experiments
-    initial_df = dfs["initial_conditions_layer"]
+    initial_df = dfs["initial_condition_layers"]
     for i in initial_df.axes[0]:
-        eid = initial_df["EID"][i]
-        tid = initial_df["TREAT_ID"][i]
-        ictl = initial_df["ICTL"][i]
-        icbl = initial_df["ICBL"][i]
+        eid = str(initial_df["EID"][i])
+        tid = str(initial_df["TREAT_ID"][i])
+        ictl = int(initial_df["ICTL"][i])
+        icbl = int(initial_df["ICBL"][i])
 
         experiments[eid]["treatments"][tid]["initial_conditions"][(ictl, icbl)] = {
             "EID": eid,
             "TREAT_ID": tid,
-            "ICDAT": datetime.strptime(initial_df["ICDAT"][i], "%Y.%m.%d").isoformat(),
+            "ICDAT": str(initial_df["ICDAT"][i])[:10],
             "ICTL": ictl,
             "ICBL": icbl,
             "ICH2O": float(initial_df["ICH2O"][i]), # fraction
@@ -199,35 +200,35 @@ def run_producer(server=None, port=None):
     # load planting events for a treatment
     planting_df = dfs["Planting_events"]
     for i in planting_df.axes[0]:
-        eid = planting_df["EID"][i]
-        tid = planting_df["TREAT_ID"][i]
+        eid = str(planting_df["EID"][i])
+        tid = str(planting_df["TREAT_ID"][i])
         experiments[eid]["treatments"][tid]["planting"] = {
-            "PDATE": datetime.strptime(treatments_df["PDATE"][i], "%Y.%m.%d").isoformat(),
+            "PDATE": str(treatments_df["PDATE"][i])[:10],
         }
 
     # load harvest events for a treatment
     harvest_df = dfs["Harvest_events"]
     for i in harvest_df.axes[0]:
-        eid = harvest_df["EID"][i]
-        tid = harvest_df["TREAT_ID"][i]
+        eid = str(harvest_df["EID"][i])
+        tid = str(harvest_df["TREAT_ID"][i])
         experiments[eid]["treatments"][tid]["harvest"] = {
-            "HADAT": datetime.strptime(treatments_df["PDATE"][i], "%Y.%m.%d").isoformat(),
+            "HADAT": str(treatments_df["PDATE"][i])[:10],
         }
 
     residues_df = dfs["Residue"]
     for i in residues_df.axes[0]:
-        eid = treatments_df["EID"][i]
-        tid = treatments_df["TREAT_ID"][i]
-        residue_prev_crop = residues_df["ICRCR"][i]
+        eid = str(treatments_df["EID"][i])
+        tid = str(treatments_df["TREAT_ID"][i])
+        depth_cm = int(treatments_df["ICRDP"][i])
+        residue_prev_crop = str(residues_df["ICRCR"][i])
         perc_incorp = treatments_df["ICRIP"][i]
-        depth_cm = treatments_df["ICRDP"][i]
         above_ground = treatments_df["ICRAG"][i]
         perc_n_conc = treatments_df["ICRN"][i]
         root_wt_prev_crop = treatments_df["ICRT"][i]
         experiments[eid]["treatments"][tid]["residue"] = {
             "EID": eid,
             "TREAT_ID": tid,
-            "ICRDAT": datetime.strptime(treatments_df["ICRDAT"][i], "%Y.%m.%d").isoformat(),
+            "ICRDAT": str(treatments_df["ICRDAT"][i])[:10],
             "ICRDP": float(depth_cm) if depth_cm else None, # cm depth
             "ICRCR": float(residue_prev_crop), # code
             "ICRIP": float(perc_incorp), # % incorporated
@@ -239,15 +240,15 @@ def run_producer(server=None, port=None):
     # load plots of treatments
     plots_df = dfs["Plots"]
     for i in plots_df.axes[0]:
-        eid = plots_df["EID"][i],
-        pid = plots_df["PLTID"][i]
-        tid = plots_df["TREAT_ID"][i]
-        sid = plots_df["SOIL_ID"][i]
+        eid = str(plots_df["EID"][i])
+        pid = str(plots_df["PLTID"][i])
+        tid = str(plots_df["TREAT_ID"][i])
+        sid = str(plots_df["SOIL_ID"][i])
         experiments[eid]["treatments"][tid]["plots"][pid] = {
             "PLTID": pid,
             "EID": eid,
             "TREAT_ID": tid,
-            "CUL_ID": plots_df["CUL_ID"][i],
+            "CUL_ID": str(plots_df["CUL_ID"][i]),
             "SOIL_ID": sid,
             "soil": soils[sid],
         }
@@ -256,7 +257,7 @@ def run_producer(server=None, port=None):
     wstations_df = dfs["Weather_stations"]
     weather_stations = {}
     for i in wstations_df.axes[0]:
-        wsid = wstations_df["WST_ID"][i],
+        wsid = str(wstations_df["WST_ID"][i]),
         weather_stations[wsid] = {
             "WST_ID": wsid,
             "WST_LAT": float(wstations_df["WST_LAT"][i]),
@@ -275,8 +276,8 @@ def run_producer(server=None, port=None):
         "data": defaultdict(list)
     })
     for i in wdaily_df.axes[0]:
-        ds_id = wdaily_df["WST_DATASET"][i],
-        date = datetime.strptime(wdaily_df["W_DATE"][i], "%Y.%m.%d").isoformat(),
+        ds_id = str(wdaily_df["WST_DATASET"][i]),
+        date = str(wdaily_df["W_DATE"][i])[:10],
         weather_daily[ds_id]["dates"].append(date)
         weather_daily[ds_id]["data"][8].append(float(wdaily_df["SRAD"][i])) # globrad MJ m-2 day-1
         weather_daily[ds_id]["data"][5].append(float(wdaily_df["TMAX"][i])) # max temp °C
