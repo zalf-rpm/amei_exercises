@@ -166,6 +166,9 @@ def run_producer(server=None, port=None):
             "TAV": float(weather_metadata_csv[wst_id]["TAV"]),
         }
 
+        #if wst_id != "USGA" or soil_id != "SAND" or int(t_data['LAID']) != 7 or float(t_data['AWC']) != 0.75:
+        #    continue
+
         env_template["customId"] = {
             "env_id": sent_env_count + 1,
             "location": wst_id,
@@ -181,7 +184,7 @@ def run_producer(server=None, port=None):
         sent_env_count += 1
 
         stop_setup_time = time.perf_counter()
-        print("Setup ", sent_env_count, " envs took ", (stop_setup_time - start_setup_time), " seconds")
+        print("Setup: ", sent_env_count, " customId: " + str(env_template["customId"]) + " took ", (stop_setup_time - start_setup_time), " seconds")
 
     env_template["customId"] = {
         "no_of_sent_envs": sent_env_count,
