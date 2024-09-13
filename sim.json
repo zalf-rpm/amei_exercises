@@ -13,7 +13,7 @@
 			"TMAX": "tmax",
 			"RAIN": "precip",
 			"SRAD": "globrad",
-			"EOAD": "et0",
+			"ESP": "et0",
 			"DAYLD": "sunhours",
 			"G": "o3",
 			"SNOW": "precipOrig"

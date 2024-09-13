@@ -203,7 +203,7 @@ def run_producer(server=None, port=None):
         eid = str(planting_df["EID"][i])
         tid = str(planting_df["TREAT_ID"][i])
         experiments[eid]["treatments"][tid]["planting"] = {
-            "PDATE": str(treatments_df["PDATE"][i])[:10],
+            "PDATE": str(planting_df["PDATE"][i])[:10],
         }
 
     # load harvest events for a treatment
@@ -212,25 +212,24 @@ def run_producer(server=None, port=None):
         eid = str(harvest_df["EID"][i])
         tid = str(harvest_df["TREAT_ID"][i])
         experiments[eid]["treatments"][tid]["harvest"] = {
-            "HADAT": str(treatments_df["PDATE"][i])[:10],
+            "HADAT": str(harvest_df["HADAT"][i])[:10],
         }
 
     residues_df = dfs["Residue"]
     for i in residues_df.axes[0]:
-        eid = str(treatments_df["EID"][i])
-        tid = str(treatments_df["TREAT_ID"][i])
-        depth_cm = int(treatments_df["ICRDP"][i])
-        residue_prev_crop = str(residues_df["ICRCR"][i])
-        perc_incorp = treatments_df["ICRIP"][i]
-        above_ground = treatments_df["ICRAG"][i]
-        perc_n_conc = treatments_df["ICRN"][i]
-        root_wt_prev_crop = treatments_df["ICRT"][i]
+        eid = str(residues_df["EID"][i])
+        tid = str(residues_df["TREAT_ID"][i])
+        icrdp = residues_df["ICRDP"][i]
+        perc_incorp = residues_df["ICRIP"][i]
+        above_ground = residues_df["ICRAG"][i]
+        perc_n_conc = residues_df["ICRN"][i]
+        root_wt_prev_crop = residues_df["ICRT"][i]
         experiments[eid]["treatments"][tid]["residue"] = {
             "EID": eid,
             "TREAT_ID": tid,
-            "ICRDAT": str(treatments_df["ICRDAT"][i])[:10],
-            "ICRDP": float(depth_cm) if depth_cm else None, # cm depth
-            "ICRCR": float(residue_prev_crop), # code
+            "ICRDAT": str(residues_df["ICRDAT"][i])[:10],
+            "ICRDP": float(icrdp) if np.isnan(icrdp) else None, # cm depth
+            "ICPCR": str(residues_df["ICPCR"][i]), # residue_prev_crop #code
             "ICRIP": float(perc_incorp), # % incorporated
             "ICRAG": float(above_ground), # kg[dDM] ha-1
             "ICRN": float(perc_n_conc), # % N
@@ -257,14 +256,14 @@ def run_producer(server=None, port=None):
     wstations_df = dfs["Weather_stations"]
     weather_stations = {}
     for i in wstations_df.axes[0]:
-        wsid = str(wstations_df["WST_ID"][i]),
+        wsid = str(wstations_df["WST_ID"][i])
         weather_stations[wsid] = {
             "WST_ID": wsid,
             "WST_LAT": float(wstations_df["WST_LAT"][i]),
             "WST_LONG": float(wstations_df["WST_LONG"][i]),
-            "WST_ELE": float(wstations_df["WST_ELE"][i]),
-            "WST_TAV": float(wstations_df["WST_TAV"][i]),
-            "WST_TAMP": float(wstations_df["WST_TAMP"][i]),
+            "WST_ELEV": float(wstations_df["WST_ELEV"][i]),
+            "TAV": float(wstations_df["TAV"][i]),
+            "TAMP": float(wstations_df["TAMP"][i]),
             "CO2Y": float(wstations_df["CO2Y"][i]),
         }
 
@@ -276,9 +275,8 @@ def run_producer(server=None, port=None):
         "data": defaultdict(list)
     })
     for i in wdaily_df.axes[0]:
-        ds_id = str(wdaily_df["WST_DATASET"][i]),
-        date = str(wdaily_df["W_DATE"][i])[:10],
-        weather_daily[ds_id]["dates"].append(date)
+        ds_id = str(wdaily_df["WST_DATASET"][i])
+        weather_daily[ds_id]["dates"].append(str(wdaily_df["W_DATE"][i])[:10])
         weather_daily[ds_id]["data"][8].append(float(wdaily_df["SRAD"][i])) # globrad MJ m-2 day-1
         weather_daily[ds_id]["data"][5].append(float(wdaily_df["TMAX"][i])) # max temp °C
         weather_daily[ds_id]["data"][4].append(float(wdaily_df["TAVD"][i]))  # tavg temp °C

@@ -166,7 +166,7 @@ def run_producer(server=None, port=None):
             "TAV": float(weather_metadata_csv[wst_id]["TAV"]),
         }
 
-        #if wst_id != "USGA" or soil_id != "SAND" or int(t_data['LAID']) != 7 or float(t_data['AWC']) != 0.75:
+        #if wst_id != "USGA" or soil_id != "SALO" or int(t_data['LAID']) != 2 or float(t_data['AWC']) != 0:
         #    continue
 
         env_template["customId"] = {
