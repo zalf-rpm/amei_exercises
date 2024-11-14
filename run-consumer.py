@@ -22,11 +22,9 @@ import json
 import os
 import sys
 import zmq
-
 from zalfmas_common import common
-import zalfmas_capnpschemas
-
-sys.path.append(os.path.dirname(zalfmas_capnpschemas.__file__))
+import zalfmas_capnp_schemas
+sys.path.append(os.path.dirname(zalfmas_capnp_schemas.__file__))
 import fbp_capnp
 
 

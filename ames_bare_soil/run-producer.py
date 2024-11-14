@@ -31,9 +31,9 @@ import monica_run_lib
 
 from zalfmas_common import common
 from zalfmas_common.model import monica_io
-import zalfmas_capnpschemas
+import zalfmas_capnp_schemas
 
-sys.path.append(os.path.dirname(zalfmas_capnpschemas.__file__))
+sys.path.append(os.path.dirname(zalfmas_capnp_schemas.__file__))
 import fbp_capnp
 
 PATHS = {
@@ -70,7 +70,7 @@ def run_producer(server=None, port=None):
     socket = context.socket(zmq.PUSH)  # pylint: disable=no-member
 
     config = {
-        "mode": "mbm-win-local-local",
+        "mode": "mbm-local-local",
         "server-port": port if port else "6666",
         "server": server if server else "localhost",  # "login01.cluster.zalf.de",
         "sim.json": "sim.json",
@@ -86,7 +86,7 @@ def run_producer(server=None, port=None):
     socket.connect("tcp://" + config["server"] + ":" + str(config["server-port"]))
 
     # read data from excel
-    dfs = pandas.read_excel("AMEI_fallow_Aimes_2024-05-16.xlsx",
+    dfs = pandas.read_excel("AMEI_fallow_Ames_2024-05-16.xlsx",
                             sheet_name=[
                                 "Experiment_description",
                                 "Fields",
@@ -123,7 +123,7 @@ def run_producer(server=None, port=None):
         sllb = int(soil_profiles_dfs["SLLB"][i]) # cm
         soils[sid]["layers"][(sllt, sllb)] = {
             "Thickness": [(sllb - sllt) / 100, "m"],
-            "SoilOrganicCarbon": [float(soil_profiles_dfs["SLOC"][i]), "% (g[C]/100g[soil])"],
+            "SoilOrganicCarbon": [float(soil_profiles_dfs["SLOC"][i]), "%", "% (g[C]/100g[soil])"],
             "SoilBulkDensity": [float(soil_profiles_dfs["SLBDM"][i]) * 1000, "kg m-3"],
             "FieldCapacity": [float(soil_profiles_dfs["SLDUL"][i]), "m3/m3"],
             "PoreVolume": [float(soil_profiles_dfs["SLSAT"][i]), "m3/m3"],
@@ -175,7 +175,28 @@ def run_producer(server=None, port=None):
             "ENDAT": str(treatments_df["ENDAT"][i])[:10],
             "plots": {},
             "residue": {},
-            "initial_conditions": {},
+            "initial_conditions": None,
+            "initial_condition_layers": {},
+            "planting_events": {},
+            "harvest_events": {},
+            "tillage_events": {},
+            "mulch_events": {},
+        }
+
+    # load plots of treatments
+    plots_df = dfs["Plots"]
+    for i in plots_df.axes[0]:
+        eid = str(plots_df["EID"][i])
+        pid = str(plots_df["PLTID"][i])
+        tid = str(plots_df["TREAT_ID"][i])
+        sid = str(plots_df["SOIL_ID"][i])
+        experiments[eid]["treatments"][tid]["plots"][pid] = {
+            "PLTID": pid,
+            "EID": eid,
+            "TREAT_ID": tid,
+            "CUL_ID": str(plots_df["CUL_ID"][i]),
+            "SOIL_ID": sid,
+            "soil": soils[sid],
         }
 
     # load treatments of experiments
@@ -186,7 +207,7 @@ def run_producer(server=None, port=None):
         ictl = int(initial_df["ICTL"][i])
         icbl = int(initial_df["ICBL"][i])
 
-        experiments[eid]["treatments"][tid]["initial_conditions"][(ictl, icbl)] = {
+        experiments[eid]["treatments"][tid]["initial_condition_layers"][(ictl, icbl)] = {
             "EID": eid,
             "TREAT_ID": tid,
             "ICDAT": str(initial_df["ICDAT"][i])[:10],
@@ -197,12 +218,21 @@ def run_producer(server=None, port=None):
             "ICNO3M": float(initial_df["ICNO3M"][i]), # kg[N] ha-1
         }
 
+        for p_id, p in experiments[eid]["treatments"][tid]["plots"].items():
+            ls = p["soil"]["layers"]
+            icl = experiments[eid]["treatments"][tid]["initial_condition_layers"]
+            if (ictl, icbl) in ls and (ictl, icbl) in icl:
+                ls[(ictl, icbl)]["SoilMoisturePercentFC"] = \
+                    [icl[(ictl, icbl)]["ICH2O"]/ls[(ictl, icbl)]["FieldCapacity"][0]*100, "%"]
+                #ls[(ictl, icbl)]["SoilAmmonium"] = [icl[(ictl, icbl)]["ICNH4M"], "kg NH4-N m-3"]
+                #ls[(ictl, icbl)]["SoilNitrate"] = [icl[(ictl, icbl)]["ICNO3M"], "kg NO3-N m-3"]
+
     # load planting events for a treatment
     planting_df = dfs["Planting_events"]
     for i in planting_df.axes[0]:
         eid = str(planting_df["EID"][i])
         tid = str(planting_df["TREAT_ID"][i])
-        experiments[eid]["treatments"][tid]["planting"] = {
+        experiments[eid]["treatments"][tid]["planting_events"] = {
             "PDATE": str(planting_df["PDATE"][i])[:10],
         }
 
@@ -211,7 +241,7 @@ def run_producer(server=None, port=None):
     for i in harvest_df.axes[0]:
         eid = str(harvest_df["EID"][i])
         tid = str(harvest_df["TREAT_ID"][i])
-        experiments[eid]["treatments"][tid]["harvest"] = {
+        experiments[eid]["treatments"][tid]["harvest_events"] = {
             "HADAT": str(harvest_df["HADAT"][i])[:10],
         }
 
@@ -234,22 +264,6 @@ def run_producer(server=None, port=None):
             "ICRAG": float(above_ground), # kg[dDM] ha-1
             "ICRN": float(perc_n_conc), # % N
             "ICRT": float(root_wt_prev_crop), # kg[DM] ha-1
-        }
-
-    # load plots of treatments
-    plots_df = dfs["Plots"]
-    for i in plots_df.axes[0]:
-        eid = str(plots_df["EID"][i])
-        pid = str(plots_df["PLTID"][i])
-        tid = str(plots_df["TREAT_ID"][i])
-        sid = str(plots_df["SOIL_ID"][i])
-        experiments[eid]["treatments"][tid]["plots"][pid] = {
-            "PLTID": pid,
-            "EID": eid,
-            "TREAT_ID": tid,
-            "CUL_ID": str(plots_df["CUL_ID"][i]),
-            "SOIL_ID": sid,
-            "soil": soils[sid],
         }
 
     # load weather data
@@ -306,111 +320,55 @@ def run_producer(server=None, port=None):
         "climate": ""
     })
 
-    exp_desc_df = dfs["Experiment_description"]
-    fields = dfs["Fields"]
-    treatments_df = dfs["Treatments"]
-    # loop over all the experiments
-    for e in exp_desc_df.axes[0]:
-        eid = exp_desc_df["EID"][e]
-        year = exp_desc_df["PLYR"][e]
-
-        for t in treatments_df.axes[0]:
-            tid = treatments_df["TREAT_ID"][t]
-
-
-
-
-
-    soil_profiles_dict = defaultdict(dict)
-    soil_profiles_dfs = dfs["Soil_profile_layers"]
-    for i in soil_profiles_dfs.axes[0]:
-        soil_profiles_dict[soil_profiles_dfs["SOIL_ID"]][i] = {
-            "Thickness": [(float(soil_profiles_dfs["SLLB"][i]) - float(soil_profiles_dfs["SLLT"][i])) / 100, "m"],
-            "SoilOrganicCarbon": [float(soil_profiles_dfs["SLOC"][i]), "% (g[C]/100g[soil])"],
-            "SoilBulkDensity": [float(soil_profiles_dfs["SLBDM"][i]) * 1000, "kg m-3"],
-            "FieldCapacity": [float(soil_profiles_dfs["SLDUL"][i]), "m3/m3"],
-            "PoreVolume": [float(soil_profiles_dfs["SLSAT"][i]), "m3/m3"],
-            "PermanentWiltingPoint": [float(soil_profiles_dfs["SLLL"][i]), "m3/m3"],
-            "Clay": [float(soil_profiles_dfs["SLCLY"][i]), "%"],
-            "Sand": [float(soil_profiles_dfs["SLSND"][i]), "%"],
-            "PH": [float(soil_profiles_dfs["SLPHW"][i]), ""],
-            "CN": [float(soil_profiles_dfs["SLCN"][i]), ""],
-            #"Lambda": [float(sps["SLDRL"][i]), ""],
-        }
-    soil_profiles = defaultdict(list)
-    for soil_id, layers_dict in soil_profiles_dict.items():
-        for lid in sorted(layers_dict.keys()):
-            soil_profiles[soil_id].append(layers_dict[lid])
-
-
-
-    # create set value worksteps
-    icls = dfs["initial_conditions_layers"]
-    initial_condition_layers_dict = defaultdict(dict)
-    for i in icls.axes[0]:
-        iso_date = datetime.strptime(icls["ICDAT"], "%Y.%m-%d")
-        initial_condition_layers_dict[soil_profiles_dfs["ICDAT"]][i] = {
-            "Thickness": [(float(soil_profiles_dfs["SLLB"]) - float(soil_profiles_dfs["SLLT"])) / 100, "m"],
-            "SoilOrganicCarbon": [float(soil_profiles_dfs["SLOC"]), "% (g[C]/100g[soil])"],
-            "SoilBulkDensity": [float(soil_profiles_dfs["SLBDM"]) * 1000, "kg m-3"],
-            "FieldCapacity": [float(soil_profiles_dfs["SLDUL"]), "m3/m3"],
-            "PoreVolume": [float(soil_profiles_dfs["SLSAT"]), "m3/m3"],
-            "PermanentWiltingPoint": [float(soil_profiles_dfs["SLLL"]), "m3/m3"],
-            "Clay": [float(soil_profiles_dfs["SLCLY"]), "%"],
-            "Sand": [float(soil_profiles_dfs["SLSND"]), "%"],
-            "PH": [float(soil_profiles_dfs["SLPHW"]), ""],
-            "CN": [float(soil_profiles_dfs["SLCN"]), ""],
-            # "Lambda": [float(sps["SLDRL"]), ""],
-        }
-
     sent_env_count = 0
     start_time = time.perf_counter()
-    for treatment_id, t_data in treatment_csv.items():
-        start_setup_time = time.perf_counter()
 
-        soil_id = t_data["SOIL_ID"]
-        wst_id = t_data["WST_ID"]
-        soil_profile = soil_profiles[soil_id]
-        env_template["params"]["siteParameters"]["SoilProfileParameters"] = soil_profile
-        env_template["params"]["siteParameters"]["Latitude"] = float(weather_metadata_csv[wst_id]["XLAT"])
-        env_template["csvViaHeaderOptions"] = sim_json["climate.csv-options"]
-        env_template["pathToClimateCSV"] = f"{paths['monica-path-to-climate-dir']}/{t_data['WST_DATASET']}.WTH"
-        # print("pathToClimateCSV:", env_template["pathToClimateCSV"])
+    # loop over all the experiments
+    for e_id, e in experiments.items():
+        for t_id, t in e["treatments"].items():
+            for p_id, p in t["plots"].items():
 
-        awc = float(t_data["AWC"])
-        env_template["params"]["userSoilTemperatureParameters"]["PlantAvailableWaterContentConst"] = awc
+                start_setup_time = time.perf_counter()
 
-        env_template["params"]["simulationParameters"]["customData"] = {
-            "LAI": float(t_data["LAID"]),
-            "AWC": awc,
-            "CWAD": float(t_data["CWAD"]),
-            "IRVAL": float(t_data["IRVAL"]),
-            "MLTHK": float(t_data["MLTHK"]),
-            "SALB": float(soil_metadata_csv[soil_id]["SALB"]),
-            "SLDP": float(soil_metadata_csv[soil_id]["SLDP"]),
-            "SABDM": float(soil_metadata_csv[soil_id]["SABDM"]),
-            "XLAT": float(weather_metadata_csv[wst_id]["XLAT"]),
-            "XLONG": float(weather_metadata_csv[wst_id]["XLONG"]),
-            "TAMP": float(weather_metadata_csv[wst_id]["TAMP"]),
-            "TAV": float(weather_metadata_csv[wst_id]["TAV"]),
-        }
+                env_template["params"]["siteParameters"]["SoilProfileParameters"] = p["soil"]["layer"]
+                env_template["params"]["siteParameters"]["Latitude"] = float(t["field"]["FL_LAT"])
 
-        env_template["customId"] = {
-            "env_id": sent_env_count + 1,
-            "location": wst_id,
-            "soil": soil_id,
-            "lai": f"L{t_data['LAID']}",
-            "aw": f"AW{t_data['AWC']}",
-            
-            "layerThickness": site_json["SiteParameters"]["LayerThickness"][0],
-            "profileLTs": list(map(lambda layer: layer["Thickness"][0], soil_profile))
-        }
+                env_template["climateData"] = weather_daily[t["WST_DATASET"]]
 
-        socket.send_json(env_template)
-        sent_env_count += 1
+                awc = float(t_data["AWC"])
+                env_template["params"]["userSoilTemperatureParameters"]["PlantAvailableWaterContentConst"] = awc
 
-        stop_setup_time = time.perf_counter()
-        print("Setup ", sent_env_count, " envs took ", (stop_setup_time - start_setup_time), " seconds")
+                env_template["params"]["simulationParameters"]["customData"] = {
+                    "LAI": float(t_data["LAID"]),
+                    "AWC": awc,
+                    "CWAD": float(t_data["CWAD"]),
+                    "IRVAL": float(t_data["IRVAL"]),
+                    "MLTHK": float(t_data["MLTHK"]),
+                    "SALB": float(soil_metadata_csv[soil_id]["SALB"]),
+                    "SLDP": float(soil_metadata_csv[soil_id]["SLDP"]),
+                    "SABDM": float(soil_metadata_csv[soil_id]["SABDM"]),
+                    "XLAT": float(weather_metadata_csv[wst_id]["XLAT"]),
+                    "XLONG": float(weather_metadata_csv[wst_id]["XLONG"]),
+                    "TAMP": float(weather_metadata_csv[wst_id]["TAMP"]),
+                    "TAV": float(weather_metadata_csv[wst_id]["TAV"]),
+                }
+
+                env_template["customId"] = {
+                    "env_id": sent_env_count + 1,
+                    "location": wst_id,
+                    "soil": soil_id,
+                    "lai": f"L{t_data['LAID']}",
+                    "aw": f"AW{t_data['AWC']}",
+
+                    "layerThickness": site_json["SiteParameters"]["LayerThickness"][0],
+                    "profileLTs": list(map(lambda layer: layer["Thickness"][0], soil_profile))
+                }
+
+                socket.send_json(env_template)
+                sent_env_count += 1
+
+                stop_setup_time = time.perf_counter()
+                print("Setup ", sent_env_count, " envs took ", (stop_setup_time - start_setup_time), " seconds")
 
     env_template["customId"] = {
         "no_of_sent_envs": sent_env_count,
