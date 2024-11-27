@@ -1,10 +1,10 @@
 {
   "SiteParameters": {
     "Latitude": 52.80939865112305,
-    "Slope": 0,
+    "Slope": 0.01,
     "HeightNN": [0 , "m"],
     "NDeposition": 30,
-    "NumberOfLayers": 38,
+    "NumberOfLayers": 24,
     "_NumberOfLayers": 20,
     "LayerThickness": [0.05, "m"],
     "_LayerThickness": [0.1, "m"],
@@ -13,8 +13,8 @@
 	
   "SoilTemperatureParameters": {
     "=":  ["include-from-file", "general/soil-temperature.json"],
-    "SoilMoisture": -1,
-    "PlantAvailableWaterContentConst": 0
+    "___SoilMoisture": -1,
+    "___PlantAvailableWaterContentConst": 0
   },
   "EnvironmentParameters": ["include-from-file", "general/environment.json"],
   "SoilOrganicParameters": ["include-from-file", "general/soil-organic.json"],

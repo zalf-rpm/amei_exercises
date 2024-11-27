@@ -104,6 +104,43 @@ def run_producer(server=None, port=None):
                             header=2,
                             )
 
+    # load weather data
+    wstations_df = dfs["Weather_stations"]
+    weather_stations = {}
+    for i in wstations_df.axes[0]:
+        wsid = str(wstations_df["WST_ID"][i])
+        weather_stations[wsid] = {
+            "WST_ID": wsid,
+            "WST_LAT": float(wstations_df["WST_LAT"][i]),
+            "WST_LONG": float(wstations_df["WST_LONG"][i]),
+            "WST_ELEV": float(wstations_df["WST_ELEV"][i]),
+            "TAV": float(wstations_df["TAV"][i]),
+            "TAMP": float(wstations_df["TAMP"][i]),
+            "CO2Y": float(wstations_df["CO2Y"][i]),
+        }
+
+    wdaily_df = dfs["Weather_daily"]
+    weather_daily = defaultdict(lambda: {
+        "start_date": None,
+        "end_date": None,
+        "dates": [],
+        "data": defaultdict(list)
+    })
+    for i in wdaily_df.axes[0]:
+        ds_id = str(wdaily_df["WST_DATASET"][i])
+        weather_daily[ds_id]["dates"].append(str(wdaily_df["W_DATE"][i])[:10])
+        weather_daily[ds_id]["data"][8].append(float(wdaily_df["SRAD"][i]))  # globrad MJ m-2 day-1
+        weather_daily[ds_id]["data"][5].append(float(wdaily_df["TMAX"][i]))  # max temp °C
+        weather_daily[ds_id]["data"][4].append(float(wdaily_df["TAVD"][i]))  # tavg temp °C
+        weather_daily[ds_id]["data"][3].append(float(wdaily_df["TMIN"][i]))  # min temp °C
+        weather_daily[ds_id]["data"][6].append(float(wdaily_df["RAIN"][i]))  # precip mm
+        weather_daily[ds_id]["data"][14].append(float(wdaily_df["VPRSD"][i]))  # kPa
+        weather_daily[ds_id]["data"][9].append(float(wdaily_df["WIND"][i]) / 24 / 3.6)  # wind km/day -> m/s
+    for ds_id, data in weather_daily.items():
+        data["start_date"] = data["dates"][0]
+        data["end_date"] = data["dates"][-1]
+
+    # load soil data
     soils = defaultdict(dict)
     soil_meta_dfs = dfs["Soil_metadata"]
     for i in soil_meta_dfs.axes[0]:
@@ -169,8 +206,10 @@ def run_producer(server=None, port=None):
             "TREAT_ID": tid,
             "EID": eid,
             "field": fields[field_id],
-            "wst_id": str(treatments_df["wst_id"][i]),
+            "WST_ID": str(treatments_df["wst_id"][i]),
+            "weather_station": weather_stations.get(str(treatments_df["wst_id"][i]), None),
             "WST_DATASET": str(treatments_df["WST_DATASET"][i]),
+            "weather_data": weather_daily.get(str(treatments_df["WST_DATASET"][i]), None),
             "SDAT": str(treatments_df["SDAT"][i])[:10],
             "ENDAT": str(treatments_df["ENDAT"][i])[:10],
             "plots": {},
@@ -266,42 +305,6 @@ def run_producer(server=None, port=None):
             "ICRT": float(root_wt_prev_crop), # kg[DM] ha-1
         }
 
-    # load weather data
-    wstations_df = dfs["Weather_stations"]
-    weather_stations = {}
-    for i in wstations_df.axes[0]:
-        wsid = str(wstations_df["WST_ID"][i])
-        weather_stations[wsid] = {
-            "WST_ID": wsid,
-            "WST_LAT": float(wstations_df["WST_LAT"][i]),
-            "WST_LONG": float(wstations_df["WST_LONG"][i]),
-            "WST_ELEV": float(wstations_df["WST_ELEV"][i]),
-            "TAV": float(wstations_df["TAV"][i]),
-            "TAMP": float(wstations_df["TAMP"][i]),
-            "CO2Y": float(wstations_df["CO2Y"][i]),
-        }
-
-    wdaily_df = dfs["Weather_daily"]
-    weather_daily = defaultdict(lambda: {
-        "startDate": None,
-        "endDate": None,
-        "dates": [],
-        "data": defaultdict(list)
-    })
-    for i in wdaily_df.axes[0]:
-        ds_id = str(wdaily_df["WST_DATASET"][i])
-        weather_daily[ds_id]["dates"].append(str(wdaily_df["W_DATE"][i])[:10])
-        weather_daily[ds_id]["data"][8].append(float(wdaily_df["SRAD"][i])) # globrad MJ m-2 day-1
-        weather_daily[ds_id]["data"][5].append(float(wdaily_df["TMAX"][i])) # max temp °C
-        weather_daily[ds_id]["data"][4].append(float(wdaily_df["TAVD"][i]))  # tavg temp °C
-        weather_daily[ds_id]["data"][3].append(float(wdaily_df["TMIN"][i])) # min temp °C
-        weather_daily[ds_id]["data"][6].append(float(wdaily_df["RAIN"][i])) # precip mm
-        weather_daily[ds_id]["data"][14].append(float(wdaily_df["VPRSD"][i]))  # kPa
-        weather_daily[ds_id]["data"][9].append(float(wdaily_df["WIND"][i]) / 24 / 3.6) # wind km/day -> m/s
-
-    for ds_id, data in weather_daily.items():
-        data["startDate"] = data["dates"][0]
-        data["endDate"] = data["dates"][-1]
 
     # read template sim.json
     with open(config["sim.json"]) as _:
@@ -330,45 +333,38 @@ def run_producer(server=None, port=None):
 
                 start_setup_time = time.perf_counter()
 
-                env_template["params"]["siteParameters"]["SoilProfileParameters"] = p["soil"]["layer"]
+                env_template["params"]["siteParameters"]["SoilProfileParameters"] = list(map(lambda k_v: k_v[1], p["soil"]["layers"].items()))
                 env_template["params"]["siteParameters"]["Latitude"] = float(t["field"]["FL_LAT"])
+                env_template["params"]["userEnvironmentParameters"]["Albedo"] = float(p["soil"]["SALB"])
 
-                env_template["climateData"] = weather_daily[t["WST_DATASET"]]
-
-                awc = float(t_data["AWC"])
-                env_template["params"]["userSoilTemperatureParameters"]["PlantAvailableWaterContentConst"] = awc
-
-                env_template["params"]["simulationParameters"]["customData"] = {
-                    "LAI": float(t_data["LAID"]),
-                    "AWC": awc,
-                    "CWAD": float(t_data["CWAD"]),
-                    "IRVAL": float(t_data["IRVAL"]),
-                    "MLTHK": float(t_data["MLTHK"]),
-                    "SALB": float(soil_metadata_csv[soil_id]["SALB"]),
-                    "SLDP": float(soil_metadata_csv[soil_id]["SLDP"]),
-                    "SABDM": float(soil_metadata_csv[soil_id]["SABDM"]),
-                    "XLAT": float(weather_metadata_csv[wst_id]["XLAT"]),
-                    "XLONG": float(weather_metadata_csv[wst_id]["XLONG"]),
-                    "TAMP": float(weather_metadata_csv[wst_id]["TAMP"]),
-                    "TAV": float(weather_metadata_csv[wst_id]["TAV"]),
+                env_template["climateData"] = {
+                    "startDate": t["weather_data"]["start_date"],
+                    "endDate": t["weather_data"]["end_date"],
+                    "data": t["weather_data"]["data"],
                 }
 
-                env_template["customId"] = {
-                    "env_id": sent_env_count + 1,
-                    "location": wst_id,
-                    "soil": soil_id,
-                    "lai": f"L{t_data['LAID']}",
-                    "aw": f"AW{t_data['AWC']}",
+                for st_model, model_code in [("internal", "iMO"),
+                                 ("Monica_SoilTemp", "MO"),
+                                 ("DSSAT_ST_standalone", "DS"), ("DSSAT_EPICST_standalone", "DE"),
+                                 ("Simplace_Soil_Temperature", "SA"), ("Stics_soil_temperature", "ST"),
+                                 ("SQ_Soil_Temperature", "SQ"), ("BiomaSurfacePartonSoilSWATC", "PS"),
+                                 ("BiomaSurfaceSWATSoilSWATC", "SW")]:
+                    env_template["params"]["simulationParameters"]["SoilTempModel"] = st_model
 
-                    "layerThickness": site_json["SiteParameters"]["LayerThickness"][0],
-                    "profileLTs": list(map(lambda layer: layer["Thickness"][0], soil_profile))
-                }
+                    env_template["customId"] = {
+                        "env_id": sent_env_count + 1,
+                        "st_model": st_model,
+                        "model_code": model_code,
+                        "year": t["weather_data"]["start_date"][:4],
+                        "wst_dataset": t["WST_DATASET"],
+                        "soil_profile_id": p["SOIL_ID"],
+                    }
 
-                socket.send_json(env_template)
-                sent_env_count += 1
+                    socket.send_json(env_template)
+                    sent_env_count += 1
 
-                stop_setup_time = time.perf_counter()
-                print("Setup ", sent_env_count, " envs took ", (stop_setup_time - start_setup_time), " seconds")
+                    stop_setup_time = time.perf_counter()
+                    print("Setup ", sent_env_count, " envs took ", (stop_setup_time - start_setup_time), " seconds")
 
     env_template["customId"] = {
         "no_of_sent_envs": sent_env_count,

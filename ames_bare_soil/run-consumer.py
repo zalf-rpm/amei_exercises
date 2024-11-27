@@ -24,9 +24,9 @@ import sys
 import zmq
 
 from zalfmas_common import common
-import zalfmas_capnpschemas
+import zalfmas_capnp_schemas
 
-sys.path.append(os.path.dirname(zalfmas_capnpschemas.__file__))
+sys.path.append(os.path.dirname(zalfmas_capnp_schemas.__file__))
 import fbp_capnp
 
 
@@ -71,166 +71,52 @@ def run_consumer(server=None, port=None):
                 envs_received += 1
                 print("received result customId:", custom_id)
 
-                loc = custom_id["location"]
-                soil = custom_id["soil"]
-                lai = custom_id["lai"]
-                aw = custom_id["aw"]
-                lt = custom_id["layerThickness"]
-                lt_cm = int(lt * 100)
-                plts_cm = list(map(lambda lt_m: int(lt_m*100), custom_id["profileLTs"]))
+                #st_model = custom_id["st_model"]
+                model_code = custom_id["model_code"]
+                year_str = custom_id["year"]
+                #wst_dataset = custom_id["wst_dataset"]
+                #soil_profile_id = custom_id["soil_profile_id"]
 
                 for data in msg.get("data", []):
-                    with open(f"{path_to_out}/SoilTemperature_MO_MOO_{loc}_{soil}_{lai}_{aw}.txt", "w") as _:
-                        _.write(f"DATE, SLLT, SLLB, TSLD, TSLX, TSLN\n")
-
+                    with open(f"{path_to_out}/{model_code}MOLayersAimes{year_str}.txt", "w") as _:
+                        _.write(f"""\
+AMEI Aimes fallow								
+Model: MONICA version 3.6.28.214 - {datetime.now().isoformat()}							
+Modeler_name: Michael Berg-Mohnicke								
+			soil_layer_top_depth	soil_layer_base_depth	soil_temp_daily_avg	maximum_soil_temp_daily	minimum_soil_temp_daily	soil_water_by_layer
+Framework	Model	Date	cm	cm	°C	°C	°C	cm3/cm3
+(2letters)	(2letters)	(YYYY-MM-DD)	SLLT	SLLB	TSAV	TSMX	TSMN	SWLD
+""")
                         results = data.get("results", [])
                         for vals in results:
-                            _.write(f"{vals['Date']}, 0, 0, {vals['SurfTemp']}, na, na\n")
-                            sum_lt_cm: int = 0
-                            sum_s_temp: float = 0
+                            # only store results up to 31st of October
+                            if vals["Date"][5:] == "11-01":
+                                break
+                            for layer_index in [0, 1, 2, 3, 4, 9, 10, 18, 20]:
+                                tsav_i = vals["TSAV"][layer_index]
+                                tsmn = "na"
+                                tsmx = "na"
+                                _.write(f"MO\t{model_code}\t{vals['Date']}\t{layer_index*5}\t{(layer_index+1)*5}\t"
+                                        f"{tsav_i}\t{tsmx}\t{tsmn}\t{vals['SWLD'][layer_index]}\n")
 
-                            plt_iter = iter(plts_cm)
-                            plt = next(plt_iter)
-                            i_plt = 1
-                            for i, s_temp in enumerate(vals["SoilTemp"]):
-                                sum_lt_cm += lt_cm
-                                sum_s_temp += s_temp
-                                if sum_lt_cm >= plt:
-                                    avg_s_temp = round(sum_s_temp / (sum_lt_cm / lt_cm), 1)
-                                    lower = (i + 1) * lt_cm
-                                    upper = lower - sum_lt_cm
-                                    _.write(f"{vals['Date']}, {upper}, {lower}, {avg_s_temp}, na, na\n")
-                                    if i_plt < len(plts_cm):
-                                        plt = next(plt_iter)
-                                        i_plt += 1
-                                    sum_lt_cm = 0
-                                    sum_s_temp = 0.0
-
-                    with open(f"{path_to_out}/SoilTemperature_MO_MOO_{loc}_{soil}_{lai}_{aw}.txt", "w") as _:
-                        _.write(f"DATE, SLLT, SLLB, TSLD, TSLX, TSLN\n")
-
+                    with open(f"{path_to_out}/{model_code}MOAimes{year_str}.txt", "w") as _:
+                        _.write(f"""\
+AMEI Aimes fallow									
+Model: MONICA version 3.6.28.214 - {datetime.now().isoformat()} 									
+Modeler_name: Michael Berg-Mohnicke									
+			potential_evaporation	soil_evaporation_daily	potential_evapotrans	evapotranspiration_daily	ground_heat_daily	latent_heat_daily	net_radiation_daily
+Framework	Model	Date	mm/d	mm/d	mm/d	mm/d	w/m2	w/m2	w/m2
+(2letters)	(2letters)	(YYYY-MM-DD)	EPAD	ESAD	EOAD	ETAD	GHFD	LHFD	RHFD
+""")
                         results = data.get("results", [])
                         for vals in results:
-                            _.write(f"{vals['Date']}, 0, 0, {vals['SurfTemp']}, na, na\n")
-                            sum_lt_cm: int = 0
-                            sum_s_temp: float = 0
-
-                            plt_iter = iter(plts_cm)
-                            plt = next(plt_iter)
-                            i_plt = 1
-                            for i, s_temp in enumerate(vals["SoilTemp"]):
-                                sum_lt_cm += lt_cm
-                                sum_s_temp += s_temp
-                                if sum_lt_cm >= plt:
-                                    avg_s_temp = round(sum_s_temp / (sum_lt_cm / lt_cm), 2)
-                                    lower = (i + 1) * lt_cm
-                                    upper = lower - sum_lt_cm
-                                    _.write(f"{vals['Date']}, {upper}, {lower}, {avg_s_temp}, na, na\n")
-                                    if i_plt < len(plts_cm):
-                                        plt = next(plt_iter)
-                                        i_plt += 1
-                                    sum_lt_cm = 0
-                                    sum_s_temp = 0.0
-
-                    with open(f"{path_to_out}/SoilTemperature_MO_MOC_{loc}_{soil}_{lai}_{aw}.txt", "w") as _:
-                        _.write(f"DATE, SLLT, SLLB, TSLD, TSLX, TSLN\n")
-                        results = data.get("results", [])
-                        for vals in results:
-                            _.write(f"{vals['Date']}, 0, 0, {vals['AMEI_Monica_SurfTemp']}, na, na\n")
-                            sum_lt_cm: int = 0
-                            sum_s_temp: float = 0
-
-                            plt_iter = iter(plts_cm)
-                            plt = next(plt_iter)
-                            i_plt = 1
-                            for i, s_temp in enumerate(vals["AMEI_Monica_SoilTemp"]):
-                                sum_lt_cm += lt_cm
-                                sum_s_temp += s_temp
-                                if sum_lt_cm >= plt:
-                                    avg_s_temp = round(sum_s_temp / (sum_lt_cm / lt_cm), 1)
-                                    lower = (i + 1) * lt_cm
-                                    upper = lower - sum_lt_cm
-                                    _.write(f"{vals['Date']}, {upper}, {lower}, {avg_s_temp}, na, na\n")
-                                    if i_plt < len(plts_cm):
-                                        plt = next(plt_iter)
-                                        i_plt += 1
-                                    sum_lt_cm = 0
-                                    sum_s_temp = 0.0
-
-                    with open(f"{path_to_out}/SoilTemperature_MO_DSC_{loc}_{soil}_{lai}_{aw}.txt", "w") as _:
-                        _.write(f"DATE, SLLT, SLLB, TSLD, TSLX, TSLN\n")
-                        results = data.get("results", [])
-                        for vals in results:
-                            _.write(f"{vals['Date']}, 0, 0, {vals['AMEI_DSSAT_ST_standalone_SurfTemp']}, na, na\n")
-                            upper_cm = 0
-                            for i, s_temp in enumerate(vals["AMEI_DSSAT_ST_standalone_SoilTemp"]):
-                                lt_cm = plts_cm[i]
-                                lower_cm = upper_cm + lt_cm
-                                _.write(f"{vals['Date']}, {upper_cm}, {lower_cm}, {s_temp}, na, na\n")
-                                upper_cm = lower_cm
-
-                    with open(f"{path_to_out}/SoilTemperature_MO_DEC_{loc}_{soil}_{lai}_{aw}.txt", "w") as _:
-                        _.write(f"DATE, SLLT, SLLB, TSLD, TSLX, TSLN\n")
-                        results = data.get("results", [])
-                        for vals in results:
-                            _.write(f"{vals['Date']}, 0, 0, {vals['AMEI_DSSAT_EPICST_standalone_SurfTemp']}, na, na\n")
-                            upper_cm = 0
-                            for i, s_temp in enumerate(vals["AMEI_DSSAT_EPICST_standalone_SoilTemp"]):
-                                lt_cm = plts_cm[i]
-                                lower_cm = upper_cm + lt_cm
-                                _.write(f"{vals['Date']}, {upper_cm}, {lower_cm}, {s_temp}, na, na\n")
-                                upper_cm = lower_cm    
-
-                    with open(f"{path_to_out}/SoilTemperature_MO_SAC_{loc}_{soil}_{lai}_{aw}.txt", "w") as _:
-                        _.write(f"DATE, SLLT, SLLB, TSLD, TSLX, TSLN\n")
-                        results = data.get("results", [])
-                        for vals in results:
-                            _.write(f"{vals['Date']}, 0, 0, {vals['AMEI_Simplace_Soil_Temperature_SurfTemp']}, na, na\n")
-                            upper_cm = 0
-                            for i, s_temp in enumerate(vals["AMEI_Simplace_Soil_Temperature_SoilTemp"]):
-                                lt_cm = plts_cm[i]
-                                lower_cm = upper_cm + lt_cm
-                                _.write(f"{vals['Date']}, {upper_cm}, {lower_cm}, {s_temp}, na, na\n")
-                                upper_cm = lower_cm
-
-                    with open(f"{path_to_out}/SoilTemperature_MO_SQC_{loc}_{soil}_{lai}_{aw}.txt", "w") as _:
-                        _.write(f"DATE, SLLT, SLLB, TSLD, TSLX, TSLN\n")
-                        results = data.get("results", [])
-                        for vals in results:
-                            _.write(f"{vals['Date']}, 0, 0, na, na, na\n")
-                            st_min = vals["AMEI_SQ_Soil_Temperature_SoilTemp_min"]
-                            st_max = vals["AMEI_SQ_Soil_Temperature_SoilTemp_max"]
-                            _.write(f"{vals['Date']}, 0, 0, {round((st_min + st_max)/2.0, 1)}, {st_max}, {st_min}\n")
-                            layer_depths = [(5, 15), (15, 30), (30, 45), (45, 60),
-                                            (60, 90), (90, 120), (120, 150), (150, 180), (180, 210)]
-                            for upper_cm, lower_cm in layer_depths:
-                                _.write(f"{vals['Date']}, {upper_cm}, {lower_cm}, {vals['AMEI_SQ_Soil_Temperature_SoilTemp_deep']}, na, na\n")
-
-                    with open(f"{path_to_out}/SoilTemperature_MO_PSC_{loc}_{soil}_{lai}_{aw}.txt", "w") as _:
-                        _.write(f"DATE, SLLT, SLLB, TSLD, TSLX, TSLN\n")
-                        results = data.get("results", [])
-                        for vals in results:
-                            _.write(
-                                f"{vals['Date']}, 0, 0, {vals['AMEI_BiomaSurfacePartonSoilSWATC_SurfTemp']}, {vals['AMEI_BiomaSurfacePartonSoilSWATC_SurfTemp_max']}, {vals['AMEI_BiomaSurfacePartonSoilSWATC_SurfTemp_min']}\n")
-                            upper_cm = 0
-                            for i, s_temp in enumerate(vals["AMEI_BiomaSurfacePartonSoilSWATC_SoilTemp"]):
-                                lt_cm = plts_cm[i]
-                                lower_cm = upper_cm + lt_cm
-                                _.write(f"{vals['Date']}, {upper_cm}, {lower_cm}, {s_temp}, na, na\n")
-                                upper_cm = lower_cm
-
-                    with open(f"{path_to_out}/SoilTemperature_MO_SWC_{loc}_{soil}_{lai}_{aw}.txt", "w") as _:
-                        _.write(f"DATE, SLLT, SLLB, TSLD, TSLX, TSLN\n")
-                        results = data.get("results", [])
-                        for vals in results:
-                            _.write(
-                                f"{vals['Date']}, 0, 0, {vals['AMEI_BiomaSurfaceSWATSoilSWATC_SurfTemp']}, na, na\n")
-                            upper_cm = 0
-                            for i, s_temp in enumerate(vals["AMEI_BiomaSurfaceSWATSoilSWATC_SoilTemp"]):
-                                lt_cm = plts_cm[i]
-                                lower_cm = upper_cm + lt_cm
-                                _.write(f"{vals['Date']}, {upper_cm}, {lower_cm}, {s_temp}, na, na\n")
-                                upper_cm = lower_cm
+                            # only store results up to 31st of October
+                            if vals["Date"][5:] == "11-01":
+                                break
+                            ghfd = "na"
+                            lhfd = "na"
+                            _.write(f"MO\t{model_code}\t{vals['Date']}\t{vals['EPAD']}\t{vals['ESAD']}\t"
+                                    f"{vals['EOAD']}\t{vals['ETAD']}\t{ghfd}\t{lhfd}\t{vals['RHFD']}\n")
 
             if no_of_envs_expected == envs_received:
                 print("last expected env received")

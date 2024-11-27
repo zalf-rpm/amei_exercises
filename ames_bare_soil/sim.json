@@ -38,15 +38,30 @@
 		"events": [
 			"daily", [
 				"Date",
-				"Pot_ET|EPAD",
-				"soil_evaporation_daily|ESAD",
-				"potential_evapotrans|EOAD",
-				"evapotranspiration_daily|ETAD",
-				"ground_heat_daily|GHFD",
-				"latent_heat_daily|LHFD",
-				"net_radiation_daily|RHFD",
-				"STemp|TSAV",
-				"Mois|SWLD"
+				["Pot_ET|EPAD", {"round": 2}],
+				["Act_Ev|ESAD", {"round": 2}],
+				["Pot_ET|EOAD", {"round": 2}],
+				["Act_ET|ETAD", {"round": 2}],
+				["0|GHFD", {"round": 3}],
+				["0|LHFD", {"round": 3}],
+				["net_radiation|RHFD", {"round": 3}],
+				["STemp|TSAV", [1, 24], {"round": 2}],
+				["Mois|SWLD", [1, 24], {"round": 4}]
+			]
+		],
+
+		"note events": [
+			"daily", [
+				"Date",
+				"daily_potential_soil_evaporation_mm_d-1|EPAD",
+				"daily_actual_soil_evaporation_mm_d-1|ESAD",
+				"daily_potential_evapotranspiration_mm_d-1|EOAD",
+				"daily_actual_evapotranspiration_mm_d-1|ETAD",
+				"soil_heat_flux_W_m-2|GHFD",
+				"latent_heat_flux_W_m-2|LHFD",
+				"net_radiation_W_m-2|RHFD",
+				["STemp|TSAV", [1, 24]],
+				["Mois|SWLD", [1, 24]]
 			]
 		]
 	},
