@@ -173,7 +173,7 @@ def run_consumer(server=None, port=None):
                             _.write(f"{vals['Date']}, 0, 0, na, na, na\n")
                             st_min = vals["AMEI_SQ_Soil_Temperature_SoilTemp_min"]
                             st_max = vals["AMEI_SQ_Soil_Temperature_SoilTemp_max"]
-                            _.write(f"{vals['Date']}, 0, 0, {round((st_min + st_max)/2.0, 6)}, {st_max}, {st_min}\n")
+                            _.write(f"{vals['Date']}, 0, 5, {round((st_min + st_max)/2.0, 6)}, {st_max}, {st_min}\n")
                             layer_depths = [(5, 15), (15, 30), (30, 45), (45, 60),
                                             (60, 90), (90, 120), (120, 150), (150, 180), (180, 210)]
                             for upper_cm, lower_cm in layer_depths:
