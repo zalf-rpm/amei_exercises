@@ -110,6 +110,8 @@ def run_producer(server=None, port=None):
             #"PoreVolume": [float(soil_data["SLSAT"])+0.1, "m3/m3"],
             "PermanentWiltingPoint": [float(soil_data["SLLL"]), "m3/m3"],
             "Clay": [float(soil_data["SLCLY"]), "%"],
+            "Sand": [float(soil_data["SLSND"]), "%"],
+            "Silt": [float(soil_data["SLSIL"]), "%"],
         }
     soil_profiles = defaultdict(list)
     for soil_id, layers_dict in soil_profiles_dict.items():
@@ -182,8 +184,8 @@ def run_producer(server=None, port=None):
             "profileLTs": list(map(lambda layer: layer["Thickness"][0], soil_profile))
         }
 
-        with open(f"debug_out/env_{sent_env_count + 1}_{wst_id}_{soil_id}.json", "w") as _:
-            json.dump(env_template, _, indent=2)
+        #with open(f"debug_out/env_{sent_env_count + 1}_{wst_id}_{soil_id}.json", "w") as _:
+        #    json.dump(env_template, _, indent=2)
         socket.send_json(env_template)
         sent_env_count += 1
 

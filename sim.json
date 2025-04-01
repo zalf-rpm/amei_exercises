@@ -13,10 +13,12 @@
 			"TMAX": "tmax",
 			"RAIN": "precip",
 			"SRAD": "globrad",
-			"ESP": "et0",
-			"DAYLD": "sunhours",
-			"G": "o3",
-			"SNOW": "precipOrig"
+			"EOAD": "x1",
+			"ES": "x2",
+			"ESP": "x3",
+			"DAYLD": "x4",
+			"G": "x5",
+			"SNOW": "x6"
 		}
     },
 	
@@ -59,7 +61,13 @@
 				"AMEI_BiomaSurfacePartonSoilSWATC_SurfTemp_max",
 				["AMEI_BiomaSurfacePartonSoilSWATC_SoilTemp", [1, 10]],
 				"AMEI_BiomaSurfaceSWATSoilSWATC_SurfTemp",
-				["AMEI_BiomaSurfaceSWATSoilSWATC_SoilTemp", [1, 10]]
+				["AMEI_BiomaSurfaceSWATSoilSWATC_SoilTemp", [1, 10]],
+				"AMEI_ApsimCampbell_SurfTemp",
+				"AMEI_ApsimCampbell_SurfTemp_min",
+				"AMEI_ApsimCampbell_SurfTemp_max",
+				["AMEI_ApsimCampbell_SoilTemp", [1, 10]],
+				["AMEI_ApsimCampbell_SoilTemp_min", [1, 10]],
+				["AMEI_ApsimCampbell_SoilTemp_max", [1, 10]]
 			]
 		]
 	},

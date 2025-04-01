@@ -218,6 +218,19 @@ def run_consumer(server=None, port=None):
                                 _.write(f"{vals['Date']}, {upper_cm}, {lower_cm}, {s_temp}, na, na\n")
                                 upper_cm = lower_cm
 
+                    with open(f"{path_to_out}/SoilTemperature_MO_APC_{loc}_{soil}_{lai}_{aw}.txt", "w") as _:
+                        _.write(f"DATE, SLLT, SLLB, TSLD, TSLX, TSLN\n")
+                        results = data.get("results", [])
+                        for vals in results:
+                            _.write(
+                                f"{vals['Date']}, 0, 0, {vals['AMEI_ApsimCampbell_SurfTemp']}, {vals['AMEI_ApsimCampbell_SurfTemp_max']}, {vals['AMEI_ApsimCampbell_SurfTemp_min']}\n")
+                            upper_cm = 0
+                            for i, s_temp in enumerate(vals["AMEI_ApsimCampbell_SoilTemp"]):
+                                lt_cm = plts_cm[i]
+                                lower_cm = upper_cm + lt_cm
+                                _.write(f"{vals['Date']}, {upper_cm}, {lower_cm}, {s_temp}, {vals['AMEI_ApsimCampbell_SoilTemp_max'][i]}, {vals['AMEI_ApsimCampbell_SoilTemp'][i]}\n")
+                                upper_cm = lower_cm
+
             if no_of_envs_expected == envs_received:
                 print("last expected env received")
                 leave = True
