@@ -152,7 +152,7 @@ def run_consumer(server=None, port=None):
                                 lt_cm = plts_cm[i]
                                 lower_cm = upper_cm + lt_cm
                                 _.write(f"{vals['Date']}, {upper_cm}, {lower_cm}, {s_temp}, na, na\n")
-                                upper_cm = lower_cm    
+                                upper_cm = lower_cm
 
                     with open(f"{path_to_out}/SoilTemperature_MO_SAC_{loc}_{soil}_{lai}_{aw}.txt", "w") as _:
                         _.write(f"DATE, SLLT, SLLB, TSLD, TSLX, TSLN\n")
@@ -228,7 +228,7 @@ def run_consumer(server=None, port=None):
                             for i, s_temp in enumerate(vals["AMEI_ApsimCampbell_SoilTemp"]):
                                 lt_cm = plts_cm[i]
                                 lower_cm = upper_cm + lt_cm
-                                _.write(f"{vals['Date']}, {upper_cm}, {lower_cm}, {s_temp}, {vals['AMEI_ApsimCampbell_SoilTemp_max'][i]}, {vals['AMEI_ApsimCampbell_SoilTemp'][i]}\n")
+                                _.write(f"{vals['Date']}, {upper_cm}, {lower_cm}, {s_temp}, {vals['AMEI_ApsimCampbell_SoilTemp_max'][i]}, {vals['AMEI_ApsimCampbell_SoilTemp_min'][i]}\n")
                                 upper_cm = lower_cm
 
             if no_of_envs_expected == envs_received:
@@ -237,7 +237,7 @@ def run_consumer(server=None, port=None):
 
         except zmq.error.Again as _e:
             print('no response from the server (with "timeout"=%d ms) ' % socket.RCVTIMEO)
-            continue
+            break
         except Exception as e:
             print("Exception:", e)
             break
