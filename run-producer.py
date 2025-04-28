@@ -170,8 +170,8 @@ def run_producer(server=None, port=None):
 
         #if wst_id != "CAQC" or soil_id != "SALO" or int(t_data['LAID']) != 0 or int(float(t_data['AWC'])*100) != 0:
         #if wst_id != "FRLU" or soil_id != "SILO" or int(t_data['LAID']) != 7 or int(float(t_data['AWC'])*100) != 75:
-        if wst_id != "USMA" or soil_id != "SILO" or int(t_data['LAID']) != 7 or int(float(t_data['AWC'])*100) != 0:
-           continue
+        #if wst_id != "USMA" or soil_id != "SILO" or int(t_data['LAID']) != 7 or int(float(t_data['AWC'])*100) != 0:
+        #   continue
 
         env_template["customId"] = {
             "env_id": sent_env_count + 1,
