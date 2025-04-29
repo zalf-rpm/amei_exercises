@@ -343,12 +343,18 @@ def run_producer(server=None, port=None):
                     "data": t["weather_data"]["data"],
                 }
 
-                for st_model, model_code in [("internal", "iMO"),
-                                 ("Monica_SoilTemp", "MO"),
-                                 ("DSSAT_ST_standalone", "DS"), ("DSSAT_EPICST_standalone", "DE"),
-                                 ("Simplace_Soil_Temperature", "SA"), ("Stics_soil_temperature", "ST"),
-                                 ("SQ_Soil_Temperature", "SQ"), ("BiomaSurfacePartonSoilSWATC", "PS"),
-                                 ("BiomaSurfaceSWATSoilSWATC", "SW")]:
+                for st_model, model_code in [
+                    ("internal", "iMO"),
+                    ("Monica_SoilTemp", "MO"),
+                    ("DSSAT_ST_standalone", "DS"),
+                    ("DSSAT_EPICST_standalone", "DE"),
+                    ("Simplace_Soil_Temperature", "SA"),
+                    ("Stics_soil_temperature", "ST"),
+                    ("SQ_Soil_Temperature", "SQ"),
+                    ("BiomaSurfacePartonSoilSWATC", "PS"),
+                    ("BiomaSurfaceSWATSoilSWATC", "SW"),
+                    ("ApsimCampbell", "AP")
+                ]:
                     env_template["params"]["simulationParameters"]["SoilTempModel"] = st_model
 
                     env_template["customId"] = {
