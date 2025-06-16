@@ -22,11 +22,9 @@ import json
 import os
 import sys
 import zmq
-
 from zalfmas_common import common
-import zalfmas_capnpschemas
-
-sys.path.append(os.path.dirname(zalfmas_capnpschemas.__file__))
+import zalfmas_capnp_schemas
+sys.path.append(os.path.dirname(zalfmas_capnp_schemas.__file__))
 import fbp_capnp
 
 
@@ -154,7 +152,7 @@ def run_consumer(server=None, port=None):
                                 lt_cm = plts_cm[i]
                                 lower_cm = upper_cm + lt_cm
                                 _.write(f"{vals['Date']}, {upper_cm}, {lower_cm}, {s_temp}, na, na\n")
-                                upper_cm = lower_cm    
+                                upper_cm = lower_cm
 
                     with open(f"{path_to_out}/SoilTemperature_MO_SAC_{loc}_{soil}_{lai}_{aw}.txt", "w") as _:
                         _.write(f"DATE, SLLT, SLLB, TSLD, TSLX, TSLN\n")
@@ -175,7 +173,7 @@ def run_consumer(server=None, port=None):
                             _.write(f"{vals['Date']}, 0, 0, na, na, na\n")
                             st_min = vals["AMEI_SQ_Soil_Temperature_SoilTemp_min"]
                             st_max = vals["AMEI_SQ_Soil_Temperature_SoilTemp_max"]
-                            _.write(f"{vals['Date']}, 0, 0, {round((st_min + st_max)/2.0, 6)}, {st_max}, {st_min}\n")
+                            _.write(f"{vals['Date']}, 0, 5, {round((st_min + st_max)/2.0, 6)}, {st_max}, {st_min}\n")
                             layer_depths = [(5, 15), (15, 30), (30, 45), (45, 60),
                                             (60, 90), (90, 120), (120, 150), (150, 180), (180, 210)]
                             for upper_cm, lower_cm in layer_depths:
@@ -220,13 +218,26 @@ def run_consumer(server=None, port=None):
                                 _.write(f"{vals['Date']}, {upper_cm}, {lower_cm}, {s_temp}, na, na\n")
                                 upper_cm = lower_cm
 
+                    with open(f"{path_to_out}/SoilTemperature_MO_APC_{loc}_{soil}_{lai}_{aw}.txt", "w") as _:
+                        _.write(f"DATE, SLLT, SLLB, TSLD, TSLX, TSLN\n")
+                        results = data.get("results", [])
+                        for vals in results:
+                            _.write(
+                                f"{vals['Date']}, 0, 0, {vals['AMEI_ApsimCampbell_SurfTemp']}, {vals['AMEI_ApsimCampbell_SurfTemp_max']}, {vals['AMEI_ApsimCampbell_SurfTemp_min']}\n")
+                            upper_cm = 0
+                            for i, s_temp in enumerate(vals["AMEI_ApsimCampbell_SoilTemp"]):
+                                lt_cm = plts_cm[i]
+                                lower_cm = upper_cm + lt_cm
+                                _.write(f"{vals['Date']}, {upper_cm}, {lower_cm}, {s_temp}, {vals['AMEI_ApsimCampbell_SoilTemp_max'][i]}, {vals['AMEI_ApsimCampbell_SoilTemp_min'][i]}\n")
+                                upper_cm = lower_cm
+
             if no_of_envs_expected == envs_received:
                 print("last expected env received")
                 leave = True
 
         except zmq.error.Again as _e:
             print('no response from the server (with "timeout"=%d ms) ' % socket.RCVTIMEO)
-            continue
+            break
         except Exception as e:
             print("Exception:", e)
             break

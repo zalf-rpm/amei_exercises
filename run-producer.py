@@ -29,9 +29,8 @@ import monica_run_lib
 
 from zalfmas_common import common
 from zalfmas_common.model import monica_io
-import zalfmas_capnpschemas
-
-sys.path.append(os.path.dirname(zalfmas_capnpschemas.__file__))
+import zalfmas_capnp_schemas
+sys.path.append(os.path.dirname(zalfmas_capnp_schemas.__file__))
 import fbp_capnp
 
 PATHS = {
@@ -68,7 +67,7 @@ def run_producer(server=None, port=None):
     socket = context.socket(zmq.PUSH)  # pylint: disable=no-member
 
     config = {
-        "mode": "mbm-win-local-local",
+        "mode": "mbm-local-local",
         "server-port": port if port else "6666",
         "server": server if server else "localhost",  # "login01.cluster.zalf.de",
         "sim.json": "sim.json",
@@ -111,6 +110,8 @@ def run_producer(server=None, port=None):
             #"PoreVolume": [float(soil_data["SLSAT"])+0.1, "m3/m3"],
             "PermanentWiltingPoint": [float(soil_data["SLLL"]), "m3/m3"],
             "Clay": [float(soil_data["SLCLY"]), "%"],
+            "Sand": [float(soil_data["SLSND"]), "%"],
+            "Silt": [float(soil_data["SLSIL"]), "%"],
         }
     soil_profiles = defaultdict(list)
     for soil_id, layers_dict in soil_profiles_dict.items():
@@ -151,6 +152,7 @@ def run_producer(server=None, port=None):
         awc = float(t_data["AWC"])
         env_template["params"]["userSoilTemperatureParameters"]["PlantAvailableWaterContentConst"] = awc
 
+        #env_template["params"]["userEnvironmentParameters"]["Albedo"] = float(soil_metadata_csv[soil_id]["SALB"])
         env_template["params"]["simulationParameters"]["customData"] = {
             "LAI": float(t_data["LAID"]),
             "AWC": awc,
@@ -166,8 +168,10 @@ def run_producer(server=None, port=None):
             "TAV": float(weather_metadata_csv[wst_id]["TAV"]),
         }
 
-        #if wst_id != "USGA" or soil_id != "SALO" or int(t_data['LAID']) != 2 or float(t_data['AWC']) != 0:
-        #    continue
+        #if wst_id != "CAQC" or soil_id != "SALO" or int(t_data['LAID']) != 0 or int(float(t_data['AWC'])*100) != 0:
+        #if wst_id != "FRLU" or soil_id != "SILO" or int(t_data['LAID']) != 7 or int(float(t_data['AWC'])*100) != 75:
+        #if wst_id != "USMA" or soil_id != "SILO" or int(t_data['LAID']) != 7 or int(float(t_data['AWC'])*100) != 0:
+        #   continue
 
         env_template["customId"] = {
             "env_id": sent_env_count + 1,
@@ -180,6 +184,8 @@ def run_producer(server=None, port=None):
             "profileLTs": list(map(lambda layer: layer["Thickness"][0], soil_profile))
         }
 
+        #with open(f"debug_out/env_{sent_env_count + 1}_{wst_id}_{soil_id}.json", "w") as _:
+        #    json.dump(env_template, _, indent=2)
         socket.send_json(env_template)
         sent_env_count += 1
 

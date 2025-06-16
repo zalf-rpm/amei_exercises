@@ -1,9 +1,10 @@
 #!/bin/bash
 
 PATH_TO_MONICA_BIN_DIR=/home/berg/GitHub/monica/_cmake_debug
-PATH_TO_PYTHON=/home/berg/miniconda3/bin/python
+#PATH_TO_PYTHON=/home/berg/miniconda3/bin/python
+PATH_TO_PYTHON=poetry run python
 
-MONICA_PARAMETERS=$(pwd)/data/monica-parameters
+MONICA_PARAMETERS=/home/berg/GitHub/monica-parameters
 export MONICA_PARAMETERS
 echo "$MONICA_PARAMETERS"
 
@@ -23,11 +24,18 @@ done
 echo "monica_pids -> ${monica_pids[*]}"
 
 echo "run producer"
-$PATH_TO_PYTHON run-producer.py &
+#$PATH_TO_PYTHON run-producer.py &
+poetry run python run-producer.py &
 echo "run consumer"
-$PATH_TO_PYTHON run-consumer.py
+#$PATH_TO_PYTHON run-consumer.py
+poetry run python run-consumer.py &
+poetry run python run-consumer.py &
+poetry run python run-consumer.py &
+poetry run python run-consumer.py &
+poetry run python run-consumer.py
 echo "consumer finished -> kill all servers and proxies"
 
+SLEEP 120
 kill "$in_proxy_pid"
 echo "killed in_proxy_pid -> $in_proxy_pid"
 kill "$out_proxy_pid"
