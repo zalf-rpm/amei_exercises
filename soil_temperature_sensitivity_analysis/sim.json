@@ -16,7 +16,7 @@
 			"EOAD": "x1",
 			"ES": "x2",
 			"ESP": "x3",
-			"DAYLD": "x4",
+			"DAYLD": "daylength",
 			"G": "x5",
 			"SNOW": "x6"
 		}

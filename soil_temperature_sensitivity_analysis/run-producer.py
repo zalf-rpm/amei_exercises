@@ -24,10 +24,7 @@ from pathlib import Path
 import sys
 import time
 import zmq
-
-import monica_run_lib
-
-from zalfmas_common import common
+from zalfmas_common import common, csv
 from zalfmas_common.model import monica_io
 import zalfmas_capnp_schemas
 sys.path.append(os.path.dirname(zalfmas_capnp_schemas.__file__))
@@ -82,20 +79,20 @@ def run_producer(server=None, port=None):
     # connect to monica proxy (if local, it will try to connect to a locally started monica)
     socket.connect("tcp://" + config["server"] + ":" + str(config["server-port"]))
 
-    soil_data_csv = monica_run_lib.read_csv("input_data/SoilData.csv",
+    soil_data_csv = csv.read_csv("input_data/SoilData.csv",
                                             key=("SOIL_ID", "SLID"), key_type=(str, int),
                                             header_row_line=3, data_row_start=4)
 
-    soil_metadata_csv = monica_run_lib.read_csv("input_data/SoilMetadata.csv",
+    soil_metadata_csv = csv.read_csv("input_data/SoilMetadata.csv",
                                             key="SOIL_ID", key_type=(str,),
                                             header_row_line=3, data_row_start=4)
 
 
-    treatment_csv = monica_run_lib.read_csv("input_data/Treatment.csv",
+    treatment_csv = csv.read_csv("input_data/Treatment.csv",
                                             key="SM", key_type=(str,),
                                             header_row_line=3, data_row_start=4)
 
-    weather_metadata_csv = monica_run_lib.read_csv("input_data/WeatherMetadata.csv",
+    weather_metadata_csv = csv.read_csv("input_data/WeatherMetadata.csv",
                                                    key="WST_ID", key_type=(str,),
                                                    header_row_line=3, data_row_start=4)
 
