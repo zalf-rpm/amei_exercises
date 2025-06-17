@@ -3,21 +3,7 @@
 	"site.json": "site.json",
 	"climate.csv": "",
 
-	"climate.csv-options": {
-        "no-of-climate-file-header-lines": 1,
-		"lineNoOfHeaderLine": 3,
-        "csv-separator": ",",
-        "header-to-acd-names": {
-			"W_DATE": "iso-date",
-			"TAVD": "tavg",
-			"TMIN": "tmin",
-			"TMAX": "tmax",
-			"RAIN": "precip",
-			"SRAD": "globrad",
-			"VPRSD": "vaporpress",
-			"WIND": ["wind", "/", 24]
-		}
-    },
+	"climate.csv-options": {},
 	
 	"debug?": false,
 	"path-to-output": "./",

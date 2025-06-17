@@ -26,9 +26,6 @@ from pathlib import Path
 import sys
 import time
 import zmq
-
-import monica_run_lib
-
 from zalfmas_common import common
 from zalfmas_common.model import monica_io
 import zalfmas_capnp_schemas
@@ -70,7 +67,7 @@ def run_producer(server=None, port=None):
     socket = context.socket(zmq.PUSH)  # pylint: disable=no-member
 
     config = {
-        "mode": "mbm-local-local",
+        "mode": "mbm-win-local-local",
         "server-port": port if port else "6666",
         "server": server if server else "localhost",  # "login01.cluster.zalf.de",
         "sim.json": "sim.json",
@@ -341,6 +338,8 @@ def run_producer(server=None, port=None):
                     "startDate": t["weather_data"]["start_date"],
                     "endDate": t["weather_data"]["end_date"],
                     "data": t["weather_data"]["data"],
+                    "tamp": t["weather_station"]["TAMP"],
+                    "tav": t["weather_station"]["TAV"],
                 }
 
                 for st_model, model_code in [
@@ -353,7 +352,7 @@ def run_producer(server=None, port=None):
                     ("SQ_Soil_Temperature", "SQ"),
                     ("BiomaSurfacePartonSoilSWATC", "PS"),
                     ("BiomaSurfaceSWATSoilSWATC", "SW"),
-                    ("ApsimCampbell", "AP")
+                    ("ApsimCampbell", "AP"),
                 ]:
                     env_template["params"]["simulationParameters"]["SoilTempModel"] = st_model
 
