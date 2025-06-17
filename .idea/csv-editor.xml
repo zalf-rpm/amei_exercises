@@ -31,6 +31,20 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\input_data\SoilMetadata.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="&#9;" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\input_data\WeatherMetadata.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="&#9;" />
+            </Attribute>
+          </value>
+        </entry>
       </map>
     </option>
   </component>
