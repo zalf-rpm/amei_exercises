@@ -1,0 +1,89 @@
+{
+	"crop.json": "crop.json",
+	"site.json": "site.json",
+	"climate.csv": "",
+
+	"climate.csv-options": {
+        "no-of-climate-file-header-lines": 1,
+		"lineNoOfHeaderLine": 3,
+        "csv-separator": ",",
+        "header-to-acd-names": {
+			"W_DATE": "iso-date",
+			"TAVD": "tavg",
+			"TMIN": "tmin",
+			"TMAX": "tmax",
+			"RAIN": "precip",
+			"SRAD": "globrad",
+			"VPRSD": "vaporpress",
+			"WIND": ["wind", "/", 24]
+		}
+    },
+	
+	"debug?": false,
+	"path-to-output": "./",
+	"include-file-base-path": "${MONICA_PARAMETERS}",
+
+	"output": { 
+	  	"write-file?": false,
+		"file-name": "out.csv",
+	
+		"csv-options": {
+			"include-header-row": true,
+			"include-units-row": false,
+			"csv-separator": ","
+		},
+
+		"obj-outputs?": true,
+
+		"events": [
+			"daily", [
+				"Date",
+				["Pot_ET|EPAD", {"round": 2}],
+				["Act_Ev|ESAD", {"round": 2}],
+				["Pot_ET|EOAD", {"round": 2}],
+				["Act_ET|ETAD", {"round": 2}],
+				["0|GHFD", {"round": 3}],
+				["0|LHFD", {"round": 3}],
+				["net_radiation|RHFD", {"round": 3}],
+				["STemp|TSAV", [1, 24], {"round": 2}],
+				["Mois|SWLD", [1, 24], {"round": 4}]
+			]
+		],
+
+		"note events": [
+			"daily", [
+				"Date",
+				"daily_potential_soil_evaporation_mm_d-1|EPAD",
+				"daily_actual_soil_evaporation_mm_d-1|ESAD",
+				"daily_potential_evapotranspiration_mm_d-1|EOAD",
+				"daily_actual_evapotranspiration_mm_d-1|ETAD",
+				"soil_heat_flux_W_m-2|GHFD",
+				"latent_heat_flux_W_m-2|LHFD",
+				"net_radiation_W_m-2|RHFD",
+				["STemp|TSAV", [1, 24]],
+				["Mois|SWLD", [1, 24]]
+			]
+		]
+	},
+
+	"UseSecondaryYields": false,
+	"NitrogenResponseOn": true,
+	"WaterDeficitResponseOn": true,
+	"EmergenceMoistureControlOn": false,
+	"EmergenceFloodingControlOn": false,
+
+	"UseAutomaticIrrigation": false,
+	"AutoIrrigationParams": {
+		"irrigationParameters": {
+			"nitrateConcentration": [0, "mg dm-3"],
+			"sulfateConcentration": [0, "mg dm-3"]
+		},
+		"amount": [0, "mm"],
+		"threshold": 0.9
+	},
+
+	"UseNMinMineralFertilisingMethod": true,
+	"NMinUserParams": { "min": 40, "max": 120, "delayInDays": 10 },
+	"NMinFertiliserPartition": ["include-from-file", "mineral-fertilisers/AN.json"],
+	"JulianDayAutomaticFertilising": 89
+}
