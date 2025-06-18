@@ -15,8 +15,8 @@
 # Landscape Systems Analysis at the ZALF.
 # Copyright (C: Leibniz Centre for Agricultural Landscape Research (ZALF)
 
-import capnp
 from collections import defaultdict
+import copy
 from datetime import date, timedelta, datetime
 import json
 import numpy as np
@@ -26,39 +26,24 @@ from pathlib import Path
 import sys
 import time
 import zmq
-
-import monica_run_lib
-
 from zalfmas_common import common
 from zalfmas_common.model import monica_io
-import zalfmas_capnp_schemas
-
-sys.path.append(os.path.dirname(zalfmas_capnp_schemas.__file__))
-import fbp_capnp
 
 PATHS = {
     # adjust the local path to your environment
     "mbm-local-local": {
-        "monica-path-to-climate-dir": "/home/berg/GitHub/amei_monica_soil_temperature_sensitivity_analysis/input_data/WeatherData/",
-        # mounted path to archive accessable by monica executable
         "path-to-data-dir": "./data/",  # mounted path to archive or hard drive with data
         "path-debug-write-folder": "./debug-out/",
     },
     "mbm-win-local-local": {
-        "monica-path-to-climate-dir": "C:/Users/berg/GitHub/amei_monica_soil_temperature_sensitivity_analysis/input_data/WeatherData/",
-        # mounted path to archive accessable by monica executable
         "path-to-data-dir": "./data/",  # mounted path to archive or hard drive with data
         "path-debug-write-folder": "./debug-out/",
     },
     "mbm-local-remote": {
-        "monica-path-to-climate-dir": "/monica_data/climate-data/",
-        # mounted path to archive accessable by monica executable
         "path-to-data-dir": "./data/",  # mounted path to archive or hard drive with data
         "path-debug-write-folder": "./debug-out/",
     },
     "hpc-local-remote": {
-        "monica-path-to-climate-dir": "/monica_data/climate-data/",
-        # mounted path to archive accessable by monica executable
         "path-to-data-dir": "./data/",  # mounted path to archive or hard drive with data
         "path-debug-write-folder": "./debug-out/",
     },
@@ -89,7 +74,7 @@ def run_producer(server=None, port=None):
         return default if np.isnan(value) else value
 
     # read data from excel
-    dfs = pandas.read_excel("MARICOPA Wheat FACE data_2023-11-28 (ICASA data format v4.0).xlsx",
+    dfs = pandas.read_excel("MARICOPA Wheat FACE data_2024-10-25 (ICASA data format v4.1)(PM6)(BAK1)(no soil temp).xlsx",
                             sheet_name=[
                                 "Experiment_description",
                                 "Fields",
@@ -99,13 +84,14 @@ def run_producer(server=None, port=None):
                                 "initial_condition_layers",
                                 "Planting_events",
                                 "Harvest_events",
+                                "Irrigation_events",
+                                "Fertilizer_events",
                                 "Soil_metadata",
                                 "Soil_profile_layers",
                                 "Weather_stations",
                                 "Weather_daily",
                             ],
-                            header=2,
-                            )
+                            header=2)
 
     # load weather data
     wstations_df = dfs["Weather_stations"]
@@ -161,7 +147,7 @@ def run_producer(server=None, port=None):
         #soils[sid]["SLTOP"] = int(soil_meta_dfs["SLTOP"][i]) # cm
         soils[sid]["SADR"] = float(soil_meta_dfs["SADR"][i]) # 1/day
         soils[sid]["SAWC"] = int(soil_meta_dfs["SAWC"][i])  # cm
-        soils[sid]["SALB"] = int(soil_meta_dfs["SALB"][i])  # cm
+        soils[sid]["SALB"] = float(soil_meta_dfs["SALB"][i])  # cm
 
     soil_profiles_dfs = dfs["Soil_profile_layers"]
 
@@ -231,6 +217,8 @@ def run_producer(server=None, port=None):
             "harvest_events": {},
             "tillage_events": {},
             "mulch_events": {},
+            "irrigation_events": {},
+            "fertilizer_events": {},
         }
 
     # load plots of treatments
@@ -295,6 +283,32 @@ def run_producer(server=None, port=None):
             "HADAT": str(harvest_df["HADAT"][i])[:10],
         }
 
+    irrigation_df = dfs["Irrigation_events"]
+    for i in irrigation_df.axes[0]:
+        eid = str(irrigation_df["EID"][i])
+        tid = str(irrigation_df["TREAT_ID"][i])
+        experiments[eid]["treatments"][tid]["irrigation_events"] = {
+            "IDATE": str(irrigation_df["IDATE"][i])[:10],
+            "IROP": str(irrigation_df["IROP"][i]),
+            "IRADP": int(irrigation_df["IRADP"][i]), #cm
+            "IRVAL": float(irrigation_df["IRVAL"][i]),
+            "IRNPC": float(irrigation_df["IRNPC"][i]),
+        }
+
+    fertilizer_df = dfs["Fertilizer_events"]
+    for i in fertilizer_df.axes[0]:
+        eid = str(fertilizer_df["EID"][i])
+        tid = str(fertilizer_df["TREAT_ID"][i])
+        experiments[eid]["treatments"][tid]["fertilizer_events"] = {
+            "FEDATE": str(fertilizer_df["FEDATE"][i])[:10],
+            "FEACD": str(fertilizer_df["FEACD"][i]),
+            "FEDEP": int(fertilizer_df["FEDEP"][i]),  # cm
+            "FECD": str(fertilizer_df["FECD"][i]),
+            "FEAMN": float(default_if_nan(fertilizer_df["FEAMN"][i])),
+            "FENO3": float(default_if_nan(fertilizer_df["FENO3"][i])),
+            "FENH4": float(default_if_nan(fertilizer_df["FENH4"][i])),
+        }
+
     residues_df = dfs["Residue"]
     for i in residues_df.axes[0]:
         eid = str(residues_df["EID"][i])
@@ -346,13 +360,53 @@ def run_producer(server=None, port=None):
 
                 env_template["params"]["siteParameters"]["SoilProfileParameters"] = list(map(lambda k_v: k_v[1], p["soil"]["layers"].items()))
                 env_template["params"]["siteParameters"]["Latitude"] = float(t["field"]["FL_LAT"])
+                env_template["params"]["siteParameters"]["HeightNN"] = float(t["field"]["FLELE"])
+                env_template["params"]["siteParameters"]["Slope"] = float(t["field"]["FLSL"])
                 env_template["params"]["userEnvironmentParameters"]["Albedo"] = float(p["soil"]["SALB"])
+                env_template["params"]["userEnvironmentParameters"]["AtmosphericCO2"] = float(t["weather_station"]["CO2Y"])
+
+                env_template["cropRotation"][0]["worksteps"][0]["date"] = t["planting_events"]["PDATE"]
+                env_template["cropRotation"][0]["worksteps"][1]["date"] = t["harvest_events"]["HADAT"]
 
                 env_template["climateData"] = {
-                    "startDate": t["weather_data"]["start_date"],
-                    "endDate": t["weather_data"]["end_date"],
+                    "startDate": t["SDAT"], #t["weather_data"]["start_date"],
+                    "endDate": f"{t['harvest_events']['HADAT'][:4]}-12-31", #t["weather_data"]["end_date"],
                     "data": t["weather_data"]["data"],
+                    "tamp": float(t["weather_station"]["TAMP"]),
+                    "tav": float(t["weather_station"]["TAV"]),
                 }
+
+                irr_fert_evs = defaultdict(list)
+                for e in t["irrigation_events"]:
+                    irr_fert_evs[e["IDATE"]].append(e)
+                for e in t["fertilizer_events"]:
+                    irr_fert_evs[e["FEDATE"]].append(e)
+                irr_fert_dates = list(irr_fert_evs.keys())
+                irr_fert_dates.sort()
+
+                for if_date in irr_fert_dates:
+                    kg_N_nitrate_in_irr_water = None
+                    for ev in irr_fert_evs[if_date]:
+                        if "FEDATE" in ev:
+                            if ev["FEACD"] == "Applied in irrigation water":
+                                kg_N_nitrate_in_irr_water = ev["FEAMN"]
+                                continue
+                            mf = copy.deepcopy(crop_json["ws"]["MineralFertilization"])
+                            mf["date"] = ev["FEDATE"]
+                            mf["amount"] = ev["FEAMN"]
+                            mf["partition"] = {
+                                "Carbamid": 100.0,
+                                "NH4": 0.0,
+                                "NO3": 0.0,
+                                "name": ev["FECD"],
+                            }
+                            env_template["cropRotation"][0]["worksteps"].insert(-2, mf)
+                        elif "IDATE" in ev:
+                            irr = copy.deepcopy(crop_json["ws"]["Irrigation"])
+                            if kg_N_nitrate_in_irr_water:
+                                irr["parameters"]["nitrateConcentration"] =
+
+
 
                 for st_model, model_code in [
                     ("internal", "iMO"),
@@ -372,6 +426,7 @@ def run_producer(server=None, port=None):
                         "env_id": sent_env_count + 1,
                         "st_model": st_model,
                         "model_code": model_code,
+                        "treatment_id": t_id,
                         "year": t["weather_data"]["start_date"][:4],
                         "wst_dataset": t["WST_DATASET"],
                         "soil_profile_id": p["SOIL_ID"],

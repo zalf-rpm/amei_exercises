@@ -31,26 +31,18 @@ from zalfmas_common.model import monica_io
 PATHS = {
     # adjust the local path to your environment
     "mbm-local-local": {
-        "monica-path-to-climate-dir": "/home/berg/GitHub/amei_monica_soil_temperature_sensitivity_analysis/input_data/WeatherData/",
-        # mounted path to archive accessable by monica executable
         "path-to-data-dir": "./data/",  # mounted path to archive or hard drive with data
         "path-debug-write-folder": "./debug-out/",
     },
     "mbm-win-local-local": {
-        "monica-path-to-climate-dir": "C:/Users/berg/GitHub/amei_monica_soil_temperature_sensitivity_analysis/input_data/WeatherData/",
-        # mounted path to archive accessable by monica executable
         "path-to-data-dir": "./data/",  # mounted path to archive or hard drive with data
         "path-debug-write-folder": "./debug-out/",
     },
     "mbm-local-remote": {
-        "monica-path-to-climate-dir": "/monica_data/climate-data/",
-        # mounted path to archive accessable by monica executable
         "path-to-data-dir": "./data/",  # mounted path to archive or hard drive with data
         "path-debug-write-folder": "./debug-out/",
     },
     "hpc-local-remote": {
-        "monica-path-to-climate-dir": "/monica_data/climate-data/",
-        # mounted path to archive accessable by monica executable
         "path-to-data-dir": "./data/",  # mounted path to archive or hard drive with data
         "path-debug-write-folder": "./debug-out/",
     },
@@ -143,7 +135,7 @@ def run_producer(server=None, port=None):
         soils[sid]["SLTOP"] = int(soil_meta_dfs["SLTOP"][i]) # cm
         soils[sid]["SADR"] = float(soil_meta_dfs["SADR"][i]) # 1/day
         soils[sid]["SAWC"] = int(soil_meta_dfs["SAWC"][i])  # cm
-        soils[sid]["SALB"] = int(soil_meta_dfs["SALB"][i])  # cm
+        soils[sid]["SALB"] = float(soil_meta_dfs["SALB"][i])  # []
 
     soil_profiles_dfs = dfs["Soil_profile_layers"]
     for i in soil_profiles_dfs.axes[0]:

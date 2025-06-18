@@ -15,24 +15,17 @@
 # Landscape Systems Analysis at the ZALF.
 # Copyright (C: Leibniz Centre for Agricultural Landscape Research (ZALF)
 
-import capnp
 from collections import defaultdict
 from datetime import datetime
+from io import StringIO
 import json
 import os
 import sys
+
 import zmq
-
 from zalfmas_common import common
-import zalfmas_capnp_schemas
-
-sys.path.append(os.path.dirname(zalfmas_capnp_schemas.__file__))
-import fbp_capnp
-
 
 def run_consumer(server=None, port=None):
-    """collect data from workers"""
-
     config = {
         "mode": "remoteConsumer-remoteMonica",
         "port": port if port else "7777",
@@ -74,50 +67,154 @@ def run_consumer(server=None, port=None):
                 #st_model = custom_id["st_model"]
                 model_code = custom_id["model_code"]
                 year_str = custom_id["year"]
+                t_id = custom_id["treatment_id"]
                 #wst_dataset = custom_id["wst_dataset"]
                 #soil_profile_id = custom_id["soil_profile_id"]
 
-                for data in msg.get("data", []):
-                    with open(f"{path_to_out}/{model_code}MOLayersAimes{year_str}.txt", "w") as _:
-                        _.write(f"""\
-AMEI Aimes fallow								
-Model: MONICA version 3.6.36 - {datetime.now().isoformat()}							
-Modeler_name: Michael Berg-Mohnicke								
-			soil_layer_top_depth	soil_layer_base_depth	soil_temp_daily_avg	maximum_soil_temp_daily	minimum_soil_temp_daily	soil_water_by_layer
-Framework	Model	Date	cm	cm	°C	°C	°C	cm3/cm3
-(2letters)	(2letters)	(YYYY-MM-DD)	SLLT	SLLB	TSAV	TSMX	TSMN	SWLD
+                with open(f"{path_to_out}/{model_code}MOLayersMaricopa{t_id}.txt", "w") as _:
+                    _.write(f"""\
+Maricopa Wheat FACE										
+Model: MONICA version 3.6.38 - {datetime.now().isoformat()}
+Modeler_name: Michael Berg-Mohnicke
+                                    
+framework_ID	model_ID	treatment_ID	date	soil_layer_top_depth	soil_layer_base_depth	soil_temp_daily_avg	maximum_soil_temp_daily	minimum_soil_temp_daily	soil_water_by_layer	soil_N_by_layer
+text	text	text	(YYYY-MM-DD)	cm	cm  °C	°C	°C	cm3/cm3	kg[N]/ha
+FRAMEWORK_ID	MODEL_ID	TREAT_ID	DATE	SLLT	SLLB	TSAV	TSMX	TSMN	SWLD	SNLD
 """)
-                        results = data.get("results", [])
-                        for vals in results:
-                            # only store results up to 31st of October
-                            if vals["Date"][5:] == "11-01":
-                                break
-                            for layer_index in [0, 1, 2, 3, 4, 9, 10, 18, 20]:
-                                tsav_i = vals["TSAV"][layer_index]
-                                tsmn = "na"
-                                tsmx = "na"
-                                _.write(f"MO\t{model_code}\t{vals['Date']}\t{layer_index*5}\t{(layer_index+1)*5}\t"
-                                        f"{tsav_i}\t{tsmx}\t{tsmn}\t{vals['SWLD'][layer_index]}\n")
+                    results = msg["data"][0].get("results", [])
+                    for vals in results:
+                        for layer_index in range(42):
+                            out = StringIO()
+                            out.write(f"MO\t")
+                            out.write(f"{model_code}\t")
+                            out.write(f"{t_id}\t")
+                            out.write(f"{vals['Date']}\t")
+                            out.write(f"{layer_index * 5}\t") #SLLT
+                            out.write(f"{(layer_index + 1) * 5}\t") #SLLB
+                            out.write(f"{vals['TSAV'][layer_index]}\t")
+                            out.write("na\t") #TSMX
+                            out.write("na\t") #TSMN
+                            out.write(f"{vals['SWLD'][layer_index]}\t")
+                            out.write(f"{vals['SNLD'][layer_index]}")
+                            out.write("\n")
+                            _.write(out.getvalue())
 
-                    with open(f"{path_to_out}/{model_code}MOAimes{year_str}.txt", "w") as _:
-                        _.write(f"""\
-AMEI Aimes fallow									
-Model: MONICA version 3.6.36 - {datetime.now().isoformat()} 									
-Modeler_name: Michael Berg-Mohnicke									
-			potential_evaporation	soil_evaporation_daily	potential_evapotrans	evapotranspiration_daily	ground_heat_daily	latent_heat_daily	net_radiation_daily
-Framework	Model	Date	mm/d	mm/d	mm/d	mm/d	w/m2	w/m2	w/m2
-(2letters)	(2letters)	(YYYY-MM-DD)	EPAD	ESAD	EOAD	ETAD	GHFD	LHFD	RHFD
+                with open(f"{path_to_out}/{model_code}MODailyMaricopa{t_id}.txt", "w") as _:
+                    _.write(f"""\
+Maricopa Wheat FACE																																							
+Model: MONICA version 3.6.38 - {datetime.now().isoformat()}
+Modeler_name: Michael Berg-Mohnicke
+                                                                                                                                                        
+framework_ID	model_ID	treatment_ID	date	leaf_number_as_haun_stg	growth_stage_Zadoks	leaf_area_index	PAR_interception_daily	tops_dry_weight	grain_dry_weight	grain_unit_dry_weight	tops_N	grain_N	grain_unit_N	root_depth	soil_water_whole_profile	drainage_daily	runoff_surface	N_inorganic_day	N_leached_day	N_mineralization_day	N2O_emissions_day	N_immobilization_day	N_denitrification_day	ground_heat_daily	latent_heat_daily	sensible_heat_daily	net_radiation_daily	soil_temp_surface_daily_avg	soil_temp_surface_daily_max	soil_temp_surface_daily_min	canopy_temp_daily_avg	canopy_temp_daily_max	canopy_temp_daily_min	potential_evapotrans	evapotranspiration_daily	portential_soil_evaporation_daily	soil_evaporation_daily	potential_transpiration_daily	transpiration_daily
+text	text	text	(YYYY-MM-DD)	leaf\mainstem	number	m�/m�	%	kg[DM]/ha	kg[DM]/ha	mg[DM]/grain	kg[N]/ha	kg[N]/ha	mg[N]/grain	m	cm3/cm3	mm/d	mm/d	kg[N]/ha/d	kg[N]/ha/d	kg[N]/ha/d	kg[N]/ha/d	kg[N]/ha/d	kg[N]/ha/d	w/m2	w/m2	w/m2	w/m2	�C	�C	�C	�C	�C	�C	mm/d	mm/d	mm/d	mm/d	mm/d	mm/d
+FRAMEWORK_ID	MODEL_ID	TREAT_ID	DATE	LNUM	GSTZD	LAID	LIPCD	CWAD	GWAD	GWGD	CNAD	GNAD	GNGD	RDPD	SWWPD	DRND	ROFD	NIAD	NLCD	NMND	N2OED	NIMD	NDND	GHFD	LHFD	HHFD	RND	TSSAV	TSSMX	TSSMN	TGAV	TGMX	TGMN	EOAD	ETAD	EPSAD	ESAD	EPPAD	EPAD
 """)
-                        results = data.get("results", [])
-                        for vals in results:
-                            # only store results up to 31st of October
-                            if vals["Date"][5:] == "11-01":
-                                break
-                            ghfd = "na"
-                            lhfd = "na"
-                            rhfd = vals['RHFD'] * (1000000.0 / 86400.0)
-                            _.write(f"MO\t{model_code}\t{vals['Date']}\t{vals['EPAD']}\t{vals['ESAD']}\t"
-                                    f"{vals['EOAD']}\t{vals['ETAD']}\t{ghfd}\t{lhfd}\t{rhfd}\n")
+                    results = msg["data"][0].get("results", [])
+                    for vals in results:
+                        out = StringIO()
+                        out.write("MO\t")
+                        out.write(f"{model_code}\t")
+                        out.write(f"{t_id}\t")
+                        out.write("na\t") # LNUM = "na"
+                        if vals["Stage"] == 1: out.write("0\t") #GSTZD
+                        elif vals["Stage"] == 2: out.write("9\t") #GSTZD
+                        elif vals["Stage"] == 3: out.write("na\t") #GSTZD
+                        elif vals["Stage"] == 4: out.write("51\t") #GSTZD
+                        elif vals["Stage"] == 5: out.write("65\t") #GSTZD
+                        elif vals["Stage"] == 6: out.write("89\t") #GSTZD
+                        out.write("na\t") #LIPCD
+                        out.write("na\t") #GWGD
+                        out.write(f'{vals["CNAD"]}\n')
+                        out.write(f'{vals["GNAD"]}\n')
+                        out.write("na\t") #GNGD
+                        out.write(f'{vals["RDPD"]}\n')
+                        out.write(f'{vals["SWWPD"]}\n')
+                        out.write(f'{vals["DRND"]}\n')
+                        out.write(f'{vals["ROFD"]}\n')
+                        out.write("na\t") #NIAD
+                        out.write(f'{vals["NLCD"]}\n')
+                        out.write(f'{vals["NMND"]}\n')
+                        out.write(f'{vals["N2OED"]}\n')
+                        out.write("na\t") #NIMD
+                        out.write(f'{vals["NDND"]}\n')
+                        out.write("na\t") #GHFD
+                        out.write("na\t") #LHFD
+                        out.write("na\t") #HHFD
+                        out.write(f'{vals["RND"]}\n')
+                        out.write(f'{vals["TSSAV"]}\n')
+                        out.write("na\t") #TSSMX
+                        out.write("na\t") #TSSMN
+                        out.write("na\t") #TGAV
+                        out.write("na\t") #TGMX
+                        out.write("na\t") #TGMN
+                        out.write(f'{vals["EOAD"]}\n')
+                        out.write(f'{vals["ETAD"]}\n')
+                        out.write("na\t") #EPSAD
+                        out.write(f'{vals["ESAD"]}\n')
+                        out.write("na\t") #EPPAD
+                        out.write(f'{vals["EPAD"]}\n')
+                        out.write("\n")
+                        _.write(out.getvalue())
+
+                with open(f"{path_to_out}/{model_code}MOSummaryMaricopa{t_id}.txt", "w") as _:
+                    _.write(f"""\
+Maricopa Wheat FACE																																		
+Model: MONICA version 3.6.38 - {datetime.now().isoformat()}
+Modeler_name: Michael Berg-Mohnicke
+                                                                                                                                    
+framework_ID	model_ID	treatment_ID	planting_date	emergence_date	anthesis_date	physiologic_maturity_dat	leaf_no_per_stem_matur	leaf_area_index_maximum	PAR_interception_over_season	tops_dry_weight_anthesis	tops_dry_weight_maturity	grain_dry_wt_at_mat	harvest_no_at_maturity	grain_unit_dry_wt_matur	tops_N_at_anthesis	tops_N_at_maturity	grain_N_at_maturity	grain_unit_N_matur	root_depth_maximum	avail_water_soil_profile_sow_mat	drainage_over_season	runoff_over_season	avail_N_inorganic_soil_profile_over_season	N_leached_during_season	N_mineralization_during_season	N2O_emissions__over_season	N_immobilization_cumul	N_denitrification_over_season	potential_evapotrans_over_season	evapotrans_over_season	potential_soil_evaporation_over_season	soil_evap_over_season	potential_transpiration_over_season	transpiration_over_season
+text	text	text	date	date	date	date	leaf\mainstem	m�/m�	%	kg[DM]/ha	kg[DM]/ha	kg[DM]/ha	number/m2	mg[DM]/grain	kg[N]/ha	kg[N]/ha	kg[N]/ha	mg[N]/grain	m	mm	mm	mm	kg[N]/ha	kg[N]/ha	kg[N]/ha	kg[N]/ha	kg[N]/ha	kg[N]/ha	mm	mm	mm	mm	mm	mm
+FRAMEWORK_ID	MODEL_ID	TREAT_ID	PDATE	PLDAE	ADAT	MDAT	LnoSM	LAIX	LIPCCM	CWAA	CWAM	GWAM	HnoAM	GWGM	CNAA	CNAM	GNAM	GNGM	RDPM	WAVSSM	DRCM	ROCM	NIAVSSM	NLCM	NMNCM	N2OECM	NIMCM	NDNCM	EOCM	ETCM	EPSCM	ESCM	EPPCM	EPCM
+""")
+                    results_summary: dict = msg["data"][1].get("results", [])
+                    results_sowing = msg["data"][2].get("results", [])
+                    results_emergence = msg["data"][3].get("results", [])
+                    results_anthesis = msg["data"][4].get("results", [])
+                    results_maturity = msg["data"][5].get("results", [])
+                    for i, vals in enumerate(results_summary):
+                        vals_s = results_sowing[i]
+                        vals_e = results_emergence[i]
+                        vals_a = results_anthesis[i]
+                        vals_m = results_maturity[i]
+
+                        out = StringIO()
+                        out.write(f"MO\t")
+                        out.write(f"{model_code}\t")
+                        out.write(f"{t_id}\t")
+                        out.write(f"{vals_s['PDATE']}\t")
+                        out.write(f"{vals_e['PLDAE']}\t")
+                        out.write(f"{vals_a['ADAT']}\t")
+                        out.write(f"{vals_m['MDAT']}\t")
+                        out.write(f"na\t") #LnoSM
+                        out.write(f"{vals['LAIX']}\t")
+                        out.write(f"na\t") #LIPCCM
+                        out.write(f"{vals_a['CWAA']}\t")
+                        out.write(f"{vals_m['CWAM']}\t")
+                        out.write(f"{vals_m['GWAM']}\t")
+                        out.write(f"{vals_m['HnoAM']}\t")
+                        out.write(f"na\t") #GWGM
+                        out.write(f"{vals_a['CNAA']}\t")
+                        out.write(f"{vals_m['CNAM']}\t")
+                        out.write(f"{vals_m['GNAM']}\t")
+                        out.write(f"na\t") #GNGM
+                        out.write(f"{vals['RDPM']}\t")
+                        out.write(f"{vals['WAVSSM']}\t")
+                        out.write(f"{vals['DRCM']}\t")
+                        out.write(f"{vals['ROCM']}\t")
+                        out.write(f"na\t") #NIAVSSM
+                        out.write(f"{vals['NLCM']}\t")
+                        out.write(f"{vals['NMNCM']}\t")
+                        out.write(f"{vals['N2OECM']}\t")
+                        out.write(f"na\t") #NIMCM
+                        out.write(f"{vals['NDNCM']}\t")
+                        out.write(f"{vals['EOCM']}\t")
+                        out.write(f"{vals['ETCM']}\t")
+                        out.write(f"na\t") #EPSCM
+                        out.write(f"{vals['ESCM']}\t")
+                        out.write(f"na\t") #EPPCM
+                        out.write(f"{vals['EPCM']}")
+                        out.write("\n")
+                        _.write(out.getvalue())
 
             if no_of_envs_expected == envs_received:
                 print("last expected env received")

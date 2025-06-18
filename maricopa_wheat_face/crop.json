@@ -1,6 +1,44 @@
 {
-  "cropRotation": [
+  "crops": {
+    "WW": {
+      "is-winter-crop": true,
+      "cropParams": {
+        "species": ["include-from-file", "crops/species_wheat.json"],
+        "cultivar": ["include-from-file", "crops/cultivar_winter-wheat.json"]
+      },
+      "residueParams": ["include-from-file", "crops/residue_wheat.json"]
+    }
+  },
 
-  ],
+  "ws": {
+    "MineralFertilization": {
+      "type": "NFertilization",
+      "date": "",
+      "amount": [0.0, "kg"],
+      "partition": {}
+    },
+    "Irrigation":{
+      "date": "",
+      "type": "Irrigation",
+      "amount": [0, "mm"],
+      "parameters": {
+        "nitrateConcentration": [0.0, "mg dm-3"],
+        "sulfateConcentration": [0.0, "mg dm-3"]
+      }
+    }
+  },
+
+  "cropRotation": [
+    {
+      "worksteps": [
+        {
+          "date": "", "type": "Sowing", "crop": ["ref", "crops", "WW"]
+        },
+        {
+          "type": "Harvest",
+          "date": ""
+        }
+      ]
+  }],
   "CropParameters": ["include-from-file", "general/crop.json"]
 }
