@@ -15,7 +15,6 @@
 # Landscape Systems Analysis at the ZALF.
 # Copyright (C: Leibniz Centre for Agricultural Landscape Research (ZALF)
 
-import capnp
 from collections import defaultdict
 from datetime import datetime
 import json
@@ -23,10 +22,6 @@ import os
 import sys
 import zmq
 from zalfmas_common import common
-import zalfmas_capnp_schemas
-sys.path.append(os.path.dirname(zalfmas_capnp_schemas.__file__))
-import fbp_capnp
-
 
 def run_consumer(server=None, port=None):
     """collect data from workers"""

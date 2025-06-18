@@ -24,7 +24,7 @@
 		"events": [
 			"daily", [
 				"Date",
-				["Pot_ET|EPAD", {"round": 2}],
+				["0|EPAD", {"round": 2}],
 				["Act_Ev|ESAD", {"round": 2}],
 				["Pot_ET|EOAD", {"round": 2}],
 				["Act_ET|ETAD", {"round": 2}],

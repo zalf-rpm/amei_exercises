@@ -15,20 +15,13 @@
 # Landscape Systems Analysis at the ZALF.
 # Copyright (C: Leibniz Centre for Agricultural Landscape Research (ZALF)
 
-import capnp
 from collections import defaultdict
 from datetime import datetime
 import json
 import os
 import sys
 import zmq
-
 from zalfmas_common import common
-import zalfmas_capnp_schemas
-
-sys.path.append(os.path.dirname(zalfmas_capnp_schemas.__file__))
-import fbp_capnp
-
 
 def run_consumer(server=None, port=None):
     """collect data from workers"""
@@ -113,10 +106,11 @@ Framework	Model	Date	mm/d	mm/d	mm/d	mm/d	w/m2	w/m2	w/m2
                             # only store results up to 31st of October
                             if vals["Date"][5:] == "11-01":
                                 break
+                            epad = "na" #vals['EPAD']
                             ghfd = "na"
                             lhfd = "na"
                             rhfd = vals['RHFD'] * (1000000.0 / 86400.0)
-                            _.write(f"MO\t{model_code}\t{vals['Date']}\t{vals['EPAD']}\t{vals['ESAD']}\t"
+                            _.write(f"MO\t{model_code}\t{vals['Date']}\t{epad}\t{vals['ESAD']}\t"
                                     f"{vals['EOAD']}\t{vals['ETAD']}\t{ghfd}\t{lhfd}\t{rhfd}\n")
 
             if no_of_envs_expected == envs_received:

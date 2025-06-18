@@ -15,7 +15,6 @@
 # Landscape Systems Analysis at the ZALF.
 # Copyright (C: Leibniz Centre for Agricultural Landscape Research (ZALF)
 
-import capnp
 from collections import defaultdict
 from datetime import date, timedelta, datetime
 import json
@@ -26,20 +25,17 @@ import time
 import zmq
 from zalfmas_common import common, csv
 from zalfmas_common.model import monica_io
-import zalfmas_capnp_schemas
-sys.path.append(os.path.dirname(zalfmas_capnp_schemas.__file__))
-import fbp_capnp
 
 PATHS = {
     # adjust the local path to your environment
     "mbm-local-local": {
-        "monica-path-to-climate-dir": "/home/berg/GitHub/amei_monica_soil_temperature_sensitivity_analysis/input_data/WeatherData/",
+        "monica-path-to-climate-dir": "/home/berg/GitHub/amei_exercises/soil_temperature_sensitivity_analysis/input_data/WeatherData/",
         # mounted path to archive accessable by monica executable
         "path-to-data-dir": "./data/",  # mounted path to archive or hard drive with data
         "path-debug-write-folder": "./debug-out/",
     },
     "mbm-win-local-local": {
-        "monica-path-to-climate-dir": "C:/Users/berg/GitHub/amei_monica_soil_temperature_sensitivity_analysis/input_data/WeatherData/",
+        "monica-path-to-climate-dir": "C:/Users/berg/GitHub/amei_exercises/soil_temperature_sensitivity_analysis/input_data/WeatherData/",
         # mounted path to archive accessable by monica executable
         "path-to-data-dir": "./data/",  # mounted path to archive or hard drive with data
         "path-debug-write-folder": "./debug-out/",

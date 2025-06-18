@@ -3,5 +3,5 @@
   <component name="Black">
     <option name="sdkName" value="$USER_HOME$/miniconda3" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="Poetry (amei_monica_soil_temperature_sensitivity_analysis)" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="Poetry (amei_exercises)" project-jdk-type="Python SDK" />
 </project>
