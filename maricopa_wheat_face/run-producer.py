@@ -436,8 +436,8 @@ def run_producer(server=None, port=None):
                 ]:
                     env_template["params"]["simulationParameters"]["SoilTempModel"] = st_model
 
-                    with open(f"env_{sent_env_count+1}.json", "w") as _:
-                        _.write(json.dumps(env_template))
+                    #with open(f"env_{sent_env_count+1}.json", "w") as _:
+                    #    _.write(json.dumps(env_template))
 
                     env_template["customId"] = {
                         "env_id": sent_env_count + 1,
