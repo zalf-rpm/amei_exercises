@@ -217,8 +217,8 @@ def run_producer(server=None, port=None):
             "harvest_events": {},
             "tillage_events": {},
             "mulch_events": {},
-            "irrigation_events": {},
-            "fertilizer_events": {},
+            "irrigation_events": [],
+            "fertilizer_events": [],
         }
 
     # load plots of treatments
@@ -287,19 +287,19 @@ def run_producer(server=None, port=None):
     for i in irrigation_df.axes[0]:
         eid = str(irrigation_df["EID"][i])
         tid = str(irrigation_df["TREAT_ID"][i])
-        experiments[eid]["treatments"][tid]["irrigation_events"] = {
+        experiments[eid]["treatments"][tid]["irrigation_events"].append({
             "IDATE": str(irrigation_df["IDATE"][i])[:10],
             "IROP": str(irrigation_df["IROP"][i]),
             "IRADP": int(irrigation_df["IRADP"][i]), #cm
             "IRVAL": float(irrigation_df["IRVAL"][i]),
             "IRNPC": float(irrigation_df["IRNPC"][i]),
-        }
+        })
 
     fertilizer_df = dfs["Fertilizer_events"]
     for i in fertilizer_df.axes[0]:
         eid = str(fertilizer_df["EID"][i])
         tid = str(fertilizer_df["TREAT_ID"][i])
-        experiments[eid]["treatments"][tid]["fertilizer_events"] = {
+        experiments[eid]["treatments"][tid]["fertilizer_events"].append({
             "FEDATE": str(fertilizer_df["FEDATE"][i])[:10],
             "FEACD": str(fertilizer_df["FEACD"][i]),
             "FEDEP": int(fertilizer_df["FEDEP"][i]),  # cm
@@ -307,7 +307,7 @@ def run_producer(server=None, port=None):
             "FEAMN": float(default_if_nan(fertilizer_df["FEAMN"][i])),
             "FENO3": float(default_if_nan(fertilizer_df["FENO3"][i])),
             "FENH4": float(default_if_nan(fertilizer_df["FENH4"][i])),
-        }
+        })
 
     residues_df = dfs["Residue"]
     for i in residues_df.axes[0]:
@@ -329,7 +329,6 @@ def run_producer(server=None, port=None):
             "ICRN": float(perc_n_conc), # % N
             "ICRT": float(root_wt_prev_crop), # kg[DM] ha-1
         }
-
 
     # read template sim.json
     with open(config["sim.json"]) as _:
@@ -368,6 +367,10 @@ def run_producer(server=None, port=None):
                 env_template["cropRotation"][0]["worksteps"][0]["date"] = t["planting_events"]["PDATE"]
                 env_template["cropRotation"][0]["worksteps"][1]["date"] = t["harvest_events"]["HADAT"]
 
+                #with open("climate-iso.csv", "r") as _:
+                #    csv_str = _.read()
+                #env_template["climateCSV"] = csv_str
+
                 env_template["climateData"] = {
                     "startDate": t["SDAT"], #t["weather_data"]["start_date"],
                     "endDate": f"{t['harvest_events']['HADAT'][:4]}-12-31", #t["weather_data"]["end_date"],
@@ -377,36 +380,47 @@ def run_producer(server=None, port=None):
                 }
 
                 irr_fert_evs = defaultdict(list)
-                for e in t["irrigation_events"]:
-                    irr_fert_evs[e["IDATE"]].append(e)
                 for e in t["fertilizer_events"]:
                     irr_fert_evs[e["FEDATE"]].append(e)
+                for e in t["irrigation_events"]:
+                    irr_fert_evs[e["IDATE"]].append(e)
+
                 irr_fert_dates = list(irr_fert_evs.keys())
                 irr_fert_dates.sort()
 
+                sowing_date = env_template["cropRotation"][0]["worksteps"][0]["date"]
+                harvest_date = env_template["cropRotation"][0]["worksteps"][-1]["date"]
                 for if_date in irr_fert_dates:
-                    kg_N_nitrate_in_irr_water = None
+                    kg_n_per_ha_nitrate_in_irr_water = None
                     for ev in irr_fert_evs[if_date]:
                         if "FEDATE" in ev:
                             if ev["FEACD"] == "Applied in irrigation water":
-                                kg_N_nitrate_in_irr_water = ev["FEAMN"]
+                                kg_n_per_ha_nitrate_in_irr_water = ev["FEAMN"]
                                 continue
                             mf = copy.deepcopy(crop_json["ws"]["MineralFertilization"])
                             mf["date"] = ev["FEDATE"]
-                            mf["amount"] = ev["FEAMN"]
+                            mf["amount"][0] = ev["FEAMN"]
                             mf["partition"] = {
                                 "Carbamid": 100.0,
                                 "NH4": 0.0,
                                 "NO3": 0.0,
                                 "name": ev["FECD"],
                             }
-                            env_template["cropRotation"][0]["worksteps"].insert(-2, mf)
+                            if mf["date"] < sowing_date:
+                                env_template["cropRotation"][0]["worksteps"].insert(0, mf)
+                            elif mf["date"] > harvest_date:
+                                env_template["cropRotation"][0]["worksteps"].append(mf)
+                            else:
+                                env_template["cropRotation"][0]["worksteps"].insert(-1, mf)
                         elif "IDATE" in ev:
                             irr = copy.deepcopy(crop_json["ws"]["Irrigation"])
-                            if kg_N_nitrate_in_irr_water:
-                                irr["parameters"]["nitrateConcentration"] =
-
-
+                            irr["date"] = ev["IDATE"]
+                            layer_size_cm = env_template["params"]["siteParameters"]["LayerThickness"][0] * 100.0 # m -> cm
+                            irr["atLayer"] = int(ev["IRADP"] / layer_size_cm)  # into which layer
+                            irr["amount"][0] = ev["IRVAL"]
+                            if kg_n_per_ha_nitrate_in_irr_water:
+                                irr["parameters"]["nitrateConcentration"] = kg_n_per_ha_nitrate_in_irr_water * 100.0 / ev["IRVAL"] # kg/ha -> mg/l (mg/dm3)
+                            env_template["cropRotation"][0]["worksteps"].insert(-1, irr)
 
                 for st_model, model_code in [
                     ("internal", "iMO"),
@@ -421,6 +435,9 @@ def run_producer(server=None, port=None):
                     ("ApsimCampbell", "AP")
                 ]:
                     env_template["params"]["simulationParameters"]["SoilTempModel"] = st_model
+
+                    with open(f"env_{sent_env_count+1}.json", "w") as _:
+                        _.write(json.dumps(env_template))
 
                     env_template["customId"] = {
                         "env_id": sent_env_count + 1,

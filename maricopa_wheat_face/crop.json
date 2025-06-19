@@ -12,7 +12,7 @@
 
   "ws": {
     "MineralFertilization": {
-      "type": "NFertilization",
+      "type": "MineralFertilization",
       "date": "",
       "amount": [0.0, "kg"],
       "partition": {}
