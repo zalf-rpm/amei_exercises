@@ -3,45 +3,10 @@
   <component name="CsvFileAttributes">
     <option name="attributeMap">
       <map>
-        <entry key="/input_data/SoilData.csv">
+        <entry key="\standalone_for_debugging\1.csv">
           <value>
             <Attribute>
-              <option name="separator" value="&#9;" />
-            </Attribute>
-          </value>
-        </entry>
-        <entry key="/input_data/Treatment.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="&#9;" />
-            </Attribute>
-          </value>
-        </entry>
-        <entry key="/input_data/WeatherMetadata.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="&#9;" />
-            </Attribute>
-          </value>
-        </entry>
-        <entry key="/input_data/WeatherMetadata_corr.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="&#9;" />
-            </Attribute>
-          </value>
-        </entry>
-        <entry key="\input_data\SoilMetadata.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="&#9;" />
-            </Attribute>
-          </value>
-        </entry>
-        <entry key="\input_data\WeatherMetadata.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="&#9;" />
+              <option name="separator" value=";" />
             </Attribute>
           </value>
         </entry>

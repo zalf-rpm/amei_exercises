@@ -112,6 +112,10 @@
 			"daily", [
 				"Date",
 				"Crop",
+				"Act_Ev",
+				"Act_Trans",
+				"Act_ET",
+				"Pot_ET",
 				"ETa/ETc",
 				"TraDef",
 				"Tra",
