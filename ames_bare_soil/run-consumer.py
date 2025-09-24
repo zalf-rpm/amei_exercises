@@ -74,7 +74,7 @@ def run_consumer(server=None, port=None):
                     with open(f"{path_to_out}/{model_code}MOLayersAimes{year_str}.txt", "w") as _:
                         _.write(f"""\
 AMEI Aimes fallow								
-Model: MONICA version 3.6.36 - {datetime.now().isoformat()}							
+Model: MONICA version 3.6.44 - {datetime.now().isoformat()}							
 Modeler_name: Michael Berg-Mohnicke								
 			soil_layer_top_depth	soil_layer_base_depth	soil_temp_daily_avg	maximum_soil_temp_daily	minimum_soil_temp_daily	soil_water_by_layer
 Framework	Model	Date	cm	cm	°C	°C	°C	cm3/cm3
@@ -95,7 +95,7 @@ Framework	Model	Date	cm	cm	°C	°C	°C	cm3/cm3
                     with open(f"{path_to_out}/{model_code}MOAimes{year_str}.txt", "w") as _:
                         _.write(f"""\
 AMEI Aimes fallow									
-Model: MONICA version 3.6.36 - {datetime.now().isoformat()} 									
+Model: MONICA version 3.6.44 - {datetime.now().isoformat()} 									
 Modeler_name: Michael Berg-Mohnicke									
 			potential_evaporation	soil_evaporation_daily	potential_evapotrans	evapotranspiration_daily	ground_heat_daily	latent_heat_daily	net_radiation_daily
 Framework	Model	Date	mm/d	mm/d	mm/d	mm/d	w/m2	w/m2	w/m2
