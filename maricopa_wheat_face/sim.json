@@ -42,7 +42,7 @@
 				"0|GNGD",
 				["EffRootDep|RDPD", {"round": 2}],
 				["Mois|SWWPD", [1, 42, "SUM"], {"round": 2}],
-				["PercolationRate|DRND", 42, {"round": 2}],
+				["PercolationRate|DRND", [42, 42, "AVG"], {"round": 2}],
 				["RunOff|ROFD", {"round": 2}],
 				"0|NIAD",
 				["NLeach|NLCD", {"round": 4}],
