@@ -60,7 +60,7 @@ def run_producer(server=None, port=None):
     socket = context.socket(zmq.PUSH)  # pylint: disable=no-member
 
     config = {
-        "mode": "mbm-local-local",
+        "mode": "mbm-win-local-local",
         "server-port": port if port else "6666",
         "server": server if server else "localhost",  # "login01.cluster.zalf.de",
         "sim.json": "sim.json",
