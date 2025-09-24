@@ -172,47 +172,47 @@ FRAMEWORK_ID	MODEL_ID	TREAT_ID	PDATE	PLDAE	ADAT	MDAT	LnoSM	LAIX	LIPCCM	CWAA	CWAM
                     results_anthesis = msg["data"][4].get("results", [])
                     results_maturity = msg["data"][5].get("results", [])
                     for i, vals in enumerate(results_summary):
-                        vals_s = results_sowing[i]
-                        vals_e = results_emergence[i]
-                        vals_a = results_anthesis[i]
-                        vals_m = results_maturity[i]
+                        vals_s = results_sowing[i] if len(results_sowing) > i else {}
+                        vals_e = results_emergence[i] if len(results_emergence) > i else {}
+                        vals_a = results_anthesis[i] if len(results_anthesis) > i else {}
+                        vals_m = results_maturity[i] if len(results_maturity) > i else {}
 
                         out = StringIO()
                         out.write(f"MO\t")
                         out.write(f"{model_code}\t")
                         out.write(f"{t_id}\t")
-                        out.write(f"{vals_s['PDATE']}\t")
-                        out.write(f"{vals_e['PLDAE']}\t")
-                        out.write(f"{vals_a['ADAT']}\t")
-                        out.write(f"{vals_m['MDAT']}\t")
+                        out.write(f"{vals_s.get('PDATE', 'na')}\t")
+                        out.write(f"{vals_e.get('PLDAE', 'na')}\t")
+                        out.write(f"{vals_a.get('ADAT', 'na')}\t")
+                        out.write(f"{vals_m.get('MDAT', 'na')}\t")
                         out.write(f"na\t") #LnoSM
-                        out.write(f"{vals['LAIX']}\t")
+                        out.write(f"{vals.get('LAIX', 'na')}\t")
                         out.write(f"na\t") #LIPCCM
-                        out.write(f"{vals_a['CWAA']}\t")
-                        out.write(f"{vals_m['CWAM']}\t")
-                        out.write(f"{vals_m['GWAM']}\t")
-                        out.write(f"{vals_m['HnoAM']}\t")
+                        out.write(f"{vals_a.get('CWAA', 'na')}\t")
+                        out.write(f"{vals_m.get('CWAM', 'na')}\t")
+                        out.write(f"{vals_m.get('GWAM', 'na')}\t")
+                        out.write(f"{vals_m.get('HnoAM', 'na')}\t")
                         out.write(f"na\t") #GWGM
-                        out.write(f"{vals_a['CNAA']}\t")
-                        out.write(f"{vals_m['CNAM']}\t")
-                        out.write(f"{vals_m['GNAM']}\t")
+                        out.write(f"{vals_a.get('CNAA', 'na')}\t")
+                        out.write(f"{vals_m.get('CNAM', 'na')}\t")
+                        out.write(f"{vals_m.get('GNAM', 'na')}\t")
                         out.write(f"na\t") #GNGM
-                        out.write(f"{vals['RDPM']}\t")
-                        out.write(f"{vals['WAVSSM']}\t")
-                        out.write(f"{vals['DRCM']}\t")
-                        out.write(f"{vals['ROCM']}\t")
+                        out.write(f"{vals.get('RDPM', 'na')}\t")
+                        out.write(f"{vals.get('WAVSSM', 'na')}\t")
+                        out.write(f"{vals.get('DRCM', 'na')}\t")
+                        out.write(f"{vals.get('ROCM', 'na')}\t")
                         out.write(f"na\t") #NIAVSSM
-                        out.write(f"{vals['NLCM']}\t")
-                        out.write(f"{vals['NMNCM']}\t")
-                        out.write(f"{vals['N2OECM']}\t")
+                        out.write(f"{vals.get('NLCM', 'na')}\t")
+                        out.write(f"{vals.get('NMNCM', 'na')}\t")
+                        out.write(f"{vals.get('N2OECM', 'na')}\t")
                         out.write(f"na\t") #NIMCM
-                        out.write(f"{vals['NDNCM']}\t")
-                        out.write(f"{vals['EOCM']}\t")
-                        out.write(f"{vals['ETCM']}\t")
+                        out.write(f"{vals.get('NDNCM', 'na')}\t")
+                        out.write(f"{vals.get('EOCM', 'na')}\t")
+                        out.write(f"{vals.get('ETCM', 'na')}\t")
                         out.write(f"na\t") #EPSCM
-                        out.write(f"{vals['ESCM']}\t")
+                        out.write(f"{vals.get('ESCM', 'na')}\t")
                         out.write(f"na\t") #EPPCM
-                        out.write(f"{vals['EPCM']}")
+                        out.write(f"{vals.get('EPCM', 'na')}")
                         out.write("\n")
                         _.write(out.getvalue())
 
