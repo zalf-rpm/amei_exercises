@@ -3,10 +3,10 @@
   <component name="CsvFileAttributes">
     <option name="attributeMap">
       <map>
-        <entry key="\standalone_for_debugging\1.csv">
+        <entry key="/maricopa_wheat_face/APMODailyMaricopa901.csv">
           <value>
             <Attribute>
-              <option name="separator" value=";" />
+              <option name="separator" value="&#9;" />
             </Attribute>
           </value>
         </entry>
