@@ -1,0 +1,5 @@
+{
+    "id": "ad48c4f1-2955-4b22-bd07-c99d0d84bf8c",
+    "name": "local debuggable python execution",
+    "ba5ccca8-ecbe-4598-aa1d-0123a0a95423": "python -m flow_components.read_agmip_file"
+}

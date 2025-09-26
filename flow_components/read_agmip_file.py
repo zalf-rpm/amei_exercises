@@ -23,22 +23,24 @@ import numpy as np
 import os
 import pandas
 
-from zalfmas_capnp_schemas import fbp_capnp
-
+from zalfmas_capnp_schemas import fbp_capnp, climate_capnp, common_capnp, soil_capnp
+from zalfmas_common import common
+from zalfmas_common.climate import csv_file_based
+from zalfmas_services.soil import sqlite_soil_data_service as sds
 import zalfmas_fbp.run.components as c
 import zalfmas_fbp.run.ports as ps
 
 async def run_component(port_infos_reader_sr: str, config: dict):
-    ports = await ps.PortConnector.create_from_port_infos_reader(
-        port_infos_reader_sr, ins=["conf"], outs=["out"]
-    )
-    await ps.update_config_from_port(config, ports["conf"])
+    #ports = await ps.PortConnector.create_from_port_infos_reader(
+    #    port_infos_reader_sr, ins=["conf"], outs=["out"]
+    #)
+    #await ps.update_config_from_port(config, ports["conf"])
 
     def default_if_nan(value, default=0.0):
         return default if np.isnan(value) else value
 
     # read data from excel
-    dfs = pandas.read_excel("MARICOPA Wheat FACE data_2024-10-25 (ICASA data format v4.1)(PM6)(BAK1)(no soil temp).xlsx",
+    dfs = pandas.read_excel("/home/berg/GitHub/amei_exercises/maricopa_wheat_face/MARICOPA Wheat FACE data_2024-10-25 (ICASA data format v4.1)(PM7)(BAK1)(no soil temp).xlsx",
                             sheet_name=[
                                 "Experiment_description",
                                 "Fields",
@@ -77,35 +79,41 @@ async def run_component(port_infos_reader_sr: str, config: dict):
         "start_date": None,
         "end_date": None,
         "dates": [],
-        "data": defaultdict(list)
+        "data": defaultdict(list),
+        "timeseries": {}
     })
 
-    def append_if(ds_id, acdi, col_name, i, factor=1.0):
-        if col_name in wdaily_df:
-            pandas_value = wdaily_df[col_name][i]
-            weather_daily[ds_id]["data"][acdi].append(0.0 if np.isnan(pandas_value) else factor*float(pandas_value))
+    for ds_id in wdaily_df["WST_DATASET"].unique():
+        rows_with_ds_id = wdaily_df[wdaily_df["WST_DATASET"] == ds_id]
+        data = {}
+        dates = list(map(lambda d: str(d)[:10], rows_with_ds_id["W_DATE"]))
+        data["globrad"] = rows_with_ds_id["SRAD"].array
+        data["tmax"] = rows_with_ds_id["TMAX"].array
+        data["tavg"] = rows_with_ds_id["TAVD"].array
+        data["tmin"] = rows_with_ds_id["TMIN"].array
+        data["precip"] = rows_with_ds_id["RAIN"].array
+        data["relhumid"] = rows_with_ds_id["RHAVD"].array
+        data["vaporpress"] = rows_with_ds_id["VPRSD"].array
+        data["wind"] = rows_with_ds_id["WIND"].array * (1.0 / 24.0 / 3.6)
+        weather_daily[ds_id]["timeseries"] = csv_file_based.TimeSeries.from_dataframe(pandas.DataFrame(data=data, index=dates))
 
-    for i in wdaily_df.axes[0]:
-        ds_id = str(wdaily_df["WST_DATASET"][i])
-        weather_daily[ds_id]["dates"].append(str(wdaily_df["W_DATE"][i])[:10])
-        append_if(ds_id, 8, "SRAD", i) # globrad MJ m-2 day-1
-        append_if(ds_id, 5, "TMAX", i)  # max temp °C
-        append_if(ds_id, 4, "TAVD", i)  # tavg temp °C
-        append_if(ds_id, 3, "TMIN", i)  # min temp °C
-        append_if(ds_id, 6, "RAIN", i)  # precip mm
-        append_if(ds_id, 9, "WIND", i, 1.0 / 24.0 / 3.6)  # wind km/day -> m/s
-        append_if(ds_id, 12, "RHAVD", i)  # max temp °C
-        append_if(ds_id, 14, "VPRSD", i)  # kPa
-    for ds_id, data in weather_daily.items():
-        data["start_date"] = data["dates"][0]
-        data["end_date"] = data["dates"][-1]
+    #cap = climate_capnp.TimeSeries._new_client(weather_daily["MARA"]["timeseries"])
+    #print(await cap.info())
+    #print(await cap.data())
 
     # load soil data
     soils = defaultdict(dict)
     soil_meta_dfs = dfs["Soil_metadata"]
     for i in soil_meta_dfs.axes[0]:
         sid = str(soil_meta_dfs["SOIL_ID"][i])
+        soils[sid]["profile"] = sds.Profile(
+            soil_capnp.ProfileData.new_message(),
+            0.0,
+            0.0,
+            id=sid,
+        )
         soils[sid]["layers"] = {} # (SLLT, SLLB) -> dict
+        soils[sid]["clayers"] = []
         soils[sid]["SLDP"] = int(soil_meta_dfs["SLDP"][i]) # cm
         #soils[sid]["SLOBS"] = int(soil_meta_dfs["SLOBS"][i])  # cm
         #soils[sid]["SLTOP"] = int(soil_meta_dfs["SLTOP"][i]) # cm
@@ -114,7 +122,6 @@ async def run_component(port_infos_reader_sr: str, config: dict):
         soils[sid]["SALB"] = float(soil_meta_dfs["SALB"][i])  # cm
 
     soil_profiles_dfs = dfs["Soil_profile_layers"]
-
     for i in soil_profiles_dfs.axes[0]:
         sid = str(soil_profiles_dfs["SOIL_ID"][i])
         sllt = int(soil_profiles_dfs["SLLT"][i]) # cm
@@ -132,6 +139,43 @@ async def run_component(port_infos_reader_sr: str, config: dict):
             "CN": [float(soil_profiles_dfs["C_N"][i]), ""],
             #"Lambda": [float(soil_profiles_dfs["SLDRL"][i]), ""],
         }
+
+    def append_if_not_nan(l, name, value, factor=1.0):
+        if np.isnan(value):
+            l.append({
+                "name": name,
+                "f32Value": float(value) * factor
+            })
+
+    for i in soil_profiles_dfs.axes[0]:
+        sid = str(soil_profiles_dfs["SOIL_ID"][i])
+        sllt = int(soil_profiles_dfs["SLLT"][i]) # cm
+        sllb = int(soil_profiles_dfs["SLLB"][i]) # cm
+        props = []
+        append_if_not_nan(props, "organicCarbon", default_if_nan(soil_profiles_dfs["SLOC"][i], 0.0))
+        append_if_not_nan(props, "bulkDensity", soil_profiles_dfs["SLBDM"][i], 1000)
+        append_if_not_nan(props, "fieldCapacity", soil_profiles_dfs["SLDUL"][i])
+        append_if_not_nan(props, "saturation", soil_profiles_dfs["SLSAT"][i])
+        append_if_not_nan(props, "permanentWiltingPoint", soil_profiles_dfs["SLLL"][i])
+        append_if_not_nan(props, "clay", soil_profiles_dfs["SLCLY"][i])
+        append_if_not_nan(props, "sand", soil_profiles_dfs["SLSND"][i])
+        append_if_not_nan(props, "pH", soil_profiles_dfs["SLPHW"][i])
+        append_if_not_nan(props, "cnRatio", soil_profiles_dfs["C_N"][i])
+        append_if_not_nan(props, "soilWaterConductivityCoefficient",
+        #    "f32Value": float(soil_profiles_dfs["SLDRL"][i])
+        #})
+        soils[sid]["clayers"].append({
+            "size": (sllb - sllt) / 100.0,
+            "properties": properties
+        })
+
+    for sid, data in soils.items():
+        data["profile"].data.layers = data["clayers"]
+
+    scap = soil_capnp.Profile._new_client(soils["AZMC920001"]["profile"])
+    print(await scap.info())
+    print(await scap.data())
+
 
     # load fields
     fields_df = dfs["Fields"]

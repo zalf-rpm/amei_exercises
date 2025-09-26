@@ -1,0 +1,32 @@
+{
+    "categories": [
+        {
+            "id": "amei_exercises",
+            "name": "AMEI Exercises"
+        }
+    ],
+    "entries": [
+        {
+            "categoryId": "amei_exercises",
+            "component": {
+                "info": {
+                    "id": "ba5ccca8-ecbe-4598-aa1d-0123a0a95423",
+                    "name": "Read AgMIP file",
+                    "description": "Read an AgMIP file and stream all plots"
+                },
+                "type": "standard",
+                "inPorts": [
+                    {
+                        "name": "conf"
+                    }
+                ],
+                "outPorts": [
+                    {
+                        "name": "out"
+                    }
+                ],
+                "defaultConfig": "#file = \"\"\n"
+            }
+        }
+    ]
+}

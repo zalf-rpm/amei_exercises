@@ -113,7 +113,7 @@ def run_producer(server=None, port=None):
         "start_date": None,
         "end_date": None,
         "dates": [],
-        "data": defaultdict(list)
+        "data": defaultdict(list),
     })
 
     def append_if(ds_id, acdi, col_name, i, factor=1.0):

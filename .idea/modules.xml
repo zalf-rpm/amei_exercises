@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/amei_monica_soil_temperature_sensitivity_analysis.iml" filepath="$PROJECT_DIR$/.idea/amei_monica_soil_temperature_sensitivity_analysis.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/amei_exercises.iml" filepath="$PROJECT_DIR$/.idea/amei_exercises.iml" />
     </modules>
   </component>
 </project>

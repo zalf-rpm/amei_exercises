@@ -1,0 +1,26 @@
+[service]
+id = "f0377174-af8e-435b-9c7d-f22e453aeb18"
+name = "local AMEI Exercises components service"
+description = ""
+path_to_components_json = "./configs/local_components.json"
+path_to_cmds_json = "./configs/local_cmds.json"
+fixed_sturdy_ref_token = "local_components"
+# sturdy ref to a container which is used by the service to store it's data/state etc.
+#storage_container_sr = "capnp://the_host_key@host:port/a_sturdy_ref_token"
+
+# at which registries the current service should be registered, might be only one
+#[[service.registries]]
+#name = "FBP components service"
+#category_id = "Flow components"
+# sturdy ref to a registry where the service should be registered at
+#sturdy_ref = "capnp://the_host_key@host:port/a_sturdy_ref_token"
+
+[vat]
+#host = "localhost"
+port = "9990"
+serve_bootstrap = true
+
+# at which resolvers should the vat be registered under the current vat id and optional alias
+#[[vat.resolvers]]
+#sturdy_ref = "capnp://OLBqQD7KRvJJFgAoXrcUlt5i7rb_pjyNE9ZB7v8Shew@10.10.28.186:36425/81707b08-08c5-4872-be70-a227e5115940"
+#alias = "some_components_service"
