@@ -36,27 +36,34 @@ async def run_component(port_infos_reader_sr: str, config: dict):
     #)
     #await ps.update_config_from_port(config, ports["conf"])
 
-    def default_if_nan(value, default=0.0):
-        return default if np.isnan(value) else value
+    def default_if_nan(value, default=0.0, cast=None):
+        return default if np.isnan(value) else (cast(value) if cast else value)
 
-    # read data from excel
-    dfs = pandas.read_excel("/home/berg/GitHub/amei_exercises/maricopa_wheat_face/MARICOPA Wheat FACE data_2024-10-25 (ICASA data format v4.1)(PM7)(BAK1)(no soil temp).xlsx",
-                            sheet_name=[
-                                "Experiment_description",
-                                "Fields",
-                                "Treatments",
-                                "Plots",
-                                "Residue",
-                                "initial_condition_layers",
-                                "Planting_events",
-                                "Harvest_events",
-                                "Irrigation_events",
-                                "Fertilizer_events",
-                                "Soil_metadata",
-                                "Soil_profile_layers",
-                                "Weather_stations",
-                                "Weather_daily",
-                            ],
+    #file = config["file"]
+    file = "/home/berg/GitHub/amei_exercises/maricopa_wheat_face/MARICOPA Wheat FACE data_2024-10-25 (ICASA data format v4.1)(PM7)(BAK1)(no soil temp).xlsx"
+    file = "/home/berg/GitHub/amei_exercises/ames_bare_soil/AMEI_fallow_Ames_2024-05-16.xlsx"
+
+    enabled_sheets = {
+        "Experiment_description": True,
+        "Fields": True,
+        "Treatments": True,
+        "Plots": True,
+        "Residue": True,
+        "initial_condition_layers": True,
+        "Planting_events": True,
+        "Harvest_events": True,
+        "Irrigation_events": False,
+        "Fertilizer_events": False,
+        "Soil_metadata": True,
+        "Soil_profile_layers": True,
+        "Weather_stations": True,
+        "Weather_daily": True,
+    }
+    enabled_sheets.update(config.get("enabled_sheets", {}))
+
+    # read data from Excel file
+    dfs = pandas.read_excel(file,
+                            sheet_name=list(map(lambda e2: e2[0], filter(lambda e1: e1[1], enabled_sheets.items()))),
                             header=2)
 
     # load weather data
@@ -66,38 +73,55 @@ async def run_component(port_infos_reader_sr: str, config: dict):
         wsid = str(wstations_df["WST_ID"][i])
         weather_stations[wsid] = {
             "WST_ID": wsid,
+            "WST_NAME": wstations_df["WST_NAME"][i],
+            "INST_NAME": wstations_df["INST_NAME"][i],
+            "WST_SITE": wstations_df["WST_SITE"][i],
+            "WST_LOC_1": wstations_df["WST_LOC_1"][i],
+            "WST_LOC_2": wstations_df["WST_LOC_2"][i],
+            "WST_LOC_3": wstations_df["WST_LOC_3"][i],
             "WST_LAT": float(wstations_df["WST_LAT"][i]),
             "WST_LONG": float(wstations_df["WST_LONG"][i]),
             "WST_ELEV": float(wstations_df["WST_ELEV"][i]),
             "TAV": float(wstations_df["TAV"][i]),
             "TAMP": float(wstations_df["TAMP"][i]),
             "CO2Y": float(wstations_df["CO2Y"][i]),
+            "TEMHT": float(wstations_df["TEMHT"][i]),
+            "REFHT": float(wstations_df["REFHT"][i]),
+            "WNDHT": float(wstations_df["WNDHT"][i]),
+            "WST_NOTES": default_if_nan(wstations_df["WST_NOTES"][i], None),
         }
 
-    wdaily_df = dfs["Weather_daily"]
-    weather_daily = defaultdict(lambda: {
-        "start_date": None,
-        "end_date": None,
-        "dates": [],
-        "data": defaultdict(list),
-        "timeseries": {}
-    })
+    agmip_elem_to_schema_elem = {
+        "SRAD": ["globrad", 1.0], # MJ/m2/d
+        "TMAX": ["tmax", 1.0],  # °C
+        "TMIN": ["tmin", 1.0],  # °C
+        "TAVD": ["tavg", 1.0],  # °C
+        "RAIN": ["precip", 1.0],  # mm/d
+        "VPRSD": ["vaporpress", 10.0],  # kPa -> hPa
+        "WIND": ["wind", [5.0, 432]],  # km/d -> m/s
+        "TDEW": ["dewpointTemp", 1.0],  # °C
+        "RHAVD": ["relhumid", 1.0], # %
+    }
+    agmip_elem_to_schema_elem.update(config.get("agmip_elem_to_schema_elem", {}))
+    weather_elements = set(agmip_elem_to_schema_elem.keys())
+    conf_weather_elements = config.get("weather_elements", [])
+    if len(conf_weather_elements) > 0:
+        weather_elements = weather_elements.intersection(config.get("weather_elements", []))
 
+    wdaily_df = dfs["Weather_daily"]
+    weather_timeseries = {}
     for ds_id in wdaily_df["WST_DATASET"].unique():
         rows_with_ds_id = wdaily_df[wdaily_df["WST_DATASET"] == ds_id]
         data = {}
         dates = list(map(lambda d: str(d)[:10], rows_with_ds_id["W_DATE"]))
-        data["globrad"] = rows_with_ds_id["SRAD"].array
-        data["tmax"] = rows_with_ds_id["TMAX"].array
-        data["tavg"] = rows_with_ds_id["TAVD"].array
-        data["tmin"] = rows_with_ds_id["TMIN"].array
-        data["precip"] = rows_with_ds_id["RAIN"].array
-        data["relhumid"] = rows_with_ds_id["RHAVD"].array
-        data["vaporpress"] = rows_with_ds_id["VPRSD"].array
-        data["wind"] = rows_with_ds_id["WIND"].array * (1.0 / 24.0 / 3.6)
-        weather_daily[ds_id]["timeseries"] = csv_file_based.TimeSeries.from_dataframe(pandas.DataFrame(data=data, index=dates))
-
-    #cap = climate_capnp.TimeSeries._new_client(weather_daily["MARA"]["timeseries"])
+        for w_elem in weather_elements:
+            if w_elem in agmip_elem_to_schema_elem and w_elem in rows_with_ds_id:
+                schema_elem, factor = agmip_elem_to_schema_elem[w_elem]
+                if type(factor) is list and len(factor) > 0:
+                    factor = factor[0] / factor[1] if len(factor) > 1 else 1.0
+                data[schema_elem] = rows_with_ds_id[w_elem].array * factor
+        weather_timeseries[ds_id] = csv_file_based.TimeSeries.from_dataframe(pandas.DataFrame(data=data, index=dates))
+    #cap = climate_capnp.TimeSeries._new_client(weather_timeseries["MARA"])
     #print(await cap.info())
     #print(await cap.data())
 
@@ -112,69 +136,69 @@ async def run_component(port_infos_reader_sr: str, config: dict):
             0.0,
             id=sid,
         )
-        soils[sid]["layers"] = {} # (SLLT, SLLB) -> dict
-        soils[sid]["clayers"] = []
-        soils[sid]["SLDP"] = int(soil_meta_dfs["SLDP"][i]) # cm
-        #soils[sid]["SLOBS"] = int(soil_meta_dfs["SLOBS"][i])  # cm
-        #soils[sid]["SLTOP"] = int(soil_meta_dfs["SLTOP"][i]) # cm
-        soils[sid]["SADR"] = float(soil_meta_dfs["SADR"][i]) # 1/day
-        soils[sid]["SAWC"] = int(soil_meta_dfs["SAWC"][i])  # cm
-        soils[sid]["SALB"] = float(soil_meta_dfs["SALB"][i])  # cm
-
-    soil_profiles_dfs = dfs["Soil_profile_layers"]
-    for i in soil_profiles_dfs.axes[0]:
-        sid = str(soil_profiles_dfs["SOIL_ID"][i])
-        sllt = int(soil_profiles_dfs["SLLT"][i]) # cm
-        sllb = int(soil_profiles_dfs["SLLB"][i]) # cm
-        soils[sid]["layers"][(sllt, sllb)] = {
-            "Thickness": [(sllb - sllt) / 100, "m"],
-            "SoilOrganicCarbon": [float(default_if_nan(soil_profiles_dfs["SLOC"][i], 0.0)), "%", "% (g[C]/100g[soil])"],
-            "SoilBulkDensity": [float(soil_profiles_dfs["SLBDM"][i]) * 1000, "kg m-3"],
-            "FieldCapacity": [float(soil_profiles_dfs["SLDUL"][i]), "m3/m3"],
-            "PoreVolume": [float(soil_profiles_dfs["SLSAT"][i]), "m3/m3"],
-            "PermanentWiltingPoint": [float(soil_profiles_dfs["SLLL"][i]), "m3/m3"],
-            "Clay": [float(soil_profiles_dfs["SLCLY"][i]), "%"],
-            "Sand": [float(soil_profiles_dfs["SLSND"][i]), "%"],
-            "pH": [float(soil_profiles_dfs["SLPHW"][i]), ""],
-            "CN": [float(soil_profiles_dfs["C_N"][i]), ""],
-            #"Lambda": [float(soil_profiles_dfs["SLDRL"][i]), ""],
-        }
+        soils[sid]["SOIL_ID"] = sid # text = soil profile id
+        soils[sid]["SOIL_NAME"] = str(soil_meta_dfs["Soil_NAME"][i]) # [text] name of soil
+        soils[sid]["SL_SOURCE"] = str(soil_meta_dfs["SL_SOURCE"][i]) # [text] soil source
+        soils[sid]["SLDP"] = int(soil_meta_dfs["SLDP"][i]) # [cm] soil depth
+        soils[sid]["SLOBS"] = default_if_nan(soil_meta_dfs["SLOBS"][i], None, int)  # [cm] soil obstacle depth
+        soils[sid]["SLTOP"] = default_if_nan(soil_meta_dfs["SLTOP"][i], None, int) # [cm] depth of topsoil
+        soils[sid]["SADR"] = default_if_nan(soil_meta_dfs["SADR"][i], None, float) # [1/day] drainage rate per day
+        soils[sid]["SLRO"] = default_if_nan(soil_meta_dfs["SLRO"][i], None, float) # [number] runoff curve no SCS
+        soils[sid]["SAWC"] = int(soil_meta_dfs["SAWC"][i])  # [cm] soil available water content
+        soils[sid]["FLST"] = float(soil_meta_dfs["FLST"][i])  # [m2/m2] surface stones (cover)
+        soils[sid]["SALB"] = float(soil_meta_dfs["SALB"][i])  # [] soil albedo
+        soils[sid]["SLU1"] = default_if_nan(soil_meta_dfs["SLU1"][i], None, float)  # [mm] = soil evaporation limit
+        soils[sid]["SLNF"] = default_if_nan(soil_meta_dfs["SLNF"][i], None, float)  # [number] = mineralization factor
+        soils[sid]["SLPF"] = default_if_nan(soil_meta_dfs["SLPF"][i], None, float)  # [number] = soil fertility on foto
+        soils[sid]["SL_SYSTEM"] = default_if_nan(soil_meta_dfs["SL_SYSTEM"][i], None, str)  # [text] soil classific system
+        soils[sid]["SLTX"] = default_if_nan(soil_meta_dfs["SLTX"][i], None, str)  # [code] soil texture
+        soils[sid]["CLASSIFICATION"] = default_if_nan(soil_meta_dfs["CLASSIFICATION"][i], None, str)  # [text] soil classification
+        soils[sid]["SL_NOTES"] = default_if_nan(soil_meta_dfs["SL_NOTES"][i], None, str)  # [text] soil notes
 
     def append_if_not_nan(l, name, value, factor=1.0):
-        if np.isnan(value):
+        if not np.isnan(value):
             l.append({
                 "name": name,
                 "f32Value": float(value) * factor
             })
 
+    soil_profiles_dfs = dfs["Soil_profile_layers"]
+    soil_layers = defaultdict(list)
     for i in soil_profiles_dfs.axes[0]:
         sid = str(soil_profiles_dfs["SOIL_ID"][i])
-        sllt = int(soil_profiles_dfs["SLLT"][i]) # cm
-        sllb = int(soil_profiles_dfs["SLLB"][i]) # cm
+        sllt = int(soil_profiles_dfs["SLLT"][i]) # [cm] soil layer top depth
+        sllb = int(soil_profiles_dfs["SLLB"][i]) # [cm] soil layer base depth
+        layer_size_cm = sllb - sllt # [cm]
         props = []
-        append_if_not_nan(props, "organicCarbon", default_if_nan(soil_profiles_dfs["SLOC"][i], 0.0))
-        append_if_not_nan(props, "bulkDensity", soil_profiles_dfs["SLBDM"][i], 1000)
-        append_if_not_nan(props, "fieldCapacity", soil_profiles_dfs["SLDUL"][i])
-        append_if_not_nan(props, "saturation", soil_profiles_dfs["SLSAT"][i])
-        append_if_not_nan(props, "permanentWiltingPoint", soil_profiles_dfs["SLLL"][i])
-        append_if_not_nan(props, "clay", soil_profiles_dfs["SLCLY"][i])
-        append_if_not_nan(props, "sand", soil_profiles_dfs["SLSND"][i])
-        append_if_not_nan(props, "pH", soil_profiles_dfs["SLPHW"][i])
-        append_if_not_nan(props, "cnRatio", soil_profiles_dfs["C_N"][i])
-        append_if_not_nan(props, "soilWaterConductivityCoefficient",
-        #    "f32Value": float(soil_profiles_dfs["SLDRL"][i])
-        #})
-        soils[sid]["clayers"].append({
-            "size": (sllb - sllt) / 100.0,
-            "properties": properties
+        append_if_not_nan(props, "saturation", soil_profiles_dfs["SLSAT"][i]) # [cm3/cm3] soil water saturated
+        append_if_not_nan(props, "fieldCapacity", soil_profiles_dfs["SLDUL"][i]) # [cm3/cm3] soil water drained upper limit
+        append_if_not_nan(props, "permanentWiltingPoint", soil_profiles_dfs["SLLL"][i]) # [cm3/cm3] soil water lower limit
+        append_if_not_nan(props, "soilMoisture", soil_profiles_dfs["SLAWC"][i], 100.0 / layer_size_cm) # [mm -> %] soil layer available water
+        #append_if_not_nan(props, "", default_if_nan(soil_profiles_dfs["SLRGF"][i], 0.0))
+        append_if_not_nan(props, "bulkDensity", soil_profiles_dfs["SLBDM"][i], 1000) # [g/cm3 -> kg/m3] soil bulk density moist
+        #append_if_not_nan(props, "", soil_profiles_dfs["SLNI"][i]) # [%] soil organic N concentration
+        #append_if_not_nan(props, "", soil_profiles_dfs["SKSAT"][i]) # [cm/h] saturated hydraulic conductivity
+        append_if_not_nan(props, "soilWaterConductivityCoefficient", soil_profiles_dfs["SLDRL"][i]) # [1/day] layer drainage rate per day
+        append_if_not_nan(props, "organicCarbon", default_if_nan(soil_profiles_dfs["SLOC"][i], 0.0)) # [g[C]/100g[soil]] soil organic C percent layer
+        append_if_not_nan(props, "cnRatio", soil_profiles_dfs["C_N"][i]) # [-] soil CN ratio
+        append_if_not_nan(props, "clay", soil_profiles_dfs["SLCLY"][i]) # [%-wt] soil clay fraction
+        append_if_not_nan(props, "silt", soil_profiles_dfs["SLSIL"][i]) # [%-wt] soil silt fraction
+        append_if_not_nan(props, "sand", soil_profiles_dfs["SLSND"][i])  # [%-wt] soil sand fraction
+        append_if_not_nan(props, "sceleton", soil_profiles_dfs["SLCF"][i])  # [%-wt] soil coarse fraction
+        append_if_not_nan(props, "pH", soil_profiles_dfs["SLPHW"][i]) # [number] soil ph in water
+        #append_if_not_nan(props, "", soil_profiles_dfs["CACO3"][i]) # [g/kg] CaCO3 content
+        #append_if_not_nan(props, "", soil_profiles_dfs["SLOM"][i]) # [kg[OM]/ha] soil organic matter layer
+        #append_if_not_nan(props, "", soil_profiles_dfs["SLOMC"][i]) # [g[OM]/100g[soil]] soil organic matter concentration layer
+        soil_layers[sid].append({
+            "size": layer_size_cm / 100.0,
+            "properties": props
         })
+    for sid, layers in soil_layers.items():
+        soils[sid]["profile"].data.layers = layers
 
-    for sid, data in soils.items():
-        data["profile"].data.layers = data["clayers"]
-
-    scap = soil_capnp.Profile._new_client(soils["AZMC920001"]["profile"])
-    print(await scap.info())
-    print(await scap.data())
+    #scap = soil_capnp.Profile._new_client(soils["AZMC920001"]["profile"])
+    #print(await scap.info())
+    #print(await scap.data())
 
 
     # load fields
@@ -196,8 +220,8 @@ async def run_component(port_infos_reader_sr: str, config: dict):
     for i in exp_desc_df.axes[0]:
         eid = str(exp_desc_df["EID"][i])
         experiments[eid]["EID"] = eid
-        #experiments[eid]["PLYR"] = int(exp_desc_df["PLYR"][i])
-        #experiments[eid]["HAYR"] = int(exp_desc_df["HAYR"][i])
+        experiments[eid]["PLYR"] = int(exp_desc_df["PLYR"][i])
+        experiments[eid]["HAYR"] = int(exp_desc_df["HAYR"][i])
         experiments[eid]["treatments"] = {}
 
     # load treatments of experiments
@@ -214,7 +238,7 @@ async def run_component(port_infos_reader_sr: str, config: dict):
             "WST_ID": str(treatments_df["wst_id"][i]),
             "weather_station": weather_stations.get(str(treatments_df["wst_id"][i]), None),
             "WST_DATASET": str(treatments_df["WST_DATASET"][i]),
-            "weather_data": weather_daily.get(str(treatments_df["WST_DATASET"][i]), None),
+            "weather_timeseries": weather_timeseries.get(str(treatments_df["WST_DATASET"][i]), None),
             "SDAT": str(treatments_df["SDAT"][i])[:10],
             #"ENDAT": str(treatments_df["ENDAT"][i])[:10],
             "plots": {},
@@ -274,69 +298,74 @@ async def run_component(port_infos_reader_sr: str, config: dict):
                 #ls[(ictl, icbl)]["SoilNitrate"] = [icl[(ictl, icbl)]["ICNO3M"], "kg NO3-N m-3"]
 
     # load planting events for a treatment
-    planting_df = dfs["Planting_events"]
-    for i in planting_df.axes[0]:
-        eid = str(planting_df["EID"][i])
-        tid = str(planting_df["TREAT_ID"][i])
-        experiments[eid]["treatments"][tid]["planting_events"] = {
-            "PDATE": str(planting_df["PDATE"][i])[:10],
-        }
+    if enabled_sheets["Planting_events"]:
+        planting_df = dfs["Planting_events"]
+        for i in planting_df.axes[0]:
+            eid = str(planting_df["EID"][i])
+            tid = str(planting_df["TREAT_ID"][i])
+            experiments[eid]["treatments"][tid]["planting_events"] = {
+                "PDATE": str(planting_df["PDATE"][i])[:10],
+            }
 
     # load harvest events for a treatment
-    harvest_df = dfs["Harvest_events"]
-    for i in harvest_df.axes[0]:
-        eid = str(harvest_df["EID"][i])
-        tid = str(harvest_df["TREAT_ID"][i])
-        experiments[eid]["treatments"][tid]["harvest_events"] = {
-            "HADAT": str(harvest_df["HADAT"][i])[:10],
-        }
+    if enabled_sheets["Harvest_events"]:
+        harvest_df = dfs["Harvest_events"]
+        for i in harvest_df.axes[0]:
+            eid = str(harvest_df["EID"][i])
+            tid = str(harvest_df["TREAT_ID"][i])
+            experiments[eid]["treatments"][tid]["harvest_events"] = {
+                "HADAT": str(harvest_df["HADAT"][i])[:10],
+            }
 
-    irrigation_df = dfs["Irrigation_events"]
-    for i in irrigation_df.axes[0]:
-        eid = str(irrigation_df["EID"][i])
-        tid = str(irrigation_df["TREAT_ID"][i])
-        experiments[eid]["treatments"][tid]["irrigation_events"].append({
-            "IDATE": str(irrigation_df["IDATE"][i])[:10],
-            "IROP": str(irrigation_df["IROP"][i]),
-            "IRADP": int(irrigation_df["IRADP"][i]), #cm
-            "IRVAL": float(irrigation_df["IRVAL"][i]),
-            "IRNPC": float(irrigation_df["IRNPC"][i]),
-        })
+    if enabled_sheets["Irrigation_events"]:
+        irrigation_df = dfs["Irrigation_events"]
+        for i in irrigation_df.axes[0]:
+            eid = str(irrigation_df["EID"][i])
+            tid = str(irrigation_df["TREAT_ID"][i])
+            experiments[eid]["treatments"][tid]["irrigation_events"].append({
+                "IDATE": str(irrigation_df["IDATE"][i])[:10],
+                "IROP": str(irrigation_df["IROP"][i]),
+                "IRADP": int(irrigation_df["IRADP"][i]), #cm
+                "IRVAL": float(irrigation_df["IRVAL"][i]),
+                "IRNPC": float(irrigation_df["IRNPC"][i]),
+            })
 
-    fertilizer_df = dfs["Fertilizer_events"]
-    for i in fertilizer_df.axes[0]:
-        eid = str(fertilizer_df["EID"][i])
-        tid = str(fertilizer_df["TREAT_ID"][i])
-        experiments[eid]["treatments"][tid]["fertilizer_events"].append({
-            "FEDATE": str(fertilizer_df["FEDATE"][i])[:10],
-            "FEACD": str(fertilizer_df["FEACD"][i]),
-            "FEDEP": int(fertilizer_df["FEDEP"][i]),  # cm
-            "FECD": str(fertilizer_df["FECD"][i]),
-            "FEAMN": float(default_if_nan(fertilizer_df["FEAMN"][i])),
-            "FENO3": float(default_if_nan(fertilizer_df["FENO3"][i])),
-            "FENH4": float(default_if_nan(fertilizer_df["FENH4"][i])),
-        })
+    if enabled_sheets["Fertilizer_events"]:
+        fertilizer_df = dfs["Fertilizer_events"]
+        for i in fertilizer_df.axes[0]:
+            eid = str(fertilizer_df["EID"][i])
+            tid = str(fertilizer_df["TREAT_ID"][i])
+            experiments[eid]["treatments"][tid]["fertilizer_events"].append({
+                "FEDATE": str(fertilizer_df["FEDATE"][i])[:10],
+                "FEACD": str(fertilizer_df["FEACD"][i]),
+                "FEDEP": int(fertilizer_df["FEDEP"][i]),  # cm
+                "FECD": str(fertilizer_df["FECD"][i]),
+                "FEAMN": float(default_if_nan(fertilizer_df["FEAMN"][i])),
+                "FENO3": float(default_if_nan(fertilizer_df["FENO3"][i])),
+                "FENH4": float(default_if_nan(fertilizer_df["FENH4"][i])),
+            })
 
-    residues_df = dfs["Residue"]
-    for i in residues_df.axes[0]:
-        eid = str(residues_df["EID"][i])
-        tid = str(residues_df["TREAT_ID"][i])
-        icrdp = residues_df["ICRDP"][i]
-        perc_incorp = residues_df["ICRIP"][i]
-        above_ground = residues_df["ICRAG"][i]
-        perc_n_conc = residues_df["ICRN"][i]
-        root_wt_prev_crop = residues_df["ICRT"][i]
-        experiments[eid]["treatments"][tid]["residue"] = {
-            "EID": eid,
-            "TREAT_ID": tid,
-            "ICRDAT": str(residues_df["ICRDAT"][i])[:10],
-            "ICRDP": float(icrdp) if np.isnan(icrdp) else None, # cm depth
-            "ICPCR": str(residues_df["ICPCR"][i]), # residue_prev_crop #code
-            "ICRIP": float(perc_incorp), # % incorporated
-            "ICRAG": float(above_ground), # kg[dDM] ha-1
-            "ICRN": float(perc_n_conc), # % N
-            "ICRT": float(root_wt_prev_crop), # kg[DM] ha-1
-        }
+    if enabled_sheets["Residue"]:
+        residues_df = dfs["Residue"]
+        for i in residues_df.axes[0]:
+            eid = str(residues_df["EID"][i])
+            tid = str(residues_df["TREAT_ID"][i])
+            icrdp = residues_df["ICRDP"][i]
+            perc_incorp = residues_df["ICRIP"][i]
+            above_ground = residues_df["ICRAG"][i]
+            perc_n_conc = residues_df["ICRN"][i]
+            root_wt_prev_crop = residues_df["ICRT"][i]
+            experiments[eid]["treatments"][tid]["residue"] = {
+                "EID": eid,
+                "TREAT_ID": tid,
+                "ICRDAT": str(residues_df["ICRDAT"][i])[:10],
+                "ICRDP": float(icrdp) if np.isnan(icrdp) else None, # cm depth
+                "ICPCR": str(residues_df["ICPCR"][i]), # residue_prev_crop #code
+                "ICRIP": float(perc_incorp), # % incorporated
+                "ICRAG": float(above_ground), # kg[dDM] ha-1
+                "ICRN": float(perc_n_conc), # % N
+                "ICRT": float(root_wt_prev_crop), # kg[DM] ha-1
+            }
 
 
     while ports["out"]:
@@ -359,6 +388,38 @@ async def run_component(port_infos_reader_sr: str, config: dict):
 
     await ports.close_out_ports()
     print(f"{os.path.basename(__file__)}: process finished")
+
+"""
+#file = "path to AgMIP xlsx"
+#weather_elements = ["SRAD", "TMAX", "TMIN", "TAVD", "RAIN", "VPRSD", "WIND", "TDEW", "RHAVD"]
+
+[enabled_sheets]
+Experiment_description = true
+Fields = true
+Treatments = true
+Plots = true
+Residue = true
+initial_condition_layers = true
+Planting_events = true
+Harvest_events = true
+Irrigation_events = true
+Fertilizer_events = true
+Soil_metadata = true
+Soil_profile_layers = true
+Weather_stations = true
+Weather_daily = true
+
+[agmip_elem_to_schema_elem]
+SRAD = ["globrad", 1.0], # MJ/m2/d
+TMAX = ["tmax", 1.0],  # °C
+TMIN = ["tmin", 1.0],  # °C
+TAVD = ["tavg", 1.0],  # °C
+RAIN = ["precip", 1.0],  # mm/d
+VPRSD = ["vaporpress", 10.0],  # kPa -> hPa
+WIND = ["wind", [5.0, 432]],  # km/d -> m/s
+TDEW = ["dewpointTemp", 1.0],  # °C
+RHAVD = ["relhumid", 1.0], # %
+"""
 
 default_config = {
     "port:conf": "[TOML string] -> component configuration",
