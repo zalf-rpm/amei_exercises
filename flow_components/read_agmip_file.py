@@ -37,7 +37,7 @@ async def run_component(port_infos_reader_sr: str, config: dict):
     #await ps.update_config_from_port(config, ports["conf"])
 
     def default_if_nan(value, default:float|None=0.0, apply_func=None):
-        if value:
+        if value is not None:
             if type(value) is str:
                 return apply_func(value)
             try:
@@ -65,6 +65,8 @@ async def run_component(port_infos_reader_sr: str, config: dict):
         "Soil_profile_layers": True,
         "Weather_stations": True,
         "Weather_daily": True,
+        "Env_modifications": False,
+        "Genotypes": True,
     }
     enabled_sheets.update(config.get("enabled_sheets", {}))
 
@@ -172,7 +174,7 @@ async def run_component(port_infos_reader_sr: str, config: dict):
             })
 
     soil_profiles_dfs = dfs["Soil_profile_layers"]
-    soil_layers = defaultdict(dict)
+    soil_layers = defaultdict(list)
     for i in soil_profiles_dfs.axes[0]:
         sid = str(soil_profiles_dfs["SOIL_ID"][i])
         sllt = int(soil_profiles_dfs["SLLT"][i]) # [cm] soil layer top depth
@@ -198,12 +200,12 @@ async def run_component(port_infos_reader_sr: str, config: dict):
         #append_if_not_nan(props, "", soil_profiles_dfs.get("CACO3", {}).get(i, None)) # [g/kg] CaCO3 content
         #append_if_not_nan(props, "", soil_profiles_dfs.get("SLOM", {}).get(i, None)) # [kg[OM]/ha] soil organic matter layer
         #append_if_not_nan(props, "", soil_profiles_dfs.get("SLOMC", {}).get(i, None)) # [g[OM]/100g[soil]] soil organic matter concentration layer
-        soil_layers[sid][(sllt, sllb)] = {
+        soil_layers[sid].append({
             "size": layer_size_cm / 100.0,
             "properties": props
-        }
-    #for sid, layers in soil_layers.items():
-    #    soils[sid]["profile"].data.layers = layers
+        })
+    for sid, layers in soil_layers.items():
+        soils[sid]["profile"].data.layers = layers
 
     #scap = soil_capnp.Profile._new_client(soils["AZMC920001"]["profile"])
     #print(await scap.info())
@@ -291,13 +293,33 @@ async def run_component(port_infos_reader_sr: str, config: dict):
             "residue": {},
             "initial_conditions": None,
             "initial_condition_layers": {},
-            "planting_events": {},
-            "harvest_events": {},
-            "tillage_events": {},
-            "mulch_events": {},
+            "planting_events": [],
+            "harvest_events": [],
+            "tillage_events": [],
+            "mulch_events": [],
             "irrigation_events": [],
             "fertilizer_events": [],
+            "environment_modifications": [],
         }
+
+    cultivars = {}
+    if enabled_sheets["Genotypes"]:
+        genotypes_df = dfs["Genotypes"]
+        for i in genotypes_df.axes[0]:
+            cul_id = str(genotypes_df["CUL_ID"][i])
+            cultivars[cul_id] = {
+                "CUL_ID": cul_id, # [text] cultivar identifier
+                "CUL_NAME": default_if_nan(genotypes_df.get("CUL_NAME", {}).get(i, None), None, str), # [text] cultivar name
+                "ACCES_ID": default_if_nan(genotypes_df.get("ACCES_ID", {}).get(i, None), None, str), # [number] accession id
+                "ACCES_LOC": default_if_nan(genotypes_df.get("ACCES_LOC", {}).get(i, None), None, str), # [text] accession location
+                "CRID": default_if_nan(genotypes_df.get("CRID", {}).get(i, None), None, str), # [code] crop identifier ICASA
+                "SEED_LOT": default_if_nan(genotypes_df.get("SEED_LOT", {}).get(i, None), None, str), # [text] seed lot
+                "BREED_PRG": default_if_nan(genotypes_df.get("BREED_PRG", {}).get(i, None), None, str), # [text] breeding program
+                "CUL_ORIG": default_if_nan(genotypes_df.get("CUL_ORIG", {}).get(i, None), None, str), # [text] cultivar me orig
+                "CUL_YEAR": default_if_nan(genotypes_df.get("CUL_YEAR", {}).get(i, None), None, int), # [year] cultivar release year
+                "CUL_SYN": default_if_nan(genotypes_df.get("CUL_SYN", {}).get(i, None), None, str), # [text] cultivar synonym
+                "CUL_NOTES": default_if_nan(genotypes_df.get("CUL_NOTES", {}).get(i, None), None, str), # [text] cultivar notes
+            }
 
     # load plots of treatments
     plots_df = dfs["Plots"]
@@ -305,12 +327,13 @@ async def run_component(port_infos_reader_sr: str, config: dict):
         pid = str(plots_df["PLTID"][i])
         eid = str(plots_df["EID"][i])
         tid = str(plots_df["TREAT_ID"][i])
+        cul_id =  str(plots_df["CUL_ID"][i])
         sid = str(plots_df["SOIL_ID"][i])
         experiments[eid]["treatments"][tid]["plots"][pid] = {
             "PLTID": pid, # [text] plot id
             "EID": eid, # [text] experiment id
             "TREAT_ID": tid, # [text] treatment id
-            "CUL_ID": default_if_nan(plots_df.get("CUL_ID", {}).get(i, None), None, str), # [text] cultivar identifier
+            "CUL_ID": cul_id, # [text] cultivar identifier
             "SOIL_ID": sid, # [text] soil profile id
             "BLOCK": default_if_nan(plots_df.get("BLOCK", {}).get(i, None), None, int), # [number] block number
             "PLOTno": default_if_nan(plots_df.get("PLOTno", {}).get(i, None), None, int), # [number] plot number
@@ -320,6 +343,7 @@ async def run_component(port_infos_reader_sr: str, config: dict):
             "PLTHM": default_if_nan(plots_df.get("PLOTno", {}).get(i, None), None, str), # [code] harvest method plot
             "PLOT_NOTES": default_if_nan(plots_df.get("PLOT_NOTES", {}).get(i, None), None, str), # [text] plot notes
             "soil": soils[sid],
+            "cultivar": cultivars.get(cul_id, None)
         }
 
     # load treatments of experiments
@@ -329,8 +353,7 @@ async def run_component(port_infos_reader_sr: str, config: dict):
         tid = str(initial_df["TREAT_ID"][i])
         ictl = int(default_if_nan(initial_df["ICTL"][i], 0.0))
         icbl = int(initial_df["ICBL"][i])
-
-        experiments[eid]["treatments"][tid]["initial_condition_layers"][(ictl, icbl)] = {
+        experiments[eid]["treatments"][tid]["initial_condition_layers"][json.dumps([ictl, icbl])] = {
             "EID": eid, # [text] experiment id
             "TREAT_ID": tid, # [text] treatment id
             "ICDAT": str(initial_df["ICDAT"][i])[:10], # [date] initial conditions date
@@ -344,22 +367,26 @@ async def run_component(port_infos_reader_sr: str, config: dict):
             "ICNO3": default_if_nan(initial_df.get("ICNO3", {}).get(i, None), None, float), # [ppm] initial NO3 concentration layer
         }
 
-        icl = experiments[eid]["treatments"][tid]["initial_condition_layers"]
-        soil_layer = soil_layers.get(eid, {}).get((ictl, icbl), None)
-        if soil_layer:
-            fc = next(filter(lambda p: p["name"] == "fieldCapacity", soil_layer["properties"]))
-            soil_layer["properties"].append({
-                "name": "soilMoisture",
-                "f32Value": icl[(ictl, icbl)]["ICH2O"]*100 # [mm3/mm3] -> %
-            })
-            soil_layer["properties"].append({
-                "name": "ammonium",
-                "f32Value": icl[(ictl, icbl)]["ICNH4M"]/(100.0*100.0*soil_layer["size"]) # kg[N]/ha -> kg[N]/m3
-            })
-            soil_layer["properties"].append({
-                "name": "nitrate",
-                "f32Value": icl[(ictl, icbl)]["ICNO3M"]/(100.0*100.0*soil_layer["size"]) # kg[N]/ha -> kg[N]/m3
-            })
+        # the initial conditions should probably be set via other means than in the soil profile directly
+        # e.g. in MONICA via a dedicated workstep
+        #icl = experiments[eid]["treatments"][tid]["initial_condition_layers"]
+        #soil_ids = set(map(lambda v: v[1]["SOIL_ID"], filter(lambda i: i[1]["EID"] == eid and i[1]["TREAT_ID"] == tid, experiments[eid]["treatments"][tid]["plots"].items())))
+        #for s_id in soil_ids:
+        #    soil_layer = soil_layers.get(s_id, {}).get((ictl, icbl), None)
+        #    if soil_layer:
+        #        #fc = next(filter(lambda p: p["name"] == "fieldCapacity", soil_layer["properties"]))
+        #        soil_layer["properties"].append({
+        #            "name": "soilMoisture",
+        #            "f32Value": icl[(ictl, icbl)]["ICH2O"]*100 # [mm3/mm3] -> %
+        #        })
+        #        soil_layer["properties"].append({
+        #            "name": "ammonium",
+        #            "f32Value": icl[(ictl, icbl)]["ICNH4M"]/(100.0*100.0*soil_layer["size"]) # kg[N]/ha -> kg[N]/m3
+        #        })
+        #        soil_layer["properties"].append({
+        #            "name": "nitrate",
+        #            "f32Value": icl[(ictl, icbl)]["ICNO3M"]/(100.0*100.0*soil_layer["size"]) # kg[N]/ha -> kg[N]/m3
+        #        })
 
     # load planting events for a treatment
     if enabled_sheets["Planting_events"]:
@@ -367,9 +394,20 @@ async def run_component(port_infos_reader_sr: str, config: dict):
         for i in planting_df.axes[0]:
             eid = str(planting_df["EID"][i])
             tid = str(planting_df["TREAT_ID"][i])
-            experiments[eid]["treatments"][tid]["planting_events"] = {
-                "PDATE": str(planting_df["PDATE"][i])[:10],
-            }
+            experiments[eid]["treatments"][tid]["planting_events"].append({
+                "EID": eid, # [text] experiment id
+                "TREAT_ID": tid, # [text] treatment id
+                "PLDS": default_if_nan(planting_df.get("PLDS", {}).get(i, None), None, str), # [code] planting distribution
+                "PLRS": default_if_nan(planting_df.get("PLRS", {}).get(i, None), None, float), # [cm] row spacing
+                "PLRD": default_if_nan(planting_df.get("PLRD", {}).get(i, None), None, float), # [arc degrees] row direction
+                "PLDP": default_if_nan(planting_df.get("PLDP", {}).get(i, None), None, int), # [mm] planting depth
+                "PLLAY": default_if_nan(planting_df.get("PLLAY", {}).get(i, None), None, str), # [text] plot layout
+                "PDATE": default_if_nan(planting_df.get("PDATE", {}).get(i, None), None, lambda v: str(v)[:10]), # [date] planting date
+                "PLPOP": default_if_nan(planting_df.get("PLPOP", {}).get(i, None), None, int), # [number/m2] plant population at planting
+                "APLDAE": default_if_nan(planting_df.get("APLDAE", {}).get(i, None), None, lambda v: str(v)[:10]), # [date] average emergence date
+                "APLPOE": default_if_nan(planting_df.get("APLPOE", {}).get(i, None), None, int), # [number/m2] average plant population at emergence
+                "PL_NOTES": default_if_nan(planting_df.get("PL_NOTES", {}).get(i, None), None, str), # [text] planting notes
+            })
 
     # load harvest events for a treatment
     if enabled_sheets["Harvest_events"]:
@@ -377,9 +415,15 @@ async def run_component(port_infos_reader_sr: str, config: dict):
         for i in harvest_df.axes[0]:
             eid = str(harvest_df["EID"][i])
             tid = str(harvest_df["TREAT_ID"][i])
-            experiments[eid]["treatments"][tid]["harvest_events"] = {
-                "HADAT": str(harvest_df["HADAT"][i])[:10],
-            }
+            experiments[eid]["treatments"][tid]["harvest_events"].append({
+                "EID": eid, # [text] experiment id
+                "TREAT_ID": tid, # [text] treatment id
+                "HADAT": default_if_nan(harvest_df.get("HADAT", {}).get(i, None), None, lambda v: str(v)[:10]), # [date] harvest operations date
+                "HARM": default_if_nan(harvest_df.get("HARM", {}).get(i, None), None, str), # [code] harvest method
+                "HAREA": default_if_nan(harvest_df.get("HAREA", {}).get(i, None), None, float), # [cm2] harvest area
+                "HA_NOTES": default_if_nan(harvest_df.get("HA_NOTES", {}).get(i, None), None, str), # [text] harvest notes
+                "HA_COMMENTS": default_if_nan(harvest_df.get("HA_COMMENTS", {}).get(i, None), None, str), # [text] harvest comments
+            })
 
     if enabled_sheets["Irrigation_events"]:
         irrigation_df = dfs["Irrigation_events"]
@@ -387,11 +431,14 @@ async def run_component(port_infos_reader_sr: str, config: dict):
             eid = str(irrigation_df["EID"][i])
             tid = str(irrigation_df["TREAT_ID"][i])
             experiments[eid]["treatments"][tid]["irrigation_events"].append({
-                "IDATE": str(irrigation_df["IDATE"][i])[:10],
-                "IROP": str(irrigation_df["IROP"][i]),
-                "IRADP": int(irrigation_df["IRADP"][i]), #cm
-                "IRVAL": float(irrigation_df["IRVAL"][i]),
-                "IRNPC": float(irrigation_df["IRNPC"][i]),
+                "EID": eid, # [text] experiment id
+                "TREAT_ID": tid, # [text] treatment id
+                "IDATE": default_if_nan(irrigation_df.get("IDATE", {}).get(i, None), None, lambda v: str(v)[:10]), # [date] irrigation date
+                "IROP": default_if_nan(irrigation_df.get("IROP", {}).get(i, None), None, str), # [code] irrigation operation
+                "IRADP": default_if_nan(irrigation_df.get("IRADP", {}).get(i, None), None, int), # [cm] irrigation application depth
+                "IRVAL": default_if_nan(irrigation_df.get("IRVAL", {}).get(i, None), None, int), # [mm] irrigation amount
+                "IRNPC": default_if_nan(irrigation_df.get("IRNPC", {}).get(i, None), None, float), # [%] irrigation H2O N concentration
+                "IR_NOTES": default_if_nan(irrigation_df.get("IR_NOTES", {}).get(i, None), None, str), # [text] irrigation notes
             })
 
     if enabled_sheets["Fertilizer_events"]:
@@ -400,13 +447,16 @@ async def run_component(port_infos_reader_sr: str, config: dict):
             eid = str(fertilizer_df["EID"][i])
             tid = str(fertilizer_df["TREAT_ID"][i])
             experiments[eid]["treatments"][tid]["fertilizer_events"].append({
-                "FEDATE": str(fertilizer_df["FEDATE"][i])[:10],
-                "FEACD": str(fertilizer_df["FEACD"][i]),
-                "FEDEP": int(fertilizer_df["FEDEP"][i]),  # cm
-                "FECD": str(fertilizer_df["FECD"][i]),
-                "FEAMN": float(default_if_nan(fertilizer_df["FEAMN"][i])),
-                "FENO3": float(default_if_nan(fertilizer_df["FENO3"][i])),
-                "FENH4": float(default_if_nan(fertilizer_df["FENH4"][i])),
+                "EID": eid, # [text] experiment id
+                "TREAT_ID": tid, # [text] treatment id
+                "FEDATE": default_if_nan(fertilizer_df.get("FEDATE", {}).get(i, None), None, lambda v: str(v)[:10]), # [date] fertilization date
+                "FEACD": default_if_nan(fertilizer_df.get("FEACD", {}).get(i, None), None, str), # [code] fertilizer application method
+                "FEDEP": default_if_nan(fertilizer_df.get("FEDEP", {}).get(i, None), None, int), # [cm] application depth fertilizer
+                "FECD": default_if_nan(fertilizer_df.get("FECD", {}).get(i, None), None, str), # [code] fertilizer material
+                "FEAMN": default_if_nan(fertilizer_df.get("FEAMN", {}).get(i, None), None, int), # [kg[N]/ha] N in applied fertilizer
+                "FENO3": default_if_nan(fertilizer_df.get("FENO3", {}).get(i, None), None, int), # [kg[N]/ha] NO3 in applied fertilizer
+                "FENH4": default_if_nan(fertilizer_df.get("FENH4", {}).get(i, None), None, int), # [kg[N]/ha] NH4 in applied fertilizer
+                "FE_NOTES": default_if_nan(fertilizer_df.get("FE_NOTES", {}).get(i, None), None, str), # [text] fertilizer notes
             })
 
     if enabled_sheets["Residue"]:
@@ -414,26 +464,46 @@ async def run_component(port_infos_reader_sr: str, config: dict):
         for i in residues_df.axes[0]:
             eid = str(residues_df["EID"][i])
             tid = str(residues_df["TREAT_ID"][i])
-            icrdp = residues_df["ICRDP"][i]
-            perc_incorp = residues_df["ICRIP"][i]
-            above_ground = residues_df["ICRAG"][i]
-            perc_n_conc = residues_df["ICRN"][i]
-            root_wt_prev_crop = residues_df["ICRT"][i]
             experiments[eid]["treatments"][tid]["residue"] = {
-                "EID": eid,
-                "TREAT_ID": tid,
-                "ICRDAT": str(residues_df["ICRDAT"][i])[:10],
-                "ICRDP": float(icrdp) if np.isnan(icrdp) else None, # cm depth
-                "ICPCR": str(residues_df["ICPCR"][i]), # residue_prev_crop #code
-                "ICRIP": float(perc_incorp), # % incorporated
-                "ICRAG": float(above_ground), # kg[dDM] ha-1
-                "ICRN": float(perc_n_conc), # % N
-                "ICRT": float(root_wt_prev_crop), # kg[DM] ha-1
+                "EID": eid, # [text] experiment id
+                "TREAT_ID": tid, # [text] treatment id
+                "ICRDAT": default_if_nan(residues_df.get("ICRDAT", {}).get(i, None), None, lambda v: str(v)[:10]), # [date] initial residue measure date
+                "ICRDP": default_if_nan(residues_df.get("ICRDP", {}).get(i, None), None, int), # [cm] residue incorporation depth
+                "ICRIP": default_if_nan(residues_df.get("ICRIP", {}).get(i, None), None, float), # [%] residue incorporated
+                "ICPCR": default_if_nan(residues_df.get("ICPCR", {}).get(i, None), None, str), # [code] residue nature prev crop
+                "ICRAG": default_if_nan(residues_df.get("ICRAG", {}).get(i, None), None, float), # [kg[dry matter]/ha] residue above ground weight
+                "ICRN": default_if_nan(residues_df.get("ICRN", {}).get(i, None), None, float), # [%] residue N concentration
+                "ICRT": default_if_nan(residues_df.get("ICRT", {}).get(i, None), None, float), # [kg[dry matter]/ha] root weight previous crop
             }
 
-    # finally create layers in soil profile (after collecting all necessary data)
-    for sid, layers in soil_layers.items():
-        soils[sid]["profile"].data.layers = layers
+    if enabled_sheets["Env_modifications"]:
+        env_mods_df = dfs["Env_modifications"]
+        for i in env_mods_df.axes[0]:
+            eid = str(env_mods_df["EID"][i])
+            tid = str(env_mods_df["TREAT_ID"][i])
+            experiments[eid]["treatments"][tid]["environment_modifications"] = {
+                "EID": eid, # [text] experiment id
+                "TREAT_ID": tid, # [text] treatment id
+                "EMDATE": default_if_nan(env_mods_df.get("EMDATE", {}).get(i, None), None, lambda v: str(v)[:10]), # [date] environment modification date
+                "ECCO2": default_if_nan(env_mods_df.get("ECCO2", {}).get(i, None), None, str), # [code] environment modification code CO2
+                "EMCO2": default_if_nan(env_mods_df.get("EMCO2", {}).get(i, None), None, int), # [ppm] environment modification CO2
+                "EM_NOTES": default_if_nan(env_mods_df.get("EM_NOTES", {}).get(i, None), None, str), # [text] environment modification notes
+            }
+
+    # loop over all the experiments
+    for e_id, e in experiments.items():
+        for t_id, t in e["treatments"].items():
+            for p_id, p in t["plots"].items():
+                msg = {
+                    #"soil_profile": p["soil"]["profile"],
+                    "soil": p["soil"] | {"profile": None},
+                    "plot": p | {"soil": None},
+                    #"timeseries": t["weather_timeseries"],
+                    "treatment": t | {"weather_timeseries": None, "plots": None},
+                    "experiment": e | {"treatments": None},
+                }
+                j = json.dumps(msg)
+                print(j)
 
     while ports["out"]:
         try:
@@ -475,6 +545,8 @@ Soil_metadata = true
 Soil_profile_layers = true
 Weather_stations = true
 Weather_daily = true
+Env_modifications = false
+Genotypes = true
 
 [agmip_elem_to_schema_elem]
 SRAD = ["globrad", 1.0], # MJ/m2/d
