@@ -81,23 +81,23 @@ async def run_component(port_infos_reader_sr: str, config: dict):
     for i in wstations_df.axes[0]:
         wsid = str(wstations_df["WST_ID"][i])
         weather_stations[wsid] = {
-            "WST_ID": wsid,
-            "WST_NAME": default_if_nan(wstations_df.get("WST_NAME", {}).get(i, None), None, str),
-            "INST_NAME": default_if_nan(wstations_df.get("INST_NAME", {}).get(i, None), None, str),
-            "WST_SITE": default_if_nan(wstations_df.get("WST_SITE", {}).get(i, None), None, str),
-            "WST_LOC_1": default_if_nan(wstations_df.get("WST_LOC_1", {}).get(i, None), None, str),
-            "WST_LOC_2": default_if_nan(wstations_df.get("WST_LOC_2", {}).get(i, None), None, str),
-            "WST_LOC_3": default_if_nan(wstations_df.get("WST_LOC_3", {}).get(i, None), None, str),
-            "WST_LAT": default_if_nan(wstations_df.get("WST_LAT", {}).get(i, None), None, float),
-            "WST_LONG": default_if_nan(wstations_df.get("WST_LONG", {}).get(i, None), None, float),
-            "WST_ELEV": default_if_nan(wstations_df.get("WST_ELEV", {}).get(i, None), None, float),
-            "TAV": default_if_nan(wstations_df.get("TAV", {}).get(i, None), None, float),
-            "TAMP": default_if_nan(wstations_df.get("TAMP", {}).get(i, None), None, float),
-            "CO2Y": default_if_nan(wstations_df.get("CO2Y", {}).get(i, None), None, float),
-            "TEMHT": default_if_nan(wstations_df.get("TEMHT", {}).get(i, None), None, float),
-            "REFHT": default_if_nan(wstations_df.get("REFHT", {}).get(i, None), None, float),
-            "WNDHT": default_if_nan(wstations_df.get("WNDHT", {}).get(i, None), None, float),
-            "WST_NOTES": default_if_nan(wstations_df.get("WST_NOTES", {}).get(i, None), None, str),
+            "WST_ID": wsid, # [text] weather station code
+            "WST_NAME": default_if_nan(wstations_df.get("WST_NAME", {}).get(i, None), None, str), # [text] weather station name
+            "INST_NAME": default_if_nan(wstations_df.get("INST_NAME", {}).get(i, None), None, str), # [text] institute name
+            "WST_SITE": default_if_nan(wstations_df.get("WST_SITE", {}).get(i, None), None, str), # [text] weather station site
+            "WST_LOC_1": default_if_nan(wstations_df.get("WST_LOC_1", {}).get(i, None), None, str), # [text] weather station location country
+            "WST_LOC_2": default_if_nan(wstations_df.get("WST_LOC_2", {}).get(i, None), None, str), # [text] weather station location 2nd level
+            "WST_LOC_3": default_if_nan(wstations_df.get("WST_LOC_3", {}).get(i, None), None, str), # [text] weather station location 3rd level
+            "WST_LAT": default_if_nan(wstations_df.get("WST_LAT", {}).get(i, None), None, float), # [decimal degrees] weather station latitude
+            "WST_LONG": default_if_nan(wstations_df.get("WST_LONG", {}).get(i, None), None, float), # [decimal degrees] weather station longitude
+            "WST_ELEV": default_if_nan(wstations_df.get("WST_ELEV", {}).get(i, None), None, float), # [m] weather station elevation
+            "TAV": default_if_nan(wstations_df.get("TAV", {}).get(i, None), None, float), # [°C] temperature avg year
+            "TAMP": default_if_nan(wstations_df.get("TAMP", {}).get(i, None), None, float), # [°C] temperature amplitude month avg
+            "TEMHT": default_if_nan(wstations_df.get("TEMHT", {}).get(i, None), None, float), # [m] temperature sensor height
+            "REFHT": default_if_nan(wstations_df.get("REFHT", {}).get(i, None), None, float), # [m] reference height weather measurement
+            "WNDHT": default_if_nan(wstations_df.get("WNDHT", {}).get(i, None), None, float), # [m] reference height windspeed measurement
+            "CO2Y": default_if_nan(wstations_df.get("CO2Y", {}).get(i, None), None, float), # [ppm] CO2 concentration annual
+            "WST_NOTES": default_if_nan(wstations_df.get("WST_NOTES", {}).get(i, None), None, str), # [text] weather notes
         }
 
     agmip_elem_to_schema_elem = {
@@ -140,7 +140,7 @@ async def run_component(port_infos_reader_sr: str, config: dict):
     for i in soil_meta_dfs.axes[0]:
         sid = str(soil_meta_dfs["SOIL_ID"][i])
         soils[sid] = {
-            "SOIL_ID": sid, # text = soil profile id
+            "SOIL_ID": sid, # [text] soil profile id
             "SOIL_NAME": default_if_nan(soil_meta_dfs.get("Soil_NAME", {}).get(i, None), None, str), # [text] name of soil
             "SL_SOURCE": default_if_nan(soil_meta_dfs.get("SL_SOURCE", {}).get(i, None), None, str), # [text] soil source
             "SLDP": default_if_nan(soil_meta_dfs.get("SLDP", {}).get(i, None), None, int), # [cm] soil depth
@@ -148,12 +148,12 @@ async def run_component(port_infos_reader_sr: str, config: dict):
             "SLTOP": default_if_nan(soil_meta_dfs.get("SLTOP", {}).get(i, None), None, int), # [cm] depth of topsoil
             "SADR": default_if_nan(soil_meta_dfs.get("SADR", {}).get(i, None), None, float), # [1/day] drainage rate per day
             "SLRO": default_if_nan(soil_meta_dfs.get("SLRO", {}).get(i, None), None, float), # [number] runoff curve no SCS
-            "SAWC": default_if_nan(soil_meta_dfs.get("SAWC", {}).get(i, None), None, int) , # [cm] soil available water content
-            "FLST": default_if_nan(soil_meta_dfs.get("FLST", {}).get(i, None), None, int) , # [m2/m2] surface stones (cover)
-            "SALB": default_if_nan(soil_meta_dfs.get("SALB", {}).get(i, None), None, int) , # [] soil albedo
-            "SLU1": default_if_nan(soil_meta_dfs.get("SLU1", {}).get(i, None), None, float) , # [mm: soil evaporation limit
-            "SLNF": default_if_nan(soil_meta_dfs.get("SLNF", {}).get(i, None), None, float) , # [number: mineralization factor
-            "SLPF": default_if_nan(soil_meta_dfs.get("SLPF", {}).get(i, None), None, float) , # [number: soil fertility on foto
+            "SAWC": default_if_nan(soil_meta_dfs.get("SAWC", {}).get(i, None), None, float) , # [cm] soil available water content
+            "FLST": default_if_nan(soil_meta_dfs.get("FLST", {}).get(i, None), None, float) , # [m2/m2] surface stones (cover)
+            "SALB": default_if_nan(soil_meta_dfs.get("SALB", {}).get(i, None), None, float) , # [] soil albedo
+            "SLU1": default_if_nan(soil_meta_dfs.get("SLU1", {}).get(i, None), None, float) , # [mm] soil evaporation limit
+            "SLNF": default_if_nan(soil_meta_dfs.get("SLNF", {}).get(i, None), None, float) , # [number] mineralization factor
+            "SLPF": default_if_nan(soil_meta_dfs.get("SLPF", {}).get(i, None), None, float) , # [number] soil fertility on foto
             "SL_SYSTEM": default_if_nan(soil_meta_dfs.get("SL_SYSTEM", {}).get(i, None), None, str) , # [text] soil classific system
             "SLTX": default_if_nan(soil_meta_dfs.get("SLTX", {}).get(i, None), None, str) , # [code] soil texture
             "CLASSIFICATION": default_if_nan(soil_meta_dfs.get("CLASSIFICATION", {}).get(i, None), None, str) , # [text] soil classification
@@ -225,7 +225,7 @@ async def run_component(port_infos_reader_sr: str, config: dict):
             "FLELE": default_if_nan(fields_df.get("FLELE", {}).get(i, None), None, float), # [m] field elevation
             "FLSL": default_if_nan(fields_df.get("FLSL", {}).get(i, None), None, float), # [degree angle] field slope
             "FL_DRNTYPE": default_if_nan(fields_df.get("FL_DRNTYPE", {}).get(i, None), None, str), # [code] drainage type
-            "WST_DIST": default_if_nan(fields_df.get("WST_DIST", {}).get(i, None), None, str), # [km] weather station distance
+            "WST_DIST": default_if_nan(fields_df.get("WST_DIST", {}).get(i, None), None, float), # [km] weather station distance
             "FL_LOC_1": default_if_nan(fields_df.get("FL_LOC_1", {}).get(i, None), None, str), # [text] field country
             "FL_LOC_2": default_if_nan(fields_df.get("FL_LOC_2", {}).get(i, None), None, str), # [text] field sub country
             "FL_LOC_3": default_if_nan(fields_df.get("FL_LOC_3", {}).get(i, None), None, str), # [text] field sub sub country
