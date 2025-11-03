@@ -10,6 +10,20 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/soil_temperature_sensitivity_analysis/input_data/SoilData.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="&#9;" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/soil_temperature_sensitivity_analysis/input_data/WeatherMetadata.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="&#9;" />
+            </Attribute>
+          </value>
+        </entry>
       </map>
     </option>
   </component>

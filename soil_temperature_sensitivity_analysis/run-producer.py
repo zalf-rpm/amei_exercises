@@ -60,7 +60,7 @@ def run_producer(server=None, port=None):
     socket = context.socket(zmq.PUSH)  # pylint: disable=no-member
 
     config = {
-        "mode": "mbm-win-local-local",
+        "mode": "mbm-local-local",
         "server-port": port if port else "6666",
         "server": server if server else "localhost",  # "login01.cluster.zalf.de",
         "sim.json": "sim.json",
@@ -164,7 +164,7 @@ def run_producer(server=None, port=None):
         #if wst_id != "CAQC" or soil_id != "SALO" or int(t_data['LAID']) != 0 or int(float(t_data['AWC'])*100) != 0:
         #if wst_id != "FRLU" or soil_id != "SILO" or int(t_data['LAID']) != 7 or int(float(t_data['AWC'])*100) != 75:
         #if wst_id != "USMA" or soil_id != "SILO" or int(t_data['LAID']) != 7 or int(float(t_data['AWC'])*100) != 0:
-        #   continue
+           #continue
 
         env_template["customId"] = {
             "env_id": sent_env_count + 1,
