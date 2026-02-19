@@ -10,6 +10,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/maricopa_wheat_face/out/APMODailyMaricopa901.txt">
+          <value>
+            <Attribute>
+              <option name="separator" value="&#9;" />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/soil_temperature_sensitivity_analysis/input_data/SoilData.csv">
           <value>
             <Attribute>

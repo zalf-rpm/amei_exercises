@@ -70,11 +70,18 @@ def run_producer(server=None, port=None):
     # connect to monica proxy (if local, it will try to connect to a locally started monica)
     socket.connect("tcp://" + config["server"] + ":" + str(config["server-port"]))
 
-    def default_if_nan(value, default=0.0):
-        return default if np.isnan(value) else value
+    def default_if_nan(value, default:float|None=0.0, apply_func=None):
+        if value is not None:
+            if type(value) is str:
+                return apply_func(value)
+            try:
+                return default if np.isnan(value) else (apply_func(value) if apply_func else value)
+            except:
+                return apply_func(value) if apply_func else value
+        return value
 
     # read data from excel
-    dfs = pandas.read_excel("MARICOPA Wheat FACE data_2024-10-25 (ICASA data format v4.1)(PM6)(BAK1)(no soil temp).xlsx",
+    dfs = pandas.read_excel("MARICOPA Wheat FACE data_2026-01-23 (ICASA data format v4.1)(PM7)(BAK1)(no soilT).xlsx",
                             sheet_name=[
                                 "Experiment_description",
                                 "Fields",
@@ -90,6 +97,7 @@ def run_producer(server=None, port=None):
                                 "Soil_profile_layers",
                                 "Weather_stations",
                                 "Weather_daily",
+                                "Env_modifications",
                             ],
                             header=2)
 
@@ -105,7 +113,7 @@ def run_producer(server=None, port=None):
             "WST_ELEV": float(wstations_df["WST_ELEV"][i]),
             "TAV": float(wstations_df["TAV"][i]),
             "TAMP": float(wstations_df["TAMP"][i]),
-            "CO2Y": float(wstations_df["CO2Y"][i]),
+            #"CO2Y": float(wstations_df["CO2Y"][i]),
         }
 
     wdaily_df = dfs["Weather_daily"]
@@ -219,6 +227,7 @@ def run_producer(server=None, port=None):
             "mulch_events": {},
             "irrigation_events": [],
             "fertilizer_events": [],
+            "environment_modifications": [],
         }
 
     # load plots of treatments
@@ -330,6 +339,19 @@ def run_producer(server=None, port=None):
             "ICRT": float(root_wt_prev_crop), # kg[DM] ha-1
         }
 
+    env_mods_df = dfs["Env_modifications"]
+    for i in env_mods_df.axes[0]:
+        eid = str(env_mods_df["EID"][i])
+        tid = str(env_mods_df["TREAT_ID"][i])
+        experiments[eid]["treatments"][tid]["environment_modifications"].append({
+            "EID": eid, # [text] experiment id
+            "TREAT_ID": tid, # [text] treatment id
+            "EMDATE": default_if_nan(env_mods_df.get("EMDATE", {}).get(i, None), None, lambda v: str(v)[:10]), # [date] environment modification date
+            "ECCO2": default_if_nan(env_mods_df.get("ECCO2", {}).get(i, None), None, str), # [code] environment modification code CO2
+            "EMCO2": default_if_nan(env_mods_df.get("EMCO2", {}).get(i, None), None, int), # [ppm] environment modification CO2
+            "EM_NOTES": default_if_nan(env_mods_df.get("EM_NOTES", {}).get(i, None), None, str), # [text] environment modification notes
+        })
+
     # read template sim.json
     with open(config["sim.json"]) as _:
         sim_json = json.load(_)
@@ -362,7 +384,27 @@ def run_producer(server=None, port=None):
                 env_template["params"]["siteParameters"]["HeightNN"] = float(t["field"]["FLELE"])
                 env_template["params"]["siteParameters"]["Slope"] = float(t["field"]["FLSL"])
                 env_template["params"]["userEnvironmentParameters"]["Albedo"] = float(p["soil"]["SALB"])
-                env_template["params"]["userEnvironmentParameters"]["AtmosphericCO2"] = float(t["weather_station"]["CO2Y"])
+                #env_template["params"]["userEnvironmentParameters"]["AtmosphericCO2"] = float(t["weather_station"]["CO2Y"])
+
+                if t["weather_data"] is None:
+                    continue
+
+                # add CO2 to daily data
+                weather_data = copy.deepcopy(t["weather_data"]["data"])
+                weather_data[17] = []
+                co2s = weather_data[17]
+                cur_co2_default = float(t["weather_station"].get("CO2Y", 370))
+                mods_it = iter(t["environment_modifications"])
+                cur_mod = next(mods_it, None)
+                for date in t["weather_data"]["dates"]:
+                    if cur_mod:
+                        if cur_mod["EMDATE"] == date:
+                            if cur_mod["ECCO2"] == "Replace":
+                                cur_co2_default = float(cur_mod["EMCO2"])
+                            elif cur_mod["ECCO2"] == "Add":
+                                cur_co2_default += float(cur_mod["EMCO2"])
+                            cur_mod = next(mods_it, None) # move to next date (if any)
+                    co2s.append(cur_co2_default)
 
                 env_template["cropRotation"][0]["worksteps"][0]["date"] = t["planting_events"]["PDATE"]
                 env_template["cropRotation"][0]["worksteps"][1]["date"] = t["harvest_events"]["HADAT"]
@@ -374,7 +416,7 @@ def run_producer(server=None, port=None):
                 env_template["climateData"] = {
                     "startDate": t["SDAT"], #t["weather_data"]["start_date"],
                     "endDate": f"{t['harvest_events']['HADAT'][:4]}-12-31", #t["weather_data"]["end_date"],
-                    "data": t["weather_data"]["data"],
+                    "data": weather_data, #t["weather_data"]["data"],
                     "tamp": float(t["weather_station"]["TAMP"]),
                     "tav": float(t["weather_station"]["TAV"]),
                 }

@@ -12,6 +12,7 @@ pyzmq = "^26.2.0"
 pandas = "^2.2.2"
 openpyxl = "^3.1.5"
 zalfmas-fbp = "^0.2.20"
+pandas-stubs = "~=2.3.3"
 
 [build-system]
 requires = ["poetry-core"]

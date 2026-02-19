@@ -115,6 +115,7 @@ FRAMEWORK_ID	MODEL_ID	TREAT_ID	DATE	LNUM	GSTZD	LAID	LIPCD	CWAD	GWAD	GWGD	CNAD	GN
                         out.write("MO\t")
                         out.write(f"{model_code}\t")
                         out.write(f"{t_id}\t")
+                        out.write(f"{vals['Date']}\t")
                         out.write("na\t") # LNUM = "na"
                         if vals["Stage"] == 1: out.write("0\t") #GSTZD
                         elif vals["Stage"] == 2: out.write("9\t") #GSTZD
@@ -122,7 +123,10 @@ FRAMEWORK_ID	MODEL_ID	TREAT_ID	DATE	LNUM	GSTZD	LAID	LIPCD	CWAD	GWAD	GWGD	CNAD	GN
                         elif vals["Stage"] == 4: out.write("51\t") #GSTZD
                         elif vals["Stage"] == 5: out.write("65\t") #GSTZD
                         elif vals["Stage"] == 6: out.write("89\t") #GSTZD
+                        out.write("na\t") #LAID
                         out.write("na\t") #LIPCD
+                        out.write("na\t") #CWAD
+                        out.write("na\t") #GWAD
                         out.write("na\t") #GWGD
                         out.write(f'{vals["CNAD"]}\t')
                         out.write(f'{vals["GNAD"]}\t')

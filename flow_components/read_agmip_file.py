@@ -481,14 +481,14 @@ async def run_component(port_infos_reader_sr: str, config: dict):
         for i in env_mods_df.axes[0]:
             eid = str(env_mods_df["EID"][i])
             tid = str(env_mods_df["TREAT_ID"][i])
-            experiments[eid]["treatments"][tid]["environment_modifications"] = {
+            experiments[eid]["treatments"][tid]["environment_modifications"].append({
                 "EID": eid, # [text] experiment id
                 "TREAT_ID": tid, # [text] treatment id
                 "EMDATE": default_if_nan(env_mods_df.get("EMDATE", {}).get(i, None), None, lambda v: str(v)[:10]), # [date] environment modification date
                 "ECCO2": default_if_nan(env_mods_df.get("ECCO2", {}).get(i, None), None, str), # [code] environment modification code CO2
                 "EMCO2": default_if_nan(env_mods_df.get("EMCO2", {}).get(i, None), None, int), # [ppm] environment modification CO2
                 "EM_NOTES": default_if_nan(env_mods_df.get("EM_NOTES", {}).get(i, None), None, str), # [text] environment modification notes
-            }
+            })
 
     # loop over all the experiments
     for e_id, e in experiments.items():
