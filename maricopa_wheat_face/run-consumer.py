@@ -123,6 +123,7 @@ FRAMEWORK_ID	MODEL_ID	TREAT_ID	DATE	LNUM	GSTZD	LAID	LIPCD	CWAD	GWAD	GWGD	CNAD	GN
                         elif vals["Stage"] == 4: out.write("51\t") #GSTZD
                         elif vals["Stage"] == 5: out.write("65\t") #GSTZD
                         elif vals["Stage"] == 6: out.write("89\t") #GSTZD
+                        else: out.write("na\t") #GSTZD
                         out.write("na\t") #LAID
                         out.write("na\t") #LIPCD
                         out.write("na\t") #CWAD

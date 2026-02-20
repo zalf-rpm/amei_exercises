@@ -216,7 +216,7 @@ def run_producer(server=None, port=None):
             "WST_DATASET": str(treatments_df["WST_DATASET"][i]),
             "weather_data": weather_daily.get(str(treatments_df["WST_DATASET"][i]), None),
             "SDAT": str(treatments_df["SDAT"][i])[:10],
-            #"ENDAT": str(treatments_df["ENDAT"][i])[:10],
+            "ENDAT": str(treatments_df["ENDAT"][i])[:10],
             "plots": {},
             "residue": {},
             "initial_conditions": None,
@@ -389,14 +389,25 @@ def run_producer(server=None, port=None):
                 if t["weather_data"] is None:
                     continue
 
+                start_date_index = 0
+                end_data_index = len(t["weather_data"]["dates"]) - 1
+                for i, date in enumerate(t["weather_data"]["dates"]):
+                    if date == t["SDAT"]:
+                        start_date_index = i
+                    if date == t["ENDAT"]:
+                        end_data_index = i
+                weather_data = {}
+                for acd, data in t["weather_data"]["data"].items():
+                    weather_data[acd] = data[start_date_index:end_data_index+1]
+
                 # add CO2 to daily data
-                weather_data = copy.deepcopy(t["weather_data"]["data"])
+                #weather_data = copy.deepcopy(t["weather_data"]["data"])
                 weather_data[17] = []
                 co2s = weather_data[17]
                 cur_co2_default = float(t["weather_station"].get("CO2Y", 370))
                 mods_it = iter(t["environment_modifications"])
                 cur_mod = next(mods_it, None)
-                for date in t["weather_data"]["dates"]:
+                for date in t["weather_data"]["dates"][start_date_index:end_data_index+1]:
                     if cur_mod:
                         if cur_mod["EMDATE"] == date:
                             if cur_mod["ECCO2"] == "Replace":
@@ -415,7 +426,7 @@ def run_producer(server=None, port=None):
 
                 env_template["climateData"] = {
                     "startDate": t["SDAT"], #t["weather_data"]["start_date"],
-                    "endDate": f"{t['harvest_events']['HADAT'][:4]}-12-31", #t["weather_data"]["end_date"],
+                    "endDate": t["ENDAT"], #f"{t['harvest_events']['HADAT'][:4]}-12-31", #t["weather_data"]["end_date"],
                     "data": weather_data, #t["weather_data"]["data"],
                     "tamp": float(t["weather_station"]["TAMP"]),
                     "tav": float(t["weather_station"]["TAV"]),
@@ -465,15 +476,15 @@ def run_producer(server=None, port=None):
                             env_template["cropRotation"][0]["worksteps"].insert(-1, irr)
 
                 for st_model, model_code in [
-                    ("internal", "iMO"),
-                    ("Monica_SoilTemp", "MO"),
-                    ("DSSAT_ST_standalone", "DS"),
-                    ("DSSAT_EPICST_standalone", "DE"),
-                    ("Simplace_Soil_Temperature", "SA"),
-                    ("Stics_soil_temperature", "ST"),
-                    ("SQ_Soil_Temperature", "SQ"),
-                    ("BiomaSurfacePartonSoilSWATC", "PS"),
-                    ("BiomaSurfaceSWATSoilSWATC", "SW"),
+                    # ("internal", "iMO"),
+                    # ("Monica_SoilTemp", "MO"),
+                    # ("DSSAT_ST_standalone", "DS"),
+                    # ("DSSAT_EPICST_standalone", "DE"),
+                    # ("Simplace_Soil_Temperature", "SA"),
+                    # ("Stics_soil_temperature", "ST"),
+                    # ("SQ_Soil_Temperature", "SQ"),
+                    # ("BiomaSurfacePartonSoilSWATC", "PS"),
+                    # ("BiomaSurfaceSWATSoilSWATC", "SW"),
                     ("ApsimCampbell", "AP")
                 ]:
                     env_template["params"]["simulationParameters"]["SoilTempModel"] = st_model
