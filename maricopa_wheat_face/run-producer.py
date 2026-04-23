@@ -368,6 +368,7 @@ def run_producer(server=None, port=None):
         "sim": sim_json,
         "climate": ""
     })
+    env_temp_cr = env_template["cropRotation"]
 
     sent_env_count = 0
     start_time = time.perf_counter()
@@ -375,138 +376,140 @@ def run_producer(server=None, port=None):
     # loop over all the experiments
     for e_id, e in experiments.items():
         for t_id, t in e["treatments"].items():
-            for p_id, p in t["plots"].items():
+            #for p_id, p in t["plots"].items():
+            p = next(iter(t["plots"].items()))[1]
 
-                start_setup_time = time.perf_counter()
+            start_setup_time = time.perf_counter()
 
-                env_template["params"]["siteParameters"]["SoilProfileParameters"] = list(map(lambda k_v: k_v[1], p["soil"]["layers"].items()))
-                env_template["params"]["siteParameters"]["Latitude"] = float(t["field"]["FL_LAT"])
-                env_template["params"]["siteParameters"]["HeightNN"] = float(t["field"]["FLELE"])
-                env_template["params"]["siteParameters"]["Slope"] = float(t["field"]["FLSL"])
-                env_template["params"]["userEnvironmentParameters"]["Albedo"] = float(p["soil"]["SALB"])
-                #env_template["params"]["userEnvironmentParameters"]["AtmosphericCO2"] = float(t["weather_station"]["CO2Y"])
+            env_template["params"]["siteParameters"]["SoilProfileParameters"] = list(map(lambda k_v: k_v[1], p["soil"]["layers"].items()))
+            env_template["params"]["siteParameters"]["Latitude"] = float(t["field"]["FL_LAT"])
+            env_template["params"]["siteParameters"]["HeightNN"] = float(t["field"]["FLELE"])
+            env_template["params"]["siteParameters"]["Slope"] = float(t["field"]["FLSL"])
+            env_template["params"]["userEnvironmentParameters"]["Albedo"] = float(p["soil"]["SALB"])
+            #env_template["params"]["userEnvironmentParameters"]["AtmosphericCO2"] = float(t["weather_station"]["CO2Y"])
 
-                if t["weather_data"] is None:
-                    continue
+            if t["weather_data"] is None:
+                continue
 
-                start_date_index = 0
-                end_data_index = len(t["weather_data"]["dates"]) - 1
-                for i, date in enumerate(t["weather_data"]["dates"]):
-                    if date == t["SDAT"]:
-                        start_date_index = i
-                    if date == t["ENDAT"]:
-                        end_data_index = i
-                weather_data = {}
-                for acd, data in t["weather_data"]["data"].items():
-                    weather_data[acd] = data[start_date_index:end_data_index+1]
+            start_date_index = 0
+            end_data_index = len(t["weather_data"]["dates"]) - 1
+            for i, date in enumerate(t["weather_data"]["dates"]):
+                if date == t["SDAT"]:
+                    start_date_index = i
+                if date == t["ENDAT"]:
+                    end_data_index = i
+            weather_data = {}
+            for acd, data in t["weather_data"]["data"].items():
+                weather_data[acd] = data[start_date_index:end_data_index+1]
 
-                # add CO2 to daily data
-                #weather_data = copy.deepcopy(t["weather_data"]["data"])
-                weather_data[17] = []
-                co2s = weather_data[17]
-                cur_co2_default = float(t["weather_station"].get("CO2Y", 370))
-                mods_it = iter(t["environment_modifications"])
-                cur_mod = next(mods_it, None)
-                for date in t["weather_data"]["dates"][start_date_index:end_data_index+1]:
-                    if cur_mod:
-                        if cur_mod["EMDATE"] == date:
-                            if cur_mod["ECCO2"] == "Replace":
-                                cur_co2_default = float(cur_mod["EMCO2"])
-                            elif cur_mod["ECCO2"] == "Add":
-                                cur_co2_default += float(cur_mod["EMCO2"])
-                            cur_mod = next(mods_it, None) # move to next date (if any)
-                    co2s.append(cur_co2_default)
+            # add CO2 to daily data
+            #weather_data = copy.deepcopy(t["weather_data"]["data"])
+            weather_data[17] = []
+            co2s = weather_data[17]
+            cur_co2_default = float(t["weather_station"].get("CO2Y", 370))
+            mods_it = iter(t["environment_modifications"])
+            cur_mod = next(mods_it, None)
+            for date in t["weather_data"]["dates"][start_date_index:end_data_index+1]:
+                if cur_mod:
+                    if cur_mod["EMDATE"] == date:
+                        if cur_mod["ECCO2"] == "Replace":
+                            cur_co2_default = float(cur_mod["EMCO2"])
+                        elif cur_mod["ECCO2"] == "Add":
+                            cur_co2_default += float(cur_mod["EMCO2"])
+                        cur_mod = next(mods_it, None) # move to next date (if any)
+                co2s.append(cur_co2_default)
 
-                env_template["cropRotation"][0]["worksteps"][0]["date"] = t["planting_events"]["PDATE"]
-                env_template["cropRotation"][0]["worksteps"][1]["date"] = t["harvest_events"]["HADAT"]
+            env_template["cropRotation"] = copy.deepcopy(env_temp_cr)
+            env_template["cropRotation"][0]["worksteps"][0]["date"] = t["planting_events"]["PDATE"]
+            env_template["cropRotation"][0]["worksteps"][1]["date"] = t["harvest_events"]["HADAT"]
 
-                #with open("climate-iso.csv", "r") as _:
-                #    csv_str = _.read()
-                #env_template["climateCSV"] = csv_str
+            #with open("climate-iso.csv", "r") as _:
+            #    csv_str = _.read()
+            #env_template["climateCSV"] = csv_str
 
-                env_template["climateData"] = {
-                    "startDate": t["SDAT"], #t["weather_data"]["start_date"],
-                    "endDate": t["ENDAT"], #f"{t['harvest_events']['HADAT'][:4]}-12-31", #t["weather_data"]["end_date"],
-                    "data": weather_data, #t["weather_data"]["data"],
-                    "tamp": float(t["weather_station"]["TAMP"]),
-                    "tav": float(t["weather_station"]["TAV"]),
+            env_template["climateData"] = {
+                "startDate": t["SDAT"], #t["weather_data"]["start_date"],
+                "endDate": t["ENDAT"], #f"{t['harvest_events']['HADAT'][:4]}-12-31", #t["weather_data"]["end_date"],
+                "data": weather_data, #t["weather_data"]["data"],
+                "tamp": float(t["weather_station"]["TAMP"]),
+                "tav": float(t["weather_station"]["TAV"]),
+            }
+
+            irr_fert_evs = defaultdict(list)
+            for e in t["fertilizer_events"]:
+                irr_fert_evs[e["FEDATE"]].append(e)
+            for e in t["irrigation_events"]:
+                irr_fert_evs[e["IDATE"]].append(e)
+
+            irr_fert_dates = list(irr_fert_evs.keys())
+            irr_fert_dates.sort()
+
+            sowing_date = env_template["cropRotation"][0]["worksteps"][0]["date"]
+            harvest_date = env_template["cropRotation"][0]["worksteps"][-1]["date"]
+            for if_date in irr_fert_dates:
+                kg_n_per_ha_nitrate_in_irr_water = None
+                for ev in irr_fert_evs[if_date]:
+                    if "FEDATE" in ev:
+                        if ev["FEACD"] == "Applied in irrigation water":
+                            kg_n_per_ha_nitrate_in_irr_water = ev["FEAMN"]
+                            continue
+                        mf = copy.deepcopy(crop_json["ws"]["MineralFertilization"])
+                        mf["date"] = ev["FEDATE"]
+                        mf["amount"][0] = ev["FEAMN"]
+                        mf["partition"] = {
+                            "Carbamid": 100.0,
+                            "NH4": 0.0,
+                            "NO3": 0.0,
+                            "name": ev["FECD"],
+                        }
+                        if mf["date"] < sowing_date:
+                            env_template["cropRotation"][0]["worksteps"].insert(0, mf)
+                        elif mf["date"] > harvest_date:
+                            env_template["cropRotation"][0]["worksteps"].append(mf)
+                        else:
+                            env_template["cropRotation"][0]["worksteps"].insert(-1, mf)
+                    elif "IDATE" in ev:
+                        irr = copy.deepcopy(crop_json["ws"]["Irrigation"])
+                        irr["date"] = ev["IDATE"]
+                        layer_size_cm = env_template["params"]["siteParameters"]["LayerThickness"][0] * 100.0 # m -> cm
+                        irr["atLayer"] = int(ev["IRADP"] / layer_size_cm)  # into which layer
+                        irr["amount"][0] = ev["IRVAL"]
+                        if kg_n_per_ha_nitrate_in_irr_water:
+                            irr["parameters"]["nitrateConcentration"] = kg_n_per_ha_nitrate_in_irr_water * 100.0 / ev["IRVAL"] # kg/ha -> mg/l (mg/dm3)
+                        env_template["cropRotation"][0]["worksteps"].insert(-1, irr)
+
+            for st_model, model_code in [
+                ("internal", "iMO"),
+                ("Monica_SoilTemp", "MO"),
+                ("DSSAT_ST_standalone", "DS"),
+                ("DSSAT_EPICST_standalone", "DE"),
+                ("Simplace_Soil_Temperature", "SA"),
+                ("Stics_soil_temperature", "ST"),
+                ("SQ_Soil_Temperature", "SQ"),
+                ("BiomaSurfacePartonSoilSWATC", "PS"),
+                ("BiomaSurfaceSWATSoilSWATC", "SW"),
+                ("ApsimCampbell", "AP")
+            ]:
+                env_template["params"]["simulationParameters"]["SoilTempModel"] = st_model
+
+                #with open(f"env_{sent_env_count+1}.json", "w") as _:
+                #    _.write(json.dumps(env_template))
+
+                env_template["customId"] = {
+                    "env_id": sent_env_count + 1,
+                    "st_model": st_model,
+                    "model_code": model_code,
+                    "treatment_id": t_id,
+                    "year": env_template["climateData"]["startDate"][:4], #t["weather_data"]["start_date"][:4],
+                    "wst_dataset": t["WST_DATASET"],
+                    "soil_profile_id": p["SOIL_ID"],
                 }
 
-                irr_fert_evs = defaultdict(list)
-                for e in t["fertilizer_events"]:
-                    irr_fert_evs[e["FEDATE"]].append(e)
-                for e in t["irrigation_events"]:
-                    irr_fert_evs[e["IDATE"]].append(e)
+                socket.send_json(env_template)
+                sent_env_count += 1
 
-                irr_fert_dates = list(irr_fert_evs.keys())
-                irr_fert_dates.sort()
-
-                sowing_date = env_template["cropRotation"][0]["worksteps"][0]["date"]
-                harvest_date = env_template["cropRotation"][0]["worksteps"][-1]["date"]
-                for if_date in irr_fert_dates:
-                    kg_n_per_ha_nitrate_in_irr_water = None
-                    for ev in irr_fert_evs[if_date]:
-                        if "FEDATE" in ev:
-                            if ev["FEACD"] == "Applied in irrigation water":
-                                kg_n_per_ha_nitrate_in_irr_water = ev["FEAMN"]
-                                continue
-                            mf = copy.deepcopy(crop_json["ws"]["MineralFertilization"])
-                            mf["date"] = ev["FEDATE"]
-                            mf["amount"][0] = ev["FEAMN"]
-                            mf["partition"] = {
-                                "Carbamid": 100.0,
-                                "NH4": 0.0,
-                                "NO3": 0.0,
-                                "name": ev["FECD"],
-                            }
-                            if mf["date"] < sowing_date:
-                                env_template["cropRotation"][0]["worksteps"].insert(0, mf)
-                            elif mf["date"] > harvest_date:
-                                env_template["cropRotation"][0]["worksteps"].append(mf)
-                            else:
-                                env_template["cropRotation"][0]["worksteps"].insert(-1, mf)
-                        elif "IDATE" in ev:
-                            irr = copy.deepcopy(crop_json["ws"]["Irrigation"])
-                            irr["date"] = ev["IDATE"]
-                            layer_size_cm = env_template["params"]["siteParameters"]["LayerThickness"][0] * 100.0 # m -> cm
-                            irr["atLayer"] = int(ev["IRADP"] / layer_size_cm)  # into which layer
-                            irr["amount"][0] = ev["IRVAL"]
-                            if kg_n_per_ha_nitrate_in_irr_water:
-                                irr["parameters"]["nitrateConcentration"] = kg_n_per_ha_nitrate_in_irr_water * 100.0 / ev["IRVAL"] # kg/ha -> mg/l (mg/dm3)
-                            env_template["cropRotation"][0]["worksteps"].insert(-1, irr)
-
-                for st_model, model_code in [
-                    # ("internal", "iMO"),
-                    # ("Monica_SoilTemp", "MO"),
-                    # ("DSSAT_ST_standalone", "DS"),
-                    # ("DSSAT_EPICST_standalone", "DE"),
-                    # ("Simplace_Soil_Temperature", "SA"),
-                    # ("Stics_soil_temperature", "ST"),
-                    # ("SQ_Soil_Temperature", "SQ"),
-                    # ("BiomaSurfacePartonSoilSWATC", "PS"),
-                    # ("BiomaSurfaceSWATSoilSWATC", "SW"),
-                    ("ApsimCampbell", "AP")
-                ]:
-                    env_template["params"]["simulationParameters"]["SoilTempModel"] = st_model
-
-                    #with open(f"env_{sent_env_count+1}.json", "w") as _:
-                    #    _.write(json.dumps(env_template))
-
-                    env_template["customId"] = {
-                        "env_id": sent_env_count + 1,
-                        "st_model": st_model,
-                        "model_code": model_code,
-                        "treatment_id": t_id,
-                        "year": t["weather_data"]["start_date"][:4],
-                        "wst_dataset": t["WST_DATASET"],
-                        "soil_profile_id": p["SOIL_ID"],
-                    }
-
-                    socket.send_json(env_template)
-                    sent_env_count += 1
-
-                    stop_setup_time = time.perf_counter()
-                    print("Setup ", sent_env_count, " envs took ", (stop_setup_time - start_setup_time), " seconds")
+                stop_setup_time = time.perf_counter()
+                print("Setup ", sent_env_count, " envs took ", (stop_setup_time - start_setup_time), " seconds")
 
     env_template["customId"] = {
         "no_of_sent_envs": sent_env_count,

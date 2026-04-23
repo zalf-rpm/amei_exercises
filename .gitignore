@@ -9,3 +9,6 @@ maricopa_wheat_face/~$MARICOPA Wheat FACE data_2024-10-25 (ICASA data format v4.
 /thiago/SoilTemperature_AP_APC/Outputs/SoilTemperature_AP_APC_USMA_SILO_L7_AW1.00.txt
 /soil_temperature_sensitivity_analysis/out/
 /maricopa_wheat_face/compare/
+# pixi environments
+.pixi/*
+!.pixi/config.toml

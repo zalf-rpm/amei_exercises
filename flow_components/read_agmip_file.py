@@ -23,18 +23,116 @@ import numpy as np
 import os
 import pandas
 
-from zalfmas_capnp_schemas import fbp_capnp, climate_capnp, common_capnp, soil_capnp
-from zalfmas_common import common
-from zalfmas_common.climate import csv_file_based
-from zalfmas_services.soil import sqlite_soil_data_service as sds
+from zalfmas_capnp_schemas_with_stubs import fbp_capnp, climate_capnp, common_capnp, soil_capnp
 import zalfmas_fbp.run.components as c
 import zalfmas_fbp.run.ports as ps
+from zalfmas_common.climate import csv_file_based
+from zalfmas_services.soil import sqlite_soil_data_service as sds
+
+meta = {
+    "category": {
+        "id": "amei_exercises",
+        "name": "AMEI Exercises"
+    },
+    "component": {
+        "info": {
+            "id": "ba5ccca8-ecbe-4598-aa1d-0123a0a95423",
+            "name": "Read AgMIP file",
+            "description": "Read an AgMIP file and stream plots"
+        },
+        "type": "standard",
+        "inPorts": [
+            {
+                "name": "conf",
+                "contentType": "common.capnp:StructuredText[JSON | TOML]"
+            }
+        ],
+        "outPorts": [
+            {
+                "name": "out",
+                "contentType": "common.capnp:StructuredText[JSON]",
+                "desc": "json object describing a single plots data"
+            }
+        ],
+        "defaultConfig": {
+            "file": {
+                "value": "/home/berg/GitHub/amei_exercises/maricopa_wheat_face/MARICOPA Wheat FACE data_2026-01-23 (ICASA data format v4.1)(PM7)(BAK1)(no soilT).xlsx",
+                "type": "string",
+                "desc": "Path to AgMIP xlsx"
+            },
+            "weather_elements": {
+                "value": ["SRAD", "TMAX", "TMIN", "TAVD", "RAIN", "VPRSD", "WIND", "TDEW", "RHAVD"],
+                "type": ["SRAD", "TMAX", "TMIN", "TAVD", "RAIN", "VPRSD", "WIND", "TDEW", "RHAVD"],
+                "desc": "Weather elements to read from file."
+            },
+            "enabled_sheets": {
+                "value": [
+                    "Experiment_description",
+                    "Fields",
+                    "Treatments",
+                    "Plots",
+                    "Residue",
+                    "initial_condition_layers",
+                    "Planting_events",
+                    "Harvest_events",
+                    "Irrigation_events",
+                    "Fertilizer_events",
+                    "Soil_metadata",
+                    "Soil_profile_layers",
+                    "Weather_stations",
+                    "Weather_daily",
+                    "Env_modifications",
+                    "Genotypes"
+                ],
+                "type": [
+                    "Experiment_description",
+                    "Fields",
+                    "Treatments",
+                    "Plots",
+                    "Residue",
+                    "initial_condition_layers",
+                    "Planting_events",
+                    "Harvest_events",
+                    "Irrigation_events",
+                    "Fertilizer_events",
+                    "Soil_metadata",
+                    "Soil_profile_layers",
+                    "Weather_stations",
+                    "Weather_daily",
+                    "Env_modifications",
+                    "Genotypes"
+                ],
+                "desc": "Which sheets in the xlsx file are supposed to be read and included in the output."
+            },
+            "agmip_elem_to_schema_elem": {
+                "value": {
+                    "SRAD": ["globrad", 1.0], # MJ/m2/d
+                    "TMAX": ["tmax", 1.0],  # °C
+                    "TMIN": ["tmin", 1.0],  # °C
+                    "TAVD": ["tavg", 1.0],  # °C
+                    "RAIN": ["precip", 1.0],  # mm/d
+                    "VPRSD": ["vaporpress", 10.0],  # kPa -> hPa
+                    "WIND": ["wind", [5.0, 432]],  # km/d -> m/s
+                    "TDEW": ["dewpointTemp", 1.0],  # °C
+                    "RHAVD": ["relhumid", 1.0], # %
+                },
+                "type": "object",
+                "desc": "Map AgMIP climate element names to schema climate element names with conversion fractor."
+            }
+        }
+    }
+}
 
 async def run_component(port_infos_reader_sr: str, config: dict):
-    #ports = await ps.PortConnector.create_from_port_infos_reader(
-    #    port_infos_reader_sr, ins=["conf"], outs=["out"]
-    #)
-    #await ps.update_config_from_port(config, ports["conf"])
+    # ports = await ps.PortConnector.create_from_port_infos_reader(
+    #     port_infos_reader_sr, ins=["conf"], outs=["out"]
+    # )
+    # print(f"{os.path.basename(__file__)}: {config['name']} connected port(s)")
+    # await ps.update_config_from_port(config, ports["conf"])
+    # if ports["conf"]:
+    #     print(
+    #         f"{os.path.basename(__file__)}: {config['name']} updated config from config port"
+    #     )
 
     def default_if_nan(value, default:float|None=0.0, apply_func=None):
         if value is not None:
@@ -46,9 +144,9 @@ async def run_component(port_infos_reader_sr: str, config: dict):
                 return apply_func(value) if apply_func else value
         return value
 
-    #file = config["file"]
-    file = "/home/berg/GitHub/amei_exercises/maricopa_wheat_face/MARICOPA Wheat FACE data_2024-10-25 (ICASA data format v4.1)(PM7)(BAK1)(no soil temp).xlsx"
-    file = "/home/berg/GitHub/amei_exercises/ames_bare_soil/AMEI_fallow_Ames_2024-05-16.xlsx"
+    file = config["file"]
+    #file = "/home/berg/GitHub/amei_exercises/maricopa_wheat_face/MARICOPA Wheat FACE data_2026-01-23 (ICASA data format v4.1)(PM7)(BAK1)(no soilT).xlsx"
+    #file = "/home/berg/GitHub/amei_exercises/ames_bare_soil/AMEI_fallow_Ames_2024-05-16.xlsx"
 
     enabled_sheets = {
         "Experiment_description": True,
@@ -68,7 +166,8 @@ async def run_component(port_infos_reader_sr: str, config: dict):
         "Env_modifications": False,
         "Genotypes": True,
     }
-    enabled_sheets.update(config.get("enabled_sheets", {}))
+
+    enabled_sheets.update(map(lambda k: (k, True), config.get("enabled_sheets", [])))
 
     # read data from Excel file
     dfs = pandas.read_excel(file,
@@ -135,7 +234,7 @@ async def run_component(port_infos_reader_sr: str, config: dict):
     #print(await cap.data())
 
     # load soil data
-    soils = defaultdict(dict)
+    soils: dict[str, dict] = defaultdict(dict)
     soil_meta_dfs = dfs["Soil_metadata"]
     for i in soil_meta_dfs.axes[0]:
         sid = str(soil_meta_dfs["SOIL_ID"][i])
@@ -234,7 +333,7 @@ async def run_component(port_infos_reader_sr: str, config: dict):
 
     # load experiments
     exp_desc_df = dfs["Experiment_description"]
-    experiments = defaultdict(dict)
+    experiments: dict[str, dict] = defaultdict(dict)
     for i in exp_desc_df.axes[0]:
         eid = str(exp_desc_df["EID"][i])
         experiments[eid] = {
@@ -481,14 +580,28 @@ async def run_component(port_infos_reader_sr: str, config: dict):
         for i in env_mods_df.axes[0]:
             eid = str(env_mods_df["EID"][i])
             tid = str(env_mods_df["TREAT_ID"][i])
-            experiments[eid]["treatments"][tid]["environment_modifications"].append({
+            cur_mod = {
                 "EID": eid, # [text] experiment id
                 "TREAT_ID": tid, # [text] treatment id
                 "EMDATE": default_if_nan(env_mods_df.get("EMDATE", {}).get(i, None), None, lambda v: str(v)[:10]), # [date] environment modification date
                 "ECCO2": default_if_nan(env_mods_df.get("ECCO2", {}).get(i, None), None, str), # [code] environment modification code CO2
                 "EMCO2": default_if_nan(env_mods_df.get("EMCO2", {}).get(i, None), None, int), # [ppm] environment modification CO2
                 "EM_NOTES": default_if_nan(env_mods_df.get("EM_NOTES", {}).get(i, None), None, str), # [text] environment modification notes
-            })
+            }
+            experiments[eid]["treatments"][tid]["environment_modifications"].append(cur_mod)
+
+            t = experiments[eid]["treatments"][tid]
+            weather_timeseries = t["weather_timeseries"]
+            ts_df = weather_timeseries.dataframe
+            default_co2 = t["weather_station"].get("CO2Y", 370)
+            ts_df["co2"] = float(default_co2 if default_co2 else 370)
+            for date in ts_df.index:
+                if cur_mod["EMDATE"] == date:
+                    if cur_mod["ECCO2"] == "Replace" and cur_mod["EMCO2"]:
+                        ts_df.loc[date, "co2"] = float(cur_mod["EMCO2"])
+                    elif cur_mod["ECCO2"] == "Add" and cur_mod["EMCO2"]:
+                        ts_df.loc[date, "co2"] += float(cur_mod["EMCO2"])
+
 
     # loop over all the experiments
     for e_id, e in experiments.items():
@@ -504,6 +617,7 @@ async def run_component(port_infos_reader_sr: str, config: dict):
                 }
                 j = json.dumps(msg)
                 print(j)
+    return
 
     while ports["out"]:
         try:
@@ -526,122 +640,79 @@ async def run_component(port_infos_reader_sr: str, config: dict):
     await ports.close_out_ports()
     print(f"{os.path.basename(__file__)}: process finished")
 
-"""
-#file = "path to AgMIP xlsx"
-#weather_elements = ["SRAD", "TMAX", "TMIN", "TAVD", "RAIN", "VPRSD", "WIND", "TDEW", "RHAVD"]
-
-[enabled_sheets]
-Experiment_description = true
-Fields = true
-Treatments = true
-Plots = true
-Residue = true
-initial_condition_layers = true
-Planting_events = true
-Harvest_events = true
-Irrigation_events = true
-Fertilizer_events = true
-Soil_metadata = true
-Soil_profile_layers = true
-Weather_stations = true
-Weather_daily = true
-Env_modifications = false
-Genotypes = true
-
-[agmip_elem_to_schema_elem]
-SRAD = ["globrad", 1.0], # MJ/m2/d
-TMAX = ["tmax", 1.0],  # °C
-TMIN = ["tmin", 1.0],  # °C
-TAVD = ["tavg", 1.0],  # °C
-RAIN = ["precip", 1.0],  # mm/d
-VPRSD = ["vaporpress", 10.0],  # kPa -> hPa
-WIND = ["wind", [5.0, 432]],  # km/d -> m/s
-TDEW = ["dewpointTemp", 1.0],  # °C
-RHAVD = ["relhumid", 1.0], # %
-"""
-
-default_config = {
-    "port:conf": "[TOML string] -> component configuration",
-    "port:out": "[json] -> json object describing a single plots data",
-}
-
 
 def main():
-    parser = c.create_default_fbp_component_args_parser("Read AgMIP file")
-    port_infos_reader_sr, config, args = c.handle_default_fpb_component_args(
-        parser, default_config
-    )
-    asyncio.run(capnp.run(run_component(port_infos_reader_sr, config)))
-
+    c.run_component_from_metadata(run_component, meta)
 
 if __name__ == "__main__":
     main()
 
 
 
-                #
-                # env_template["params"]["siteParameters"]["SoilProfileParameters"] = list(map(lambda k_v: k_v[1], p["soil"]["layers"].items()))
-                # env_template["params"]["siteParameters"]["Latitude"] = float(t["field"]["FL_LAT"])
-                # env_template["params"]["siteParameters"]["HeightNN"] = float(t["field"]["FLELE"])
-                # env_template["params"]["siteParameters"]["Slope"] = float(t["field"]["FLSL"])
-                # env_template["params"]["userEnvironmentParameters"]["Albedo"] = float(p["soil"]["SALB"])
-                # env_template["params"]["userEnvironmentParameters"]["AtmosphericCO2"] = float(t["weather_station"]["CO2Y"])
-                #
-                # env_template["cropRotation"][0]["worksteps"][0]["date"] = t["planting_events"]["PDATE"]
-                # env_template["cropRotation"][0]["worksteps"][1]["date"] = t["harvest_events"]["HADAT"]
-                #
-                # #with open("climate-iso.csv", "r") as _:
-                # #    csv_str = _.read()
-                # #env_template["climateCSV"] = csv_str
-                #
-                # env_template["climateData"] = {
-                #     "startDate": t["SDAT"], #t["weather_data"]["start_date"],
-                #     "endDate": f"{t['harvest_events']['HADAT'][:4]}-12-31", #t["weather_data"]["end_date"],
-                #     "data": t["weather_data"]["data"],
-                #     "tamp": float(t["weather_station"]["TAMP"]),
-                #     "tav": float(t["weather_station"]["TAV"]),
-                # }
-                #
-                # irr_fert_evs = defaultdict(list)
-                # for e in t["fertilizer_events"]:
-                #     irr_fert_evs[e["FEDATE"]].append(e)
-                # for e in t["irrigation_events"]:
-                #     irr_fert_evs[e["IDATE"]].append(e)
-                #
-                # irr_fert_dates = list(irr_fert_evs.keys())
-                # irr_fert_dates.sort()
-                #
-                # sowing_date = env_template["cropRotation"][0]["worksteps"][0]["date"]
-                # harvest_date = env_template["cropRotation"][0]["worksteps"][-1]["date"]
-                # for if_date in irr_fert_dates:
-                #     kg_n_per_ha_nitrate_in_irr_water = None
-                #     for ev in irr_fert_evs[if_date]:
-                #         if "FEDATE" in ev:
-                #             if ev["FEACD"] == "Applied in irrigation water":
-                #                 kg_n_per_ha_nitrate_in_irr_water = ev["FEAMN"]
-                #                 continue
-                #             mf = copy.deepcopy(crop_json["ws"]["MineralFertilization"])
-                #             mf["date"] = ev["FEDATE"]
-                #             mf["amount"][0] = ev["FEAMN"]
-                #             mf["partition"] = {
-                #                 "Carbamid": 100.0,
-                #                 "NH4": 0.0,
-                #                 "NO3": 0.0,
-                #                 "name": ev["FECD"],
-                #             }
-                #             if mf["date"] < sowing_date:
-                #                 env_template["cropRotation"][0]["worksteps"].insert(0, mf)
-                #             elif mf["date"] > harvest_date:
-                #                 env_template["cropRotation"][0]["worksteps"].append(mf)
-                #             else:
-                #                 env_template["cropRotation"][0]["worksteps"].insert(-1, mf)
-                #         elif "IDATE" in ev:
-                #             irr = copy.deepcopy(crop_json["ws"]["Irrigation"])
-                #             irr["date"] = ev["IDATE"]
-                #             layer_size_cm = env_template["params"]["siteParameters"]["LayerThickness"][0] * 100.0 # m -> cm
-                #             irr["atLayer"] = int(ev["IRADP"] / layer_size_cm)  # into which layer
-                #             irr["amount"][0] = ev["IRVAL"]
-                #             if kg_n_per_ha_nitrate_in_irr_water:
-                #                 irr["parameters"]["nitrateConcentration"] = kg_n_per_ha_nitrate_in_irr_water * 100.0 / ev["IRVAL"] # kg/ha -> mg/l (mg/dm3)
-                #             env_template["cropRotation"][0]["worksteps"].insert(-1, irr)
-                #
+
+#
+# env_template["params"]["siteParameters"]["SoilProfileParameters"] = list(map(lambda k_v: k_v[1], p["soil"]["layers"].items()))
+# env_template["params"]["siteParameters"]["Latitude"] = float(t["field"]["FL_LAT"])
+# env_template["params"]["siteParameters"]["HeightNN"] = float(t["field"]["FLELE"])
+# env_template["params"]["siteParameters"]["Slope"] = float(t["field"]["FLSL"])
+# env_template["params"]["userEnvironmentParameters"]["Albedo"] = float(p["soil"]["SALB"])
+# env_template["params"]["userEnvironmentParameters"]["AtmosphericCO2"] = float(t["weather_station"]["CO2Y"])
+#
+# env_template["cropRotation"][0]["worksteps"][0]["date"] = t["planting_events"]["PDATE"]
+# env_template["cropRotation"][0]["worksteps"][1]["date"] = t["harvest_events"]["HADAT"]
+#
+# #with open("climate-iso.csv", "r") as _:
+# #    csv_str = _.read()
+# #env_template["climateCSV"] = csv_str
+#
+# env_template["climateData"] = {
+#     "startDate": t["SDAT"], #t["weather_data"]["start_date"],
+#     "endDate": f"{t['harvest_events']['HADAT'][:4]}-12-31", #t["weather_data"]["end_date"],
+#     "data": t["weather_data"]["data"],
+#     "tamp": float(t["weather_station"]["TAMP"]),
+#     "tav": float(t["weather_station"]["TAV"]),
+# }
+#
+# irr_fert_evs = defaultdict(list)
+# for e in t["fertilizer_events"]:
+#     irr_fert_evs[e["FEDATE"]].append(e)
+# for e in t["irrigation_events"]:
+#     irr_fert_evs[e["IDATE"]].append(e)
+#
+# irr_fert_dates = list(irr_fert_evs.keys())
+# irr_fert_dates.sort()
+#
+# sowing_date = env_template["cropRotation"][0]["worksteps"][0]["date"]
+# harvest_date = env_template["cropRotation"][0]["worksteps"][-1]["date"]
+# for if_date in irr_fert_dates:
+#     kg_n_per_ha_nitrate_in_irr_water = None
+#     for ev in irr_fert_evs[if_date]:
+#         if "FEDATE" in ev:
+#             if ev["FEACD"] == "Applied in irrigation water":
+#                 kg_n_per_ha_nitrate_in_irr_water = ev["FEAMN"]
+#                 continue
+#             mf = copy.deepcopy(crop_json["ws"]["MineralFertilization"])
+#             mf["date"] = ev["FEDATE"]
+#             mf["amount"][0] = ev["FEAMN"]
+#             mf["partition"] = {
+#                 "Carbamid": 100.0,
+#                 "NH4": 0.0,
+#                 "NO3": 0.0,
+#                 "name": ev["FECD"],
+#             }
+#             if mf["date"] < sowing_date:
+#                 env_template["cropRotation"][0]["worksteps"].insert(0, mf)
+#             elif mf["date"] > harvest_date:
+#                 env_template["cropRotation"][0]["worksteps"].append(mf)
+#             else:
+#                 env_template["cropRotation"][0]["worksteps"].insert(-1, mf)
+#         elif "IDATE" in ev:
+#             irr = copy.deepcopy(crop_json["ws"]["Irrigation"])
+#             irr["date"] = ev["IDATE"]
+#             layer_size_cm = env_template["params"]["siteParameters"]["LayerThickness"][0] * 100.0 # m -> cm
+#             irr["atLayer"] = int(ev["IRADP"] / layer_size_cm)  # into which layer
+#             irr["amount"][0] = ev["IRVAL"]
+#             if kg_n_per_ha_nitrate_in_irr_water:
+#                 irr["parameters"]["nitrateConcentration"] = kg_n_per_ha_nitrate_in_irr_water * 100.0 / ev["IRVAL"] # kg/ha -> mg/l (mg/dm3)
+#             env_template["cropRotation"][0]["worksteps"].insert(-1, irr)
+#

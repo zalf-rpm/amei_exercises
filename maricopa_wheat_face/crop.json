@@ -24,7 +24,6 @@
           "date": "",
           "type": "Sowing",
           "crop": {
-            "is-winter-crop": true,
             "cropParams": {
               "species": ["include-from-file", "crops/species_wheat.json"],
               "cultivar": ["include-from-file", "crops/cultivar_spring-wheat.json"]

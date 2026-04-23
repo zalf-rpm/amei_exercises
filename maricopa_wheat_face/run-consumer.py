@@ -124,16 +124,16 @@ FRAMEWORK_ID	MODEL_ID	TREAT_ID	DATE	LNUM	GSTZD	LAID	LIPCD	CWAD	GWAD	GWGD	CNAD	GN
                         elif vals["Stage"] == 5: out.write("65\t") #GSTZD
                         elif vals["Stage"] == 6: out.write("89\t") #GSTZD
                         else: out.write("na\t") #GSTZD
-                        out.write("na\t") #LAID
+                        out.write(f'{vals["LAID"]}\t') #LAID
                         out.write("na\t") #LIPCD
-                        out.write("na\t") #CWAD
-                        out.write("na\t") #GWAD
+                        out.write(f'{vals["CWAD"]}\t') #CWAD
+                        out.write(f'{vals["GWAD"]}\t') #GWAD
                         out.write("na\t") #GWGD
                         out.write(f'{vals["CNAD"]}\t')
                         out.write(f'{vals["GNAD"]}\t')
                         out.write("na\t") #GNGD
                         out.write(f'{vals["RDPD"]}\t')
-                        out.write(f'{vals["SWWPD"]}\t')
+                        out.write(f'{round(vals["SWWPD"]/42.0, 2)}\t')
                         out.write(f'{vals["DRND"]}\t')
                         out.write(f'{vals["ROFD"]}\t')
                         out.write("na\t") #NIAD
@@ -145,7 +145,7 @@ FRAMEWORK_ID	MODEL_ID	TREAT_ID	DATE	LNUM	GSTZD	LAID	LIPCD	CWAD	GWAD	GWGD	CNAD	GN
                         out.write("na\t") #GHFD
                         out.write("na\t") #LHFD
                         out.write("na\t") #HHFD
-                        out.write(f'na\t')#{vals["RND"]}\t')
+                        out.write(f'{vals["RND"]}\t')
                         out.write(f'{vals["TSSAV"]}\t')
                         out.write("na\t") #TSSMX
                         out.write("na\t") #TSSMN
@@ -226,7 +226,7 @@ FRAMEWORK_ID	MODEL_ID	TREAT_ID	PDATE	PLDAE	ADAT	MDAT	LnoSM	LAIX	LIPCCM	CWAA	CWAM
                 leave = True
 
         except zmq.error.Again as _e:
-            print('no response from the server (with "timeout"=%d ms) ' % socket.RCVTIMEO)
+            print(f"no response from the server (with timeout={socket.RCVTIMEO} ms)")
             continue
         except Exception as e:
             print("Exception:", e)

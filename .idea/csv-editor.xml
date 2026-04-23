@@ -3,17 +3,10 @@
   <component name="CsvFileAttributes">
     <option name="attributeMap">
       <map>
-        <entry key="/maricopa_wheat_face/APMODailyMaricopa901.csv">
+        <entry key="/maricopa_wheat_face/climate-iso.csv">
           <value>
             <Attribute>
-              <option name="separator" value="&#9;" />
-            </Attribute>
-          </value>
-        </entry>
-        <entry key="/maricopa_wheat_face/out/APMODailyMaricopa901.txt">
-          <value>
-            <Attribute>
-              <option name="separator" value="&#9;" />
+              <option name="separator" value=";" />
             </Attribute>
           </value>
         </entry>
