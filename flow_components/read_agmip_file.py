@@ -24,6 +24,7 @@ import os
 import pandas
 
 from zalfmas_capnp_schemas_with_stubs import fbp_capnp, climate_capnp, common_capnp, soil_capnp
+from zalfmas_capnp_schemas_with_stubs.model import agmip_capnp
 import zalfmas_fbp.run.components as c
 import zalfmas_fbp.run.ports as ps
 from zalfmas_common.climate import csv_file_based
@@ -590,17 +591,19 @@ async def run_component(port_infos_reader_sr: str, config: dict):
             }
             experiments[eid]["treatments"][tid]["environment_modifications"].append(cur_mod)
 
-            t = experiments[eid]["treatments"][tid]
-            weather_timeseries = t["weather_timeseries"]
-            ts_df = weather_timeseries.dataframe
-            default_co2 = t["weather_station"].get("CO2Y", 370)
-            ts_df["co2"] = float(default_co2 if default_co2 else 370)
-            for date in ts_df.index:
-                if cur_mod["EMDATE"] == date:
+        for _, e in experiments.items():
+            for _, t in e["treatments"].items():
+                weather_timeseries = t["weather_timeseries"] = csv_file_based.TimeSeries.from_dataframe(t["weather_timeseries"].dataframe.copy())
+                for cur_mod in t["environment_modifications"]:
+                    ts_df = weather_timeseries.dataframe
+                    if "co2" not in ts_df:
+                        if not (cur_default_co2 := t["weather_station"].get("CO2Y", 370)):
+                            cur_default_co2 = 370
+                        ts_df["co2"] = cur_default_co2
                     if cur_mod["ECCO2"] == "Replace" and cur_mod["EMCO2"]:
-                        ts_df.loc[date, "co2"] = float(cur_mod["EMCO2"])
+                        ts_df.loc[cur_mod["EMDATE"]:,"co2"] = float(cur_mod["EMCO2"])
                     elif cur_mod["ECCO2"] == "Add" and cur_mod["EMCO2"]:
-                        ts_df.loc[date, "co2"] += float(cur_mod["EMCO2"])
+                        ts_df.loc[cur_mod["EMDATE"]:,"co2"] += float(cur_mod["EMCO2"])
 
 
     # loop over all the experiments

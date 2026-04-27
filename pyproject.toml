@@ -1,19 +1,30 @@
-[tool.poetry]
-name = "amei-exercises"
+[project]
+authors = [{name = "Michael Berg-Mohnicke", email = "michael.berg@zalf.de"}]
+dependencies = [
+    "zalfmas-common>=0.1.41,<0.2",
+    "zalfmas-capnp-schemas>=0.1.58,<0.2",
+    "zalfmas-fbp>=0.2.16,<0.3"
+]
+name = "amei_exercises"
+requires-python = ">= 3.12"
 version = "0.1.0"
-description = ""
-authors = ["Michael Berg-Mohnicke <michael.berg@zalf.de>"]
-readme = "README.md"
-
-[tool.poetry.dependencies]
-python =  ">=3.10,<3.13"
-zalfmas-common = "^0.1.34"
-pyzmq = "^26.2.0"
-pandas = "^2.2.2"
-openpyxl = "^3.1.5"
-zalfmas-fbp = "^0.2.20"
-pandas-stubs = "~=2.3.3"
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+build-backend = "hatchling.build"
+requires = ["hatchling"]
+
+[tool.pixi.workspace]
+channels = ["conda-forge"]
+platforms = ["linux-64"]
+
+[tool.pixi.pypi-dependencies]
+amei_exercises = { path = ".", editable = true }
+#zalfmas-capnp-schemas = { path = "../mas_capnproto_schemas", editable = true }
+
+[tool.pixi.tasks]
+
+[tool.pixi.dependencies]
+openpyxl = ">=3.1.5,<4"
+pixi-pycharm = ">=0.0.11,<0.0.12"
+pandas-stubs = ">=3.0.0.260204,<4"
+numpy = ">=2.4.3,<3"
