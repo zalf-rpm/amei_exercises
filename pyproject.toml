@@ -2,7 +2,7 @@
 authors = [{name = "Michael Berg-Mohnicke", email = "michael.berg@zalf.de"}]
 dependencies = [
     "zalfmas-common>=0.1.41,<0.2",
-    "zalfmas-capnp-schemas>=0.1.58,<0.2",
+    "zalfmas-capnp-schemas>=0.1.59,<0.2",
     "zalfmas-fbp>=0.2.16,<0.3"
 ]
 name = "amei_exercises"

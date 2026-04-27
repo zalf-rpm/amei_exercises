@@ -68,7 +68,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/10/8f/d3ddb16c5a4befdf31a23307f72828686ab2096f068eaf56631e136c1fdd/tomli-2.4.1-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/c7/18/c86eb8e0202e32dd3df50d43d7ff9854f8e0603945ff398974c1d91ac1ef/tomli_w-1.2.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/b5/11/87d6d29fb5d237229d67973a6c9e06e048f01cf4994dee194ab0ea841814/tomlkit-0.14.0-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/5e/9d/7bd99eb04652aa1d45b2ffa393e22a5ec3c2619bf6e24063c7235555ea90/zalfmas_capnp_schemas-0.1.58-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/49/0c/16428e8b38d4c6847c4932b2febe21814829b2b7d5ed6eed80146cc63bb2/zalfmas_capnp_schemas-0.1.59-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/b0/05/0d45398c28476c4fcc958b2f82dafe2b41685fdc73000a88b71ce9e43db5/zalfmas_common-0.1.41-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/cb/b3/f2c1f1931d656813b8f5ce4e958cd691f3a6ea432b2759998c69b867f024/zalfmas_fbp-0.2.32-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5a/3f/db9134de97db4a216bfa5d76102f5aba65d87bdca3d939bcb1e4f153553f/zalfmas_services-0.1.16-py3-none-any.whl
@@ -91,10 +91,10 @@ packages:
 - pypi: ./
   name: amei-exercises
   version: 0.1.0
-  sha256: bafeac3e6e567a54998dc228c94c14213c03ea3986f11f638b8f8ee203648d93
+  sha256: 71b5de8621d1fb532ab42d82cc46904175048c7155eab04697e5e51e7980ee49
   requires_dist:
   - zalfmas-common>=0.1.41,<0.2
-  - zalfmas-capnp-schemas>=0.1.58,<0.2
+  - zalfmas-capnp-schemas>=0.1.59,<0.2
   - zalfmas-fbp>=0.2.16,<0.3
   requires_python: '>=3.12'
   editable: true
@@ -945,10 +945,10 @@ packages:
   purls: []
   size: 119135
   timestamp: 1767016325805
-- pypi: https://files.pythonhosted.org/packages/5e/9d/7bd99eb04652aa1d45b2ffa393e22a5ec3c2619bf6e24063c7235555ea90/zalfmas_capnp_schemas-0.1.58-py3-none-any.whl
+- pypi: https://files.pythonhosted.org/packages/49/0c/16428e8b38d4c6847c4932b2febe21814829b2b7d5ed6eed80146cc63bb2/zalfmas_capnp_schemas-0.1.59-py3-none-any.whl
   name: zalfmas-capnp-schemas
-  version: 0.1.58
-  sha256: 704ff48bf0889f98f418246a1bbb3a47b844b1fe73dbc566cfd618a01857d536
+  version: 0.1.59
+  sha256: d8a4c09f26bd45a5b4c58531a700c171c3e3d96e393060d4fc4c74da200cfd3e
   requires_dist:
   - pycapnp>=2.2.1,<3.0.0
   requires_python: '>=3.12,<3.14'

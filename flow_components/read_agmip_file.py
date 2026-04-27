@@ -23,8 +23,7 @@ import numpy as np
 import os
 import pandas
 
-from zalfmas_capnp_schemas_with_stubs import fbp_capnp, climate_capnp, common_capnp, soil_capnp
-from zalfmas_capnp_schemas_with_stubs.model import agmip_capnp
+from zalfmas_capnp_schemas_with_stubs import fbp_capnp, climate_capnp, common_capnp, soil_capnp, field_exp_data_capnp
 import zalfmas_fbp.run.components as c
 import zalfmas_fbp.run.ports as ps
 from zalfmas_common.climate import csv_file_based
@@ -125,15 +124,15 @@ meta = {
 }
 
 async def run_component(port_infos_reader_sr: str, config: dict):
-    # ports = await ps.PortConnector.create_from_port_infos_reader(
-    #     port_infos_reader_sr, ins=["conf"], outs=["out"]
-    # )
-    # print(f"{os.path.basename(__file__)}: {config['name']} connected port(s)")
-    # await ps.update_config_from_port(config, ports["conf"])
-    # if ports["conf"]:
-    #     print(
-    #         f"{os.path.basename(__file__)}: {config['name']} updated config from config port"
-    #     )
+    ports = await ps.PortConnector.create_from_port_infos_reader(
+        port_infos_reader_sr, ins=["conf"], outs=["out"]
+    )
+    print(f"{os.path.basename(__file__)}: {config['name']} connected port(s)")
+    await ps.update_config_from_port(config, ports["conf"])
+    if ports["conf"]:
+        print(
+            f"{os.path.basename(__file__)}: {config['name']} updated config from config port"
+        )
 
     def default_if_nan(value, default:float|None=0.0, apply_func=None):
         if value is not None:
@@ -607,20 +606,33 @@ async def run_component(port_infos_reader_sr: str, config: dict):
 
 
     # loop over all the experiments
-    for e_id, e in experiments.items():
-        for t_id, t in e["treatments"].items():
-            for p_id, p in t["plots"].items():
-                msg = {
-                    #"soil_profile": p["soil"]["profile"],
-                    "soil": p["soil"] | {"profile": None},
-                    "plot": p | {"soil": None},
-                    #"timeseries": t["weather_timeseries"],
-                    "treatment": t | {"weather_timeseries": None, "plots": None},
-                    "experiment": e | {"treatments": None},
-                }
-                j = json.dumps(msg)
-                print(j)
-    return
+    # for e_id, e in experiments.items():
+    #     for t_id, t in e["treatments"].items():
+    #         for p_id, p in t["plots"].items():
+    #             msg = field_exp_data_capnp.MixedType.new_message(
+    #                 soilProfile=p["soil"]["profile"],
+    #                 soil=common_capnp.StructuredText.new_message(value=json.dumps(p["soil"] | {"profile": None}),
+    #                                                              type="json"),
+    #                 plot=common_capnp.StructuredText.new_message(value=json.dumps(p | {"soil": None}),
+    #                                                              type="json"),
+    #                 timeseries=t["weather_timeseries"],
+    #                 treatment=common_capnp.StructuredText.new_message(value=json.dumps(t | {"weather_timeseries": None, "plots": None}),
+    #                                                              type="json"),
+    #                 experiment=common_capnp.StructuredText.new_message(value=json.dumps(e | {"treatments": None}),
+    #                                                              type="json"),
+    #             )
+    #             # print(msg)
+                # msg = {
+                #     #"soil_profile": p["soil"]["profile"],
+                #     "soil": p["soil"] | {"profile": None},
+                #     "plot": p | {"soil": None},
+                #     #"timeseries": t["weather_timeseries"],
+                #     "treatment": t | {"weather_timeseries": None, "plots": None},
+                #     "experiment": e | {"treatments": None},
+                # }
+                # j = json.dumps(msg)
+                # print(j)
+    # return
 
     while ports["out"]:
         try:
@@ -629,7 +641,19 @@ async def run_component(port_infos_reader_sr: str, config: dict):
                 for t_id, t in e["treatments"].items():
                     for p_id, p in t["plots"].items():
 
-                        content = ""
+                        content = field_exp_data_capnp.MixedType.new_message(
+                            soilProfile=p["soil"]["profile"],
+                            soil=common_capnp.StructuredText.new_message(value=json.dumps(p["soil"] | {"profile": None}),
+                                                                         type="json"),
+                            plot=common_capnp.StructuredText.new_message(value=json.dumps(p | {"soil": None}),
+                                                                         type="json"),
+                            timeseries=t["weather_timeseries"],
+                            treatment=common_capnp.StructuredText.new_message(value=json.dumps(t | {"weather_timeseries": None, "plots": None}),
+                                                                              type="json"),
+                            experiment=common_capnp.StructuredText.new_message(value=json.dumps(e | {"treatments": None}),
+                                                                               type="json"),
+                        )
+
                         out_ip = fbp_capnp.IP.new_message(content=content)
                         #common.copy_and_set_fbp_attrs(in_ip, out_ip, **{config["to_attr"]: attr})
                         await ports["out"].write(value=out_ip)
