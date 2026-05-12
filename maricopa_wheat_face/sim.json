@@ -12,7 +12,8 @@
 	
 	"debug?": false,
 	"path-to-output": "./",
-	"include-file-base-path": "params/",
+	"include-file-base-path": "/home/berg/GitHub/amei_exercises/maricopa_wheat_face/params/",
+	"_include-file-base-path": "params/",
 
 	"output": { 
 	  	"write-file?": false,

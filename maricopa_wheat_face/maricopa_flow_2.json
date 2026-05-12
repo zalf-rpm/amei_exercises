@@ -1,0 +1,295 @@
+{
+  "version": "0.3",
+  "name": "",
+  "pan": {
+    "x": 401.8061176578126,
+    "y": -177.97027904193317
+  },
+  "zoom": 0.8638375985314759,
+  "services": {
+    "channels": {
+      "d5456d2c-c99e-43a2-a7ac-49b7749f3247": "capnp://10.10.28.175:9989/local_mas_python_fbp_channel_starter"
+    },
+    "components": {
+      "f0377174-af8e-435b-9c7d-f22e453aeb18": "capnp://10.10.28.175:9990/local_amei_exercises_components",
+      "45579662-bdf0-49db-9808-860135170794": "capnp://10.10.28.175:9988/local_mas_python_fbp_components"
+    }
+  },
+  "components": "/home/berg/GitHub/mas_python_fbp/configs/local_components.json",
+  "cmds": "/home/berg/GitHub/mas_python_fbp/configs/local_cmds.json",
+  "nodes": [
+    {
+      "nodeId": "read sim.json",
+      "processName": "read sim.json",
+      "location": {
+        "x": -367.22050000000013,
+        "y": 78.03736249999993
+      },
+      "editable": false,
+      "parallelProcesses": 1,
+      "config": {
+        "to_attr": null,
+        "file": "/home/berg/GitHub/amei_exercises/maricopa_wheat_face/sim.json",
+        "lines_mode": false,
+        "skip_lines": 0.0
+      },
+      "componentId": "7ba769ca-eba1-437c-b61a-bef27e24b1dc",
+      "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
+    },
+    {
+      "nodeId": "9d07bf75-f5d6-45a8-b4e8-fc0c34e72efe",
+      "componentId": "d5603568-5ce0-45a3-900d-77c8b3b894f5",
+      "location": {
+        "x": 1033.0049070686034,
+        "y": 906.082604928887
+      }
+    },
+    {
+      "nodeId": "read crop.json",
+      "processName": "read crop.json",
+      "location": {
+        "x": -19.330750000000137,
+        "y": 91.0858562499998
+      },
+      "editable": false,
+      "parallelProcesses": 1,
+      "config": {
+        "to_attr": null,
+        "file": "/home/berg/GitHub/amei_exercises/maricopa_wheat_face/crop.json",
+        "lines_mode": false,
+        "skip_lines": 0.0
+      },
+      "componentId": "7ba769ca-eba1-437c-b61a-bef27e24b1dc",
+      "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
+    },
+    {
+      "nodeId": "read site.json",
+      "processName": "read site.json",
+      "location": {
+        "x": 323.67353749999995,
+        "y": 96.06364374999971
+      },
+      "editable": false,
+      "parallelProcesses": 1,
+      "config": {
+        "to_attr": null,
+        "file": "/home/berg/GitHub/amei_exercises/maricopa_wheat_face/site.json",
+        "lines_mode": false,
+        "skip_lines": 0.0
+      },
+      "componentId": "7ba769ca-eba1-437c-b61a-bef27e24b1dc",
+      "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
+    },
+    {
+      "nodeId": "Create MONICA JSON e...",
+      "processName": "Create MONICA JSON env 12",
+      "location": {
+        "x": -13.716268750000097,
+        "y": 520.7383749999999
+      },
+      "editable": false,
+      "parallelProcesses": 1,
+      "config": {},
+      "componentId": "128af0c8-2614-4398-9043-ff3581958bd4",
+      "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
+    },
+    {
+      "nodeId": "Read AgMIP file 13",
+      "processName": "Read AgMIP file 13",
+      "location": {
+        "x": -486.98668664453146,
+        "y": 921.0579134617187
+      },
+      "editable": false,
+      "parallelProcesses": 1,
+      "config": {},
+      "componentId": "ba5ccca8-ecbe-4598-aa1d-0123a0a95423",
+      "componentServiceId": "f0377174-af8e-435b-9c7d-f22e453aeb18"
+    },
+    {
+      "nodeId": "set experiment data",
+      "processName": "set experiment data",
+      "location": {
+        "x": 441.6600883554686,
+        "y": 921.0579134617188
+      },
+      "editable": false,
+      "parallelProcesses": 1,
+      "config": {
+        "types": {
+          "@agmip": "mas.schema.data.monica.field_exp_data_capnp:MixedType"
+        },
+        "update": [
+          [
+            "params",
+            "userEnvironmentParameters",
+            "Albedo",
+            "<-",
+            [
+              "@agmip",
+              "soil",
+              "SALB"
+            ]
+          ],
+          [
+            "params",
+            "siteParameters",
+            "Latitude",
+            "<-",
+            [
+              "@agmip",
+              "treatment",
+              "field",
+              "FL_LAT"
+            ]
+          ],
+          [
+            "params",
+            "siteParameters",
+            "HeightNN",
+            "<-",
+            [
+              "@agmip",
+              "treatment",
+              "field",
+              "FLELE"
+            ]
+          ],
+          [
+            "params",
+            "siteParameters",
+            "Slope",
+            "<-",
+            [
+              "@agmip",
+              "treatment",
+              "field",
+              "FLSL"
+            ]
+          ],
+          [
+            "params",
+            "cropRotation",
+            0,
+            "worksteps",
+            0,
+            "date",
+            "<-",
+            [
+              "@agmip",
+              "treatment",
+              "planting_events",
+              "PDATE"
+            ]
+          ],
+          [
+            "params",
+            "cropRotation",
+            0,
+            "worksteps",
+            1,
+            "date",
+            "<-",
+            [
+              "@agmip",
+              "treatment",
+              "harvest_events",
+              "HADAT"
+            ]
+          ]
+        ],
+        "replace": [],
+        "add": []
+      },
+      "componentId": "67b31990-452a-4058-8a99-6785be345216",
+      "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
+    },
+    {
+      "nodeId": "add env as content",
+      "processName": "add env as content",
+      "location": {
+        "x": -19.016780394531438,
+        "y": 919.842407211719
+      },
+      "editable": false,
+      "parallelProcesses": 1,
+      "config": {
+        "to_attr": "agmip"
+      },
+      "componentId": "030214e4-7ce8-4de7-8b3c-fb96b7fba7e0",
+      "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
+    }
+  ],
+  "links": [
+    {
+      "source": {
+        "nodeId": "read sim.json",
+        "port": "out"
+      },
+      "target": {
+        "nodeId": "Create MONICA JSON e...",
+        "port": "sim"
+      }
+    },
+    {
+      "source": {
+        "nodeId": "set experiment data",
+        "port": "out"
+      },
+      "target": {
+        "nodeId": "9d07bf75-f5d6-45a8-b4e8-fc0c34e72efe",
+        "port": "in"
+      }
+    },
+    {
+      "source": {
+        "nodeId": "read crop.json",
+        "port": "out"
+      },
+      "target": {
+        "nodeId": "Create MONICA JSON e...",
+        "port": "crop"
+      }
+    },
+    {
+      "source": {
+        "nodeId": "read site.json",
+        "port": "out"
+      },
+      "target": {
+        "nodeId": "Create MONICA JSON e...",
+        "port": "site"
+      }
+    },
+    {
+      "source": {
+        "nodeId": "Create MONICA JSON e...",
+        "port": "out"
+      },
+      "target": {
+        "nodeId": "add env as content",
+        "port": "content"
+      }
+    },
+    {
+      "source": {
+        "nodeId": "Read AgMIP file 13",
+        "port": "out"
+      },
+      "target": {
+        "nodeId": "add env as content",
+        "port": "in"
+      }
+    },
+    {
+      "source": {
+        "nodeId": "add env as content",
+        "port": "out"
+      },
+      "target": {
+        "nodeId": "set experiment data",
+        "port": "in"
+      }
+    }
+  ]
+}
