@@ -1,7 +1,8 @@
 [project]
-authors = [{name = "Michael Berg-Mohnicke", email = "michael.berg@zalf.de"}]
+authors = [{ name = "Michael Berg-Mohnicke", email = "michael.berg@zalf.de" }]
 dependencies = [
     "zalfmas-common>=0.1.42,<0.2",
+    "zalfmas-capnp-schemas>=0.1.63,<0.2",
     #"zalfmas-fbp>=0.2.33,<0.3"
 ]
 name = "amei_exercises"
@@ -22,6 +23,12 @@ amei_exercises = { path = ".", editable = true }
 #zalfmas-common = { path = "../mas_python_common", editable = true }
 zalfmas-fbp = { path = "../mas_python_fbp", editable = true }
 
+[dependency-groups]
+dev = ["ruff", "pyright", "ty"]
+
+[tool.pixi.environments]
+dev = ["dev"]
+
 [tool.pixi.tasks]
 
 [tool.pixi.dependencies]
@@ -29,3 +36,33 @@ openpyxl = ">=3.1.5,<4"
 pixi-pycharm = ">=0.0.11,<0.0.12"
 pandas-stubs = ">=3.0.0.260204,<4"
 numpy = ">=2.4.3,<3"
+ruff = ">=0.15.13,<0.16"
+pyright = ">=1.1.409,<2"
+pydantic = ">=2.13.4,<3"
+
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+[tool.ruff.lint]
+select = [
+    "E",
+    "F",
+    "I",
+    "UP",
+    "T",
+    "G",
+    "BLE",
+    "COM",
+    "PTH",
+    "C417",
+    "TRY",
+    "ASYNC109",
+    # "D100",
+    # "D101",
+]
+
+ignore = ["E501", "COM812"]
+
+[tool.pyright]
+ignore = ["tests"]
