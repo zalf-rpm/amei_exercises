@@ -2,10 +2,10 @@
   "version": "0.3",
   "name": "",
   "pan": {
-    "x": -214.20180059952727,
-    "y": 200.36165271092017
+    "x": 542.1579281308318,
+    "y": -0.05319918500941867
   },
-  "zoom": 0.4377860638582349,
+  "zoom": 0.7364284538561376,
   "services": {
     "channels": {
       "d5456d2c-c99e-43a2-a7ac-49b7749f3247": "capnp://10.10.28.175:9989/local_mas_python_fbp_channel_starter"
@@ -189,7 +189,7 @@
       "parallelProcesses": 1,
       "config": {
         "types": {
-          "@agmip": "mas.schema.data.field_exp_data_capnp:MixedType"
+          "@agmip": "@0xa23434cc8f8d6a77 = data/field_exp_data.capnp:MixedType"
         },
         "update": [
           [
@@ -315,7 +315,7 @@
       "parallelProcesses": 1,
       "config": {
         "lift_from_attr": "agmip",
-        "lift_from_type": "mas.schema.data.field_exp_data_capnp:MixedType",
+        "lift_from_type": "@0xa23434cc8f8d6a77 = data/field_exp_data.capnp:MixedType",
         "lifted_attrs": [
           "timeseries",
           "soilProfile"
@@ -355,7 +355,7 @@
       "editable": false,
       "parallelProcesses": 1,
       "config": {
-        "struct_type": "mas.schema.model.model_capnp:Env"
+        "struct_type": null
       },
       "componentId": "250488d8-7519-49a8-820e-0e981ffb2a71",
       "componentServiceId": "45579662-bdf0-49db-9808-860135170794"

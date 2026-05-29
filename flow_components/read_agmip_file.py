@@ -127,12 +127,14 @@ METADATA = meta.Component(
         description="Read an AgMIP file and stream plots",
     ),
     type="process",
-    inPorts=[meta.Port(name="conf", contentType="common.capnp:StructuredText[JSON | TOML]")],
+    inPorts=[
+        meta.Port(name="conf", contentType="@0xed6c098b67cad454 = common/common.capnp:StructuredText[JSON | TOML]")
+    ],
     outPorts=[
         meta.Port(
             name="out",
-            contentType="common.capnp:StructuredText[JSON]",
-            desc="json object describing a single plots data",
+            contentType="@0xa23434cc8f8d6a77 = data/field_exp_data.capnp:MixedType",
+            desc="Structure containing capabilities to the timeseries and soil profile as well as JSON data structures for the remaining data.",
         )
     ],
     config=CompConfig,

@@ -52,7 +52,7 @@ METADATA = meta.Component(
     ),
     type="process",
     inPorts=[
-        meta.Port(name="conf", contentType="common.capnp:StructuredText[JSON | TOML]"),
+        meta.Port(name="conf", contentType="@0xed6c098b67cad454 = common/common.capnp:StructuredText[JSON | TOML]"),
         meta.Port(name="env", contentType="Text (JSON)"),
     ],
     outPorts=[
@@ -86,7 +86,7 @@ class AddIrrFertIntoCropRotation(process.Process[CompConfig]):
                 if env_in_ip is None:
                     break
 
-                agmip = common.get_fbp_attr(env_in_ip, self.config.agmip_attr).as_struct(field_exp_data_capnp.MixedType)
+                agmip = common.get_fbp_attr(env_in_ip, self.config.agmip_attr, field_exp_data_capnp.MixedType.schema)
                 env = json.loads(env_in_ip.content.as_text())
 
                 if agmip is not None and agmip._has("treatment") and agmip.treatment._has("value"):
