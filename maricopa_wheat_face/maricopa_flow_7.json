@@ -2,10 +2,10 @@
   "version": "0.3",
   "name": "",
   "pan": {
-    "x": -993.11297191771,
-    "y": -87.34867375696659
+    "x": -568.8665121949673,
+    "y": 24.97155481390503
   },
-  "zoom": 0.7417222686202792,
+  "zoom": 0.5881846058099439,
   "services": {
     "channels": {
       "d5456d2c-c99e-43a2-a7ac-49b7749f3247": "capnp://W2zRg0jsUAXtW1NxCHFlpAhKLSCcgpmBo6hp9dld1_8=@10.10.28.175:9989/local_mas_python_fbp_channel_starter"
@@ -40,8 +40,8 @@
       "nodeId": "9d07bf75-f5d6-45a8-b4e8-fc0c34e72efe",
       "componentId": "d5603568-5ce0-45a3-900d-77c8b3b894f5",
       "location": {
-        "x": 2714.112430104253,
-        "y": 898.7871654290046
+        "x": 2669.7837614102828,
+        "y": 878.0750468142759
       }
     },
     {
@@ -346,18 +346,20 @@
       "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
     },
     {
-      "nodeId": "to string 10",
-      "processName": "to string 10",
+      "nodeId": "MONICA 4",
+      "processName": "MONICA 4",
       "location": {
-        "x": 2227.6052212027976,
-        "y": 895.7033637595
+        "x": 2217.1291501183114,
+        "y": 890.4791289542353
       },
       "editable": false,
       "parallelProcesses": 1,
       "config": {
-        "struct_type": "@0xb7fc866ef1127f7c = model/model.capnp:Env"
+        "from_attr": null,
+        "to_attr": null,
+        "monica_sr": "capnp://10.10.28.175:9920/monica"
       },
-      "componentId": "250488d8-7519-49a8-820e-0e981ffb2a71",
+      "componentId": "66f86dbb-efb1-4b16-8837-3a2aa1eca30e",
       "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
     }
   ],
@@ -375,8 +377,8 @@
     },
     {
       "source": {
-        "nodeId": "to string 10",
-        "port": "out"
+        "nodeId": "MONICA 4",
+        "port": "result"
       },
       "target": {
         "nodeId": "9d07bf75-f5d6-45a8-b4e8-fc0c34e72efe",
@@ -478,8 +480,8 @@
         "port": "out"
       },
       "target": {
-        "nodeId": "to string 10",
-        "port": "in"
+        "nodeId": "MONICA 4",
+        "port": "env"
       },
       "bufferSize": 1
     }

@@ -14,17 +14,18 @@
 # Copyright (C: Leibniz Centre for Agricultural Landscape Research (ZALF)
 from __future__ import annotations
 
-import capnp
-from collections import defaultdict
-from datetime import date
 import json
 import logging
-from typing import Literal, Any, override
+from collections import defaultdict
+from datetime import date
+from typing import Any, Literal, override
+
+import capnp
+import zalfmas_fbp.run.process as process
 from pydantic import Field
 from zalfmas_capnp_schemas_with_stubs import fbp_capnp, field_exp_data_capnp
-from zalfmas_fbp.run import metadata as meta
-import zalfmas_fbp.run.process as process
 from zalfmas_common import common
+from zalfmas_fbp.run import metadata as meta
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(
@@ -137,13 +138,13 @@ class AddIrrFertIntoCropRotation(process.Process[CompConfig]):
                 env_out_ip = fbp_capnp.IP.new_message(content=json.dumps(env))
                 common.copy_and_set_fbp_attrs(env_in_ip, env_out_ip)
                 if not await self.write_out("env", env_out_ip):
-                    logger.info(f"%{self.name}: process finished")
+                    logger.info("%s: process finished", self.name)
                     return
 
             except Exception as e:
-                logger.error(f"{self.name}: Exception: {e}")
+                logger.exception("%s", self.name)
 
-        logger.info(f"{self.name}: process finished")
+        logger.info("%s: process finished", self.name)
 
 
 def main():

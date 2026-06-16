@@ -14,20 +14,14 @@
 # Copyright (C: Leibniz Centre for Agricultural Landscape Research (ZALF)
 from __future__ import annotations
 
-import asyncio
-import copy
 import json
 import logging
-import os
 from collections import defaultdict
-from datetime import date, datetime, timedelta
-from typing import Any, Literal, override
+from typing import Literal, override
 
 import capnp
 import numpy as np
 import pandas
-import zalfmas_fbp.run.components as c
-import zalfmas_fbp.run.ports as ps
 import zalfmas_fbp.run.process as process
 from pydantic import Field
 from zalfmas_capnp_schemas_with_stubs import (
@@ -151,18 +145,24 @@ class Component(process.Process[CompConfig]):
 
     @override
     async def run(self):
-        logger.info(f"{self.name} process running")
+        logger.info("%s process running", self.name)
         if await self.update_config_from_port("conf"):
             logger.info("%s updated config from conf port", self.name)
 
         def default_if_nan(value, default: float | None = 0.0, apply_func=None):
             if value is not None:
-                if type(value) is str:
-                    return apply_func(value)
+                # if apply_func and type(value) is str:
+                #    return apply_func(value)
                 try:
-                    return default if np.isnan(value) else (apply_func(value) if apply_func else value)
-                except:
-                    return apply_func(value) if apply_func else value
+                    if isinstance(value, float) and np.isnan(value):
+                        return default
+                    elif apply_func:
+                        return apply_func(value)
+                    else:
+                        return value
+                except Exception:
+                    logger.exception("%s returning default for value %s", self.name, value)
+                    return default
             return value
 
         file = self.config.file
@@ -188,12 +188,12 @@ class Component(process.Process[CompConfig]):
             "Genotypes": True,
         }
 
-        enabled_sheets.update(map(lambda k: (k, True), self.config.enabled_sheets))
+        enabled_sheets.update((k, True) for k in self.config.enabled_sheets)
 
         # read data from Excel file
         dfs = pandas.read_excel(
             file,
-            sheet_name=list(map(lambda e2: e2[0], filter(lambda e1: e1[1], enabled_sheets.items()))),
+            sheet_name=[e2[0] for e2 in filter(lambda e1: e1[1], enabled_sheets.items())],
             header=2,
         )
 
@@ -254,7 +254,7 @@ class Component(process.Process[CompConfig]):
                 ),  # [text] weather notes
             }
 
-        agmip_elem_to_schema_elem = {
+        agmip_elem_to_schema_elem: dict[AgmipClimateElement, list[SchemaClimateElement | float | int | list]] = {
             "SRAD": ["globrad", 1.0],  # MJ/m2/d
             "TMAX": ["tmax", 1.0],  # °C
             "TMIN": ["tmin", 1.0],  # °C
@@ -276,7 +276,7 @@ class Component(process.Process[CompConfig]):
         for ds_id in wdaily_df["WST_DATASET"].unique():
             rows_with_ds_id = wdaily_df[wdaily_df["WST_DATASET"] == ds_id]
             data = {}
-            dates = list(map(lambda d: str(d)[:10], rows_with_ds_id["W_DATE"]))
+            dates = [str(d)[:10] for d in rows_with_ds_id["W_DATE"]]
             for w_elem in weather_elements:
                 if w_elem in agmip_elem_to_schema_elem and w_elem in rows_with_ds_id:
                     schema_elem, factor = agmip_elem_to_schema_elem[w_elem]
@@ -350,9 +350,9 @@ class Component(process.Process[CompConfig]):
                 ),
             }
 
-        def append_if_not_nan(l, name, value, factor=1.0):
-            if value and not np.isnan(value):
-                l.append({"name": name, "f32Value": float(value) * factor})
+        def append_if_not_nan(list, name, value, factor=1.0):
+            if value is not None and not np.isnan(value):
+                list.append({"name": name, "f32Value": float(value) * factor})
 
         soil_profiles_dfs = dfs["Soil_profile_layers"]
         soil_layers = defaultdict(list)
@@ -363,15 +363,13 @@ class Component(process.Process[CompConfig]):
             layer_size_cm = sllb - sllt  # [cm]
             props = []
             append_if_not_nan(
-                props, "saturation", soil_profiles_dfs.get("SLSAT", {}).get(i, None)
+                props, "saturation", soil_profiles_dfs.get("SLSAT", {}).get(i, None), 100
             )  # [cm3/cm3] soil water saturated
             append_if_not_nan(
-                props, "fieldCapacity", soil_profiles_dfs.get("SLDUL", {}).get(i, None)
+                props, "fieldCapacity", soil_profiles_dfs.get("SLDUL", {}).get(i, None), 100
             )  # [cm3/cm3] soil water drained upper limit
             append_if_not_nan(
-                props,
-                "permanentWiltingPoint",
-                soil_profiles_dfs.get("SLLL", {}).get(i, None),
+                props, "permanentWiltingPoint", soil_profiles_dfs.get("SLLL", {}).get(i, None), 100
             )  # [cm3/cm3] soil water lower limit
             # append_if_not_nan(props, "", soil_profiles_dfs.get("SLAWC", {}).get(i, None), 100.0 / layer_size_cm) # [mm -> %] soil layer available water
             # append_if_not_nan(props, "", default_if_nan(soil_profiles_dfs.get("SLRGF"][i], 0.0))
