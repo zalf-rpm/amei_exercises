@@ -1,0 +1,433 @@
+{
+  "version": "0.3",
+  "name": "",
+  "pan": {
+    "x": 207.43831455309197,
+    "y": 310.1348850557384
+  },
+  "zoom": 0.3324676315041481,
+  "services": {
+    "channels": {
+      "d5456d2c-c99e-43a2-a7ac-49b7749f3247": "capnp://W2zRg0jsUAXtW1NxCHFlpAhKLSCcgpmBo6hp9dld1_8=@10.10.28.175:9989/local_mas_python_fbp_channel_starter"
+    },
+    "components": {
+      "f0377174-af8e-435b-9c7d-f22e453aeb18": "capnp://ylBzKFMBr4Epc9y-lyoH6q3qL5SMQntjjVd50uRyXds=@10.10.28.175:9990/local_amei_exercises_components",
+      "45579662-bdf0-49db-9808-860135170794": "capnp://_UXUjZPeHHVb60B2VarpOu8vOZ7L_Hk6AKUklNT5LY8=@10.10.28.175:9988/local_mas_python_fbp_components"
+    }
+  },
+  "components": "/home/berg/GitHub/mas_python_fbp/configs/local_components.json",
+  "cmds": "/home/berg/GitHub/mas_python_fbp/configs/local_cmds.json",
+  "nodes": [
+    {
+      "nodeId": "read sim.json",
+      "processName": "read sim.json",
+      "location": {
+        "x": -367.22050000000013,
+        "y": 78.03736249999993
+      },
+      "editable": false,
+      "parallelProcesses": 1,
+      "config": {
+        "to_attr": null,
+        "file": "/home/berg/GitHub/amei_exercises/maricopa_wheat_face/sim.json",
+        "lines_mode": false,
+        "skip_lines": 0.0
+      },
+      "componentId": "7ba769ca-eba1-437c-b61a-bef27e24b1dc",
+      "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
+    },
+    {
+      "nodeId": "read crop.json",
+      "processName": "read crop.json",
+      "location": {
+        "x": -19.330750000000137,
+        "y": 91.0858562499998
+      },
+      "editable": false,
+      "parallelProcesses": 1,
+      "config": {
+        "to_attr": null,
+        "file": "/home/berg/GitHub/amei_exercises/maricopa_wheat_face/crop.json",
+        "lines_mode": false,
+        "skip_lines": 0.0
+      },
+      "componentId": "7ba769ca-eba1-437c-b61a-bef27e24b1dc",
+      "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
+    },
+    {
+      "nodeId": "read site.json",
+      "processName": "read site.json",
+      "location": {
+        "x": 323.67353749999995,
+        "y": 96.06364374999971
+      },
+      "editable": false,
+      "parallelProcesses": 1,
+      "config": {
+        "to_attr": null,
+        "file": "/home/berg/GitHub/amei_exercises/maricopa_wheat_face/site.json",
+        "lines_mode": false,
+        "skip_lines": 0.0
+      },
+      "componentId": "7ba769ca-eba1-437c-b61a-bef27e24b1dc",
+      "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
+    },
+    {
+      "nodeId": "Create MONICA JSON e...",
+      "processName": "Create MONICA JSON env 12",
+      "location": {
+        "x": -13.716268750000097,
+        "y": 533.3440040496566
+      },
+      "editable": false,
+      "parallelProcesses": 1,
+      "config": {},
+      "componentId": "128af0c8-2614-4398-9043-ff3581958bd4",
+      "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
+    },
+    {
+      "nodeId": "Read AgMIP file 13",
+      "processName": "Read AgMIP file 13",
+      "location": {
+        "x": -486.98668664453146,
+        "y": 921.0579134617187
+      },
+      "editable": false,
+      "parallelProcesses": 1,
+      "config": {
+        "file": "/home/berg/GitHub/amei_exercises/maricopa_wheat_face/MARICOPA Wheat FACE data_2026-01-23 (ICASA data format v4.1)(PM7)(BAK1)(no soilT).xlsx",
+        "weather_elements": [
+          "SRAD",
+          "TMAX",
+          "TMIN",
+          "TAVD",
+          "RAIN",
+          "VPRSD",
+          "WIND",
+          "TDEW",
+          "RHAVD"
+        ],
+        "enabled_sheets": [
+          "Experiment_description",
+          "Fields",
+          "Treatments",
+          "Plots",
+          "Residue",
+          "initial_condition_layers",
+          "Planting_events",
+          "Harvest_events",
+          "Irrigation_events",
+          "Fertilizer_events",
+          "Soil_metadata",
+          "Soil_profile_layers",
+          "Weather_stations",
+          "Weather_daily",
+          "Env_modifications",
+          "Genotypes"
+        ],
+        "agmip_elem_to_schema_elem": {
+          "SRAD": [
+            "globrad",
+            1.0
+          ],
+          "TMAX": [
+            "tmax",
+            1.0
+          ],
+          "TMIN": [
+            "tmin",
+            1.0
+          ],
+          "TAVD": [
+            "tavg",
+            1.0
+          ],
+          "RAIN": [
+            "precip",
+            1.0
+          ],
+          "VPRSD": [
+            "vaporpress",
+            10.0
+          ],
+          "WIND": [
+            "wind",
+            [
+              5.0,
+              432
+            ]
+          ],
+          "TDEW": [
+            "dewpointTemp",
+            1.0
+          ],
+          "RHAVD": [
+            "relhumid",
+            1.0
+          ]
+        }
+      },
+      "componentId": "ba5ccca8-ecbe-4598-aa1d-0123a0a95423",
+      "componentServiceId": "f0377174-af8e-435b-9c7d-f22e453aeb18"
+    },
+    {
+      "nodeId": "add env as content",
+      "processName": "add env as content",
+      "location": {
+        "x": -19.016780394531438,
+        "y": 919.842407211719
+      },
+      "editable": false,
+      "parallelProcesses": 1,
+      "config": {
+        "to_attr": "agmip"
+      },
+      "componentId": "030214e4-7ce8-4de7-8b3c-fb96b7fba7e0",
+      "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
+    },
+    {
+      "nodeId": "Add irr/fert data 1",
+      "processName": "Add irr/fert data 1",
+      "location": {
+        "x": 1276.846388582222,
+        "y": 903.5766106724388
+      },
+      "editable": false,
+      "parallelProcesses": 1,
+      "config": {},
+      "componentId": "210add72-f24e-4525-936a-d022403b7f4f",
+      "componentServiceId": "f0377174-af8e-435b-9c7d-f22e453aeb18"
+    },
+    {
+      "nodeId": "lift attributes 6",
+      "processName": "lift attributes 6",
+      "location": {
+        "x": 854.3593803637358,
+        "y": 913.5022947528837
+      },
+      "editable": false,
+      "parallelProcesses": 1,
+      "config": {
+        "lift_from_attr": "agmip",
+        "lift_from_type": "@0xa23434cc8f8d6a77 = data/field_exp_data.capnp:MixedType",
+        "lifted_attrs": [
+          "timeseries",
+          "soilProfile"
+        ]
+      },
+      "componentId": "1ccc2798-23b2-4148-a40f-6b70a69be2fb",
+      "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
+    },
+    {
+      "nodeId": "Create model.capnp:E...",
+      "processName": "Create model.capnp:Env with MONICA payload 7",
+      "location": {
+        "x": 1754.1289666752507,
+        "y": 902.8019936862989
+      },
+      "editable": false,
+      "parallelProcesses": 1,
+      "config": {
+        "from_attr": null,
+        "to_attr": null,
+        "timeseries_attr": "@timeseries",
+        "remove_timeseries_attr": true,
+        "soil_attr": "@soilProfile",
+        "remove_soil_attr": true,
+        "id_attr": "@id"
+      },
+      "componentId": "e58b7ff4-3c76-4ea2-9873-09d6923e5c75",
+      "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
+    },
+    {
+      "nodeId": "MONICA 4",
+      "processName": "MONICA 4",
+      "location": {
+        "x": 2217.1291501183114,
+        "y": 890.4791289542353
+      },
+      "editable": false,
+      "parallelProcesses": 1,
+      "config": {
+        "from_attr": null,
+        "to_attr": null,
+        "monica_sr": null
+      },
+      "componentId": "66f86dbb-efb1-4b16-8837-3a2aa1eca30e",
+      "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
+    },
+    {
+      "nodeId": "Write MONICA CSV 19",
+      "processName": "Write MONICA CSV 19",
+      "location": {
+        "x": 2712.387238182277,
+        "y": 886.9133713146542
+      },
+      "editable": false,
+      "parallelProcesses": 1,
+      "config": {
+        "types": {},
+        "path_to_out_dir": "out/",
+        "out_path_attr": null,
+        "from_attr": null,
+        "filepath_pattern": "csv_{customId}.csv",
+        "csv_delimiter": ","
+      },
+      "componentId": "92e48886-2728-4a78-b53e-5cb0d4ac415a",
+      "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
+    },
+    {
+      "nodeId": "set experiment data",
+      "processName": "set experiment data",
+      "location": {
+        "x": 411.1932983977125,
+        "y": 929.140056765598
+      },
+      "editable": false,
+      "parallelProcesses": 1,
+      "config": {
+        "types": {
+          "@agmip": "@0xa23434cc8f8d6a77 = data/field_exp_data.capnp:MixedType"
+        },
+        "attr_sub_access_separator": "/",
+        "update": {
+          "params/userEnvironmentParameters/Albedo": "@agmip/soil/SALB",
+          "params/siteParameters/Latitude": "@agmip/treatment/field/FL_LAT",
+          "params/siteParameters/HeightNN": "@agmip/treatment/field/FLELE",
+          "params/siteParameters/Slope": "@agmip/treatment/field/FLSL",
+          "cropRotation/0/worksteps/0/date": "@agmip/treatment/planting_events/PDATE",
+          "cropRotation/0/worksteps/1/date": "@agmip/treatment/planting_events/HADAT"
+        },
+        "replace": {},
+        "add": {
+          "customId": "@agmip/plot/PLTID"
+        }
+      },
+      "componentId": "67b31990-452a-4058-8a99-6785be345216",
+      "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
+    }
+  ],
+  "links": [
+    {
+      "source": {
+        "nodeId": "read sim.json",
+        "port": "out"
+      },
+      "target": {
+        "nodeId": "Create MONICA JSON e...",
+        "port": "sim"
+      },
+      "bufferSize": 1
+    },
+    {
+      "source": {
+        "nodeId": "read crop.json",
+        "port": "out"
+      },
+      "target": {
+        "nodeId": "Create MONICA JSON e...",
+        "port": "crop"
+      },
+      "bufferSize": 1
+    },
+    {
+      "source": {
+        "nodeId": "read site.json",
+        "port": "out"
+      },
+      "target": {
+        "nodeId": "Create MONICA JSON e...",
+        "port": "site"
+      },
+      "bufferSize": 1
+    },
+    {
+      "source": {
+        "nodeId": "Create MONICA JSON e...",
+        "port": "out"
+      },
+      "target": {
+        "nodeId": "add env as content",
+        "port": "content"
+      },
+      "bufferSize": 1
+    },
+    {
+      "source": {
+        "nodeId": "Read AgMIP file 13",
+        "port": "out"
+      },
+      "target": {
+        "nodeId": "add env as content",
+        "port": "in"
+      },
+      "bufferSize": 1
+    },
+    {
+      "source": {
+        "nodeId": "add env as content",
+        "port": "out"
+      },
+      "target": {
+        "nodeId": "set experiment data",
+        "port": "in"
+      },
+      "bufferSize": 1
+    },
+    {
+      "source": {
+        "nodeId": "lift attributes 6",
+        "port": "out"
+      },
+      "target": {
+        "nodeId": "Add irr/fert data 1",
+        "port": "env"
+      },
+      "bufferSize": 1
+    },
+    {
+      "source": {
+        "nodeId": "Add irr/fert data 1",
+        "port": "env"
+      },
+      "target": {
+        "nodeId": "Create model.capnp:E...",
+        "port": "in"
+      },
+      "bufferSize": 1
+    },
+    {
+      "source": {
+        "nodeId": "set experiment data",
+        "port": "out"
+      },
+      "target": {
+        "nodeId": "lift attributes 6",
+        "port": "in"
+      },
+      "bufferSize": 1
+    },
+    {
+      "source": {
+        "nodeId": "Create model.capnp:E...",
+        "port": "out"
+      },
+      "target": {
+        "nodeId": "MONICA 4",
+        "port": "env"
+      },
+      "bufferSize": 1
+    },
+    {
+      "source": {
+        "nodeId": "MONICA 4",
+        "port": "result"
+      },
+      "target": {
+        "nodeId": "Write MONICA CSV 19",
+        "port": "in"
+      },
+      "bufferSize": 1
+    }
+  ]
+}
