@@ -116,6 +116,25 @@ class CompConfig(process.ProcessConfig):
         },
         description="Map AgMIP climate element names to schema climate element names with conversion fractor.",
     )
+    dynamic_sheets: list[str] = Field(
+        [],
+        description=(
+            "Names of additional (custom/optional) sheets to read dynamically. Their columns are read "
+            "generically and the resulting sub-object is attached based on the key columns present in the "
+            "sheet: PLTID(+TREAT_ID+EID) -> plot, TREAT_ID(+EID) -> treatment, EID -> experiment. The "
+            "sub-object key is the lower-cased sheet name. If the key columns are unique per row a single "
+            "object is stored, otherwise a list of rows is stored."
+        ),
+    )
+    auto_discover_dynamic_sheets: bool = Field(
+        False,
+        description=(
+            "If True, automatically read every sheet located after 'Weather_daily' that is not already "
+            "handled explicitly and attach it dynamically (see 'dynamic_sheets'). Note: some of these sheets "
+            "can be very large; since a treatment is serialized once per plot in the output this may "
+            "considerably increase the output size."
+        ),
+    )
 
 
 METADATA = meta.Component(
@@ -1628,6 +1647,112 @@ class Component(process.Process[CompConfig]):
                             ts_df.loc[cur_mod["EMDATE"] :, "co2"] = float(cur_mod["EMCO2"])
                         elif cur_mod["ECCO2"] == "Add" and cur_mod["EMCO2"]:
                             ts_df.loc[cur_mod["EMDATE"] :, "co2"] += float(cur_mod["EMCO2"])
+
+        # read additional (custom/optional) sheets dynamically and attach them based on their key columns
+        def convert_cell(raw, kind: Literal["date", "int", "float", "str"]):
+            try:
+                if raw is None or (np.isscalar(raw) and pandas.isna(raw)):
+                    return None
+            except (TypeError, ValueError):
+                pass
+            try:
+                if kind == "date":
+                    return str(raw)[:10]
+                if kind == "int":
+                    return int(raw)
+                if kind == "float":
+                    return float(raw)
+                return str(raw)
+            except Exception:
+                logger.exception("%s: could not convert value %s as %s", self.name, raw, kind)
+                return None
+
+        def add_dynamic_sheet(sheet_name: str, sheet_df: pandas.DataFrame):
+            cols = list(sheet_df.columns)
+            # the attachment level is determined by the key columns present in the sheet
+            if "PLTID" in cols and "TREAT_ID" in cols and "EID" in cols:
+                level, key_cols = "plot", ["EID", "TREAT_ID", "PLTID"]
+            elif "TREAT_ID" in cols and "EID" in cols:
+                level, key_cols = "treatment", ["EID", "TREAT_ID"]
+            elif "EID" in cols:
+                level, key_cols = "experiment", ["EID"]
+            else:
+                logger.warning(
+                    "%s: skipping dynamic sheet '%s' without EID/TREAT_ID/PLTID key columns",
+                    self.name,
+                    sheet_name,
+                )
+                return
+            sub_key = sheet_name.lower()
+            # if the key columns are unique per row store a single object, otherwise a list of rows
+            as_list = bool(sheet_df.duplicated(subset=key_cols).any())
+            # derive a converter per column from its pandas dtype
+            kinds: dict[str, Literal["date", "int", "float", "str"]] = {}
+            for c in cols:
+                dt = str(sheet_df[c].dtype)
+                if dt.startswith("datetime"):
+                    kinds[c] = "date"
+                elif dt.startswith("int"):
+                    kinds[c] = "int"
+                elif dt.startswith("float"):
+                    kinds[c] = "float"
+                else:
+                    kinds[c] = "str"
+            for i in sheet_df.axes[0]:
+                eid = str(sheet_df["EID"][i])
+                target = experiments.get(eid)
+                ref = f"EID={eid}"
+                if target is not None and level in ("treatment", "plot"):
+                    tid = str(sheet_df["TREAT_ID"][i])
+                    ref += f", TREAT_ID={tid}"
+                    target = target.get("treatments", {}).get(tid)
+                if target is not None and level == "plot":
+                    pid = str(sheet_df["PLTID"][i])
+                    ref += f", PLTID={pid}"
+                    target = target.get("plots", {}).get(pid)
+                if target is None:
+                    logger.warning(
+                        "%s: dynamic sheet '%s' row references unknown %s (%s)",
+                        self.name,
+                        sheet_name,
+                        level,
+                        ref,
+                    )
+                    continue
+                record = {
+                    c: (str(sheet_df[c][i]) if c in key_cols else convert_cell(sheet_df[c][i], kinds[c]))
+                    for c in cols
+                }
+                if as_list:
+                    existing = target.get(sub_key)
+                    if not isinstance(existing, list):
+                        existing = []
+                        target[sub_key] = existing
+                    existing.append(record)
+                else:
+                    target[sub_key] = record
+
+        all_sheet_names = pandas.ExcelFile(file).sheet_names
+        dynamic_sheet_names: list[str] = []
+        # explicitly configured sheets
+        for s in self.config.dynamic_sheets:
+            if s in enabled_sheets:
+                logger.warning(
+                    "%s: sheet '%s' is handled explicitly and will not be read dynamically", self.name, s
+                )
+            elif s not in all_sheet_names:
+                logger.warning("%s: dynamic sheet '%s' not found in file", self.name, s)
+            elif s not in dynamic_sheet_names:
+                dynamic_sheet_names.append(s)
+        # auto-discover all sheets located after 'Weather_daily' that are not handled explicitly
+        if self.config.auto_discover_dynamic_sheets and "Weather_daily" in all_sheet_names:
+            for s in all_sheet_names[all_sheet_names.index("Weather_daily") + 1 :]:
+                if s not in enabled_sheets and s not in dynamic_sheet_names:
+                    dynamic_sheet_names.append(s)
+        if dynamic_sheet_names:
+            dynamic_dfs = pandas.read_excel(file, sheet_name=dynamic_sheet_names, header=2)
+            for s in dynamic_sheet_names:
+                add_dynamic_sheet(s, dynamic_dfs[s])
 
         if self.out_ports["out"]:
             try:
