@@ -61,6 +61,10 @@ type AgmipExcelSheetName = Literal[
     "Weather_daily",
     "Env_modifications",
     "Genotypes",
+    "Obs_crop_summary_plots",
+    "Obs_crop_summary_means",
+    "Obs_crop_daily_plots",
+    "Obs_crop_daily_means",
 ]
 
 
@@ -91,6 +95,10 @@ class CompConfig(process.ProcessConfig):
             "Weather_daily",
             "Env_modifications",
             "Genotypes",
+            "Obs_crop_summary_plots",
+            "Obs_crop_summary_means",
+            "Obs_crop_daily_plots",
+            "Obs_crop_daily_means",
         ],
         description="Which sheets in the xlsx file are supposed to be read and included in the output.",
     )
@@ -186,6 +194,10 @@ class Component(process.Process[CompConfig]):
             "Weather_daily": True,
             "Env_modifications": False,
             "Genotypes": True,
+            "Obs_crop_summary_plots": True,
+            "Obs_crop_summary_means": True,
+            "Obs_crop_daily_plots": True,
+            "Obs_crop_daily_means": True,
         }
 
         enabled_sheets.update((k, True) for k in self.config.enabled_sheets)
@@ -578,6 +590,8 @@ class Component(process.Process[CompConfig]):
                 "irrigation_events": [],
                 "fertilizer_events": [],
                 "environment_modifications": [],
+                "obs_crop_summary_means": None,
+                "obs_crop_daily_means": [],
             }
 
         cultivars = {}
@@ -650,7 +664,707 @@ class Component(process.Process[CompConfig]):
                 ),  # [text] plot notes
                 "soil": soils[sid],
                 "cultivar": cultivars.get(cul_id, None),
+                "obs_crop_summary_plots": None,
+                "obs_crop_daily_plots": [],
             }
+
+        # load observed crop summary data per plot
+        if enabled_sheets["Obs_crop_summary_plots"]:
+            obs_crop_summary_df = dfs["Obs_crop_summary_plots"]
+            for i in obs_crop_summary_df.axes[0]:
+                pid = str(obs_crop_summary_df["PLTID"][i])
+                eid = str(obs_crop_summary_df["EID"][i])
+                tid = str(obs_crop_summary_df["TREAT_ID"][i])
+                plot = experiments.get(eid, {}).get("treatments", {}).get(tid, {}).get("plots", {}).get(pid, None)
+                if plot is None:
+                    logger.warning(
+                        "%s: Obs_crop_summary_plots row references unknown plot (EID=%s, TREAT_ID=%s, PLTID=%s)",
+                        self.name,
+                        eid,
+                        tid,
+                        pid,
+                    )
+                    continue
+                plot["obs_crop_summary_plots"] = {
+                    "PLTID": pid,  # [text] plot id
+                    "EID": eid,  # [text] experiment id
+                    "TREAT_ID": tid,  # [text] treatment id
+                    "CUL_ID": str(obs_crop_summary_df["CUL_ID"][i]),  # [text] cultivar identifier
+                    "CUL_NAME": default_if_nan(
+                        obs_crop_summary_df.get("CUL_NAME", {}).get(i, None), None, str
+                    ),  # [text] cultivar name
+                    "BLOCK": default_if_nan(
+                        obs_crop_summary_df.get("BLOCK", {}).get(i, None), None, int
+                    ),  # [number] block number
+                    "RP": default_if_nan(
+                        obs_crop_summary_df.get("RP", {}).get(i, None), None, int
+                    ),  # [number] replicate number
+                    "PDATE": default_if_nan(
+                        obs_crop_summary_df.get("PDATE", {}).get(i, None),
+                        None,
+                        lambda v: str(v)[:10],
+                    ),  # [date] planting date
+                    "ADAT": default_if_nan(
+                        obs_crop_summary_df.get("ADAT", {}).get(i, None),
+                        None,
+                        lambda v: str(v)[:10],
+                    ),  # [date] anthesis date
+                    "ASDAT": default_if_nan(
+                        obs_crop_summary_df.get("ASDAT", {}).get(i, None),
+                        None,
+                        lambda v: str(v)[:10],
+                    ),  # [date] anthesis sampling date
+                    "MDAT": default_if_nan(
+                        obs_crop_summary_df.get("MDAT", {}).get(i, None),
+                        None,
+                        lambda v: str(v)[:10],
+                    ),  # [date] physiologic maturity date
+                    "HDATE": default_if_nan(
+                        obs_crop_summary_df.get("HDATE", {}).get(i, None),
+                        None,
+                        lambda v: str(v)[:10],
+                    ),  # [date] harvest date
+                    "LnoSM": default_if_nan(
+                        obs_crop_summary_df.get("LnoSM", {}).get(i, None), None, float
+                    ),  # [number] leaf no per stem maturity
+                    "LAIX": default_if_nan(
+                        obs_crop_summary_df.get("LAIX", {}).get(i, None), None, float
+                    ),  # [m2/m2] leaf area index maximum
+                    "LAIA": default_if_nan(
+                        obs_crop_summary_df.get("LAIA", {}).get(i, None), None, float
+                    ),  # [m2/m2] leaf area index anthesis
+                    "SAIX": default_if_nan(
+                        obs_crop_summary_df.get("SAIX", {}).get(i, None), None, float
+                    ),  # [m2/m2] stem area index maximum
+                    "SAIA": default_if_nan(
+                        obs_crop_summary_df.get("SAIA", {}).get(i, None), None, float
+                    ),  # [m2/m2] stem area index anthesis
+                    "SLWA": default_if_nan(
+                        obs_crop_summary_df.get("SLWA", {}).get(i, None), None, float
+                    ),  # [g[DM]/m2] specific leaf dry wt at anthesis
+                    "SLNA": default_if_nan(
+                        obs_crop_summary_df.get("SLNA", {}).get(i, None), None, float
+                    ),  # [g[N]/m2] specific leaf N anthesis
+                    "WLVGA": default_if_nan(
+                        obs_crop_summary_df.get("WLVGA", {}).get(i, None), None, float
+                    ),  # [kg[DM]/ha] lamina green dry wt at anthesis
+                    "LDAA": default_if_nan(
+                        obs_crop_summary_df.get("LDAA", {}).get(i, None), None, float
+                    ),  # [kg[DM]/ha] lamina dead dry wt at anthesis
+                    "LWAA": default_if_nan(
+                        obs_crop_summary_df.get("LWAA", {}).get(i, None), None, float
+                    ),  # [kg[DM]/ha] lamina dry wt at anthesis
+                    "SWAA": default_if_nan(
+                        obs_crop_summary_df.get("SWAA", {}).get(i, None), None, float
+                    ),  # [kg[DM]/ha] stem dry wt at anthesis
+                    "CRAA": default_if_nan(
+                        obs_crop_summary_df.get("CRAA", {}).get(i, None), None, float
+                    ),  # [kg[DM]/ha] crown dry wt at anthesis
+                    "CHWAA": default_if_nan(
+                        obs_crop_summary_df.get("CHWAA", {}).get(i, None), None, float
+                    ),  # [kg[DM]/ha] chaff dry wt at anthesis
+                    "GWAA": default_if_nan(
+                        obs_crop_summary_df.get("GWAA", {}).get(i, None), None, float
+                    ),  # [kg[DM]/ha] grain dry wt at anthesis
+                    "CWAA": default_if_nan(
+                        obs_crop_summary_df.get("CWAA", {}).get(i, None), None, float
+                    ),  # [kg[DM]/ha] tops dry weight anthesis
+                    "LGNAA": default_if_nan(
+                        obs_crop_summary_df.get("LGNAA", {}).get(i, None), None, float
+                    ),  # [kg[N]/ha] green leaf N anthesis
+                    "LDNAA": default_if_nan(
+                        obs_crop_summary_df.get("LDNAA", {}).get(i, None), None, float
+                    ),  # [kg[N]/ha] dead leaf N anthesis
+                    "LNAA": default_if_nan(
+                        obs_crop_summary_df.get("LNAA", {}).get(i, None), None, float
+                    ),  # [kg[N]/ha] leaf N anthesis
+                    "SNAA": default_if_nan(
+                        obs_crop_summary_df.get("SNAA", {}).get(i, None), None, float
+                    ),  # [kg[N]/ha] stem N anthesis
+                    "CHNAA": default_if_nan(
+                        obs_crop_summary_df.get("CHNAA", {}).get(i, None), None, float
+                    ),  # [kg[N]/ha] chaff N content anthesis
+                    "GNAA": default_if_nan(
+                        obs_crop_summary_df.get("GNAA", {}).get(i, None), None, float
+                    ),  # [kg[N]/ha] grain N anthesis
+                    "CNAA": default_if_nan(
+                        obs_crop_summary_df.get("CNAA", {}).get(i, None), None, float
+                    ),  # [kg[N]/ha] tops N anthesis
+                    "WLVGM": default_if_nan(
+                        obs_crop_summary_df.get("WLVGM", {}).get(i, None), None, float
+                    ),  # [kg[DM]/ha] lamina green dry wt at maturity
+                    "LDAM": default_if_nan(
+                        obs_crop_summary_df.get("LDAM", {}).get(i, None), None, float
+                    ),  # [kg[DM]/ha] lamina dead dry wt at maturity
+                    "LWAM": default_if_nan(
+                        obs_crop_summary_df.get("LWAM", {}).get(i, None), None, float
+                    ),  # [kg[DM]/ha] lamina dry wt at maturity
+                    "SWAM": default_if_nan(
+                        obs_crop_summary_df.get("SWAM", {}).get(i, None), None, float
+                    ),  # [kg[DM]/ha] stem dry wt at maturity
+                    "CRAM": default_if_nan(
+                        obs_crop_summary_df.get("CRAM", {}).get(i, None), None, float
+                    ),  # [kg[DM]/ha] crown dry wt at maturity
+                    "CHWAM": default_if_nan(
+                        obs_crop_summary_df.get("CHWAM", {}).get(i, None), None, float
+                    ),  # [kg[DM]/ha] chaff dry wt at maturity
+                    "GWAM": default_if_nan(
+                        obs_crop_summary_df.get("GWAM", {}).get(i, None), None, float
+                    ),  # [kg[DM]/ha] grain dry wt at maturity
+                    "CWAM": default_if_nan(
+                        obs_crop_summary_df.get("CWAM", {}).get(i, None), None, float
+                    ),  # [kg[DM]/ha] tops dry weight maturity
+                    "HIAM": default_if_nan(
+                        obs_crop_summary_df.get("HIAM", {}).get(i, None), None, float
+                    ),  # [unitless] harvest index maturity
+                    "HWAM": default_if_nan(
+                        obs_crop_summary_df.get("HWAM", {}).get(i, None), None, float
+                    ),  # [kg[DM]/ha] harvest yield maturity dry wt
+                    "LGNAM": default_if_nan(
+                        obs_crop_summary_df.get("LGNAM", {}).get(i, None), None, float
+                    ),  # [kg[N]/ha] green leaf N maturity
+                    "LDNAM": default_if_nan(
+                        obs_crop_summary_df.get("LDNAM", {}).get(i, None), None, float
+                    ),  # [kg[N]/ha] dead leaf N maturity
+                    "LNAM": default_if_nan(
+                        obs_crop_summary_df.get("LNAM", {}).get(i, None), None, float
+                    ),  # [kg[N]/ha] leaf N maturity
+                    "SNAM": default_if_nan(
+                        obs_crop_summary_df.get("SNAM", {}).get(i, None), None, float
+                    ),  # [kg[N]/ha] stem N maturity
+                    "CHNAM": default_if_nan(
+                        obs_crop_summary_df.get("CHNAM", {}).get(i, None), None, float
+                    ),  # [kg[N]/ha] chaff N content maturity
+                    "GNAM": default_if_nan(
+                        obs_crop_summary_df.get("GNAM", {}).get(i, None), None, float
+                    ),  # [kg[N]/ha] grain N maturity
+                    "CNAM": default_if_nan(
+                        obs_crop_summary_df.get("CNAM", {}).get(i, None), None, float
+                    ),  # [kg[N]/ha] tops N maturity
+                    "NHIAM": default_if_nan(
+                        obs_crop_summary_df.get("NHIAM", {}).get(i, None), None, float
+                    ),  # [unitless] N harvest index at maturity
+                    "GWPCM": default_if_nan(
+                        obs_crop_summary_df.get("GWPCM", {}).get(i, None), None, float
+                    ),  # [% of grain FM] grain moisture maturity
+                    "HnoUM": default_if_nan(
+                        obs_crop_summary_df.get("HnoUM", {}).get(i, None), None, float
+                    ),  # [grain/ear] harvest no per unit maturity
+                    "HnoAM": default_if_nan(
+                        obs_crop_summary_df.get("HnoAM", {}).get(i, None), None, float
+                    ),  # [grain/m2] harvest no at maturity
+                    "GWGM": default_if_nan(
+                        obs_crop_summary_df.get("GWGM", {}).get(i, None), None, float
+                    ),  # [mg[DM]/grain] grain unit dry wt maturity
+                    "GNGM": default_if_nan(
+                        obs_crop_summary_df.get("GNGM", {}).get(i, None), None, float
+                    ),  # [mg[N]/grain] grain unit N maturity
+                    "GPRCM": default_if_nan(
+                        obs_crop_summary_df.get("GPRCM", {}).get(i, None), None, float
+                    ),  # [% of grain DM] grain protein concentration maturity
+                    "GYFVM": default_if_nan(
+                        obs_crop_summary_df.get("GYFVM", {}).get(i, None), None, float
+                    ),  # [kg/l] test wt fresh maturity
+                }
+
+
+        # load observed crop summary means per treatment
+        if enabled_sheets["Obs_crop_summary_means"]:
+            obs_crop_summary_means_df = dfs["Obs_crop_summary_means"]
+            for i in obs_crop_summary_means_df.axes[0]:
+                eid = str(obs_crop_summary_means_df["EID"][i])
+                tid = str(obs_crop_summary_means_df["TREAT_ID"][i])
+                treatment = experiments.get(eid, {}).get("treatments", {}).get(tid, None)
+                if treatment is None:
+                    logger.warning(
+                        "%s: Obs_crop_summary_means row references unknown treatment (EID=%s, TREAT_ID=%s)",
+                        self.name,
+                        eid,
+                        tid,
+                    )
+                    continue
+                treatment["obs_crop_summary_means"] = {
+                    "EID": eid,  # [text] experiment id
+                    "TREAT_ID": tid,  # [text] treatment id
+                    "PDATE": default_if_nan(
+                        obs_crop_summary_means_df.get("PDATE", {}).get(i, None),
+                        None,
+                        lambda v: str(v)[:10],
+                    ),  # [date] planting_date
+                    "PLDAE": default_if_nan(
+                        obs_crop_summary_means_df.get("PLDAE", {}).get(i, None),
+                        None,
+                        lambda v: str(v)[:10],
+                    ),  # [date] emergence_date
+                    "Z30D": default_if_nan(
+                        obs_crop_summary_means_df.get("Z30D", {}).get(i, None),
+                        None,
+                        lambda v: str(v)[:10],
+                    ),  # [date] zadoks_30_growth_stage
+                    "Z39D": default_if_nan(
+                        obs_crop_summary_means_df.get("Z39D", {}).get(i, None),
+                        None,
+                        lambda v: str(v)[:10],
+                    ),  # [date] zadoks_39_growth_stage
+                    "EEMD": default_if_nan(
+                        obs_crop_summary_means_df.get("EEMD", {}).get(i, None),
+                        None,
+                        lambda v: str(v)[:10],
+                    ),  # [date] ear_emergence_stage
+                    "ADAT": default_if_nan(
+                        obs_crop_summary_means_df.get("ADAT", {}).get(i, None),
+                        None,
+                        lambda v: str(v)[:10],
+                    ),  # [date] anthesis_date
+                    "ASDAT": default_if_nan(
+                        obs_crop_summary_means_df.get("ASDAT", {}).get(i, None),
+                        None,
+                        lambda v: str(v)[:10],
+                    ),  # [date] anthesis_sampling date
+                    "MDAT": default_if_nan(
+                        obs_crop_summary_means_df.get("MDAT", {}).get(i, None),
+                        None,
+                        lambda v: str(v)[:10],
+                    ),  # [date] physiologic_maturity_dat
+                    "HDATE": default_if_nan(
+                        obs_crop_summary_means_df.get("HDATE", {}).get(i, None),
+                        None,
+                        lambda v: str(v)[:10],
+                    ),  # [date] harvest_date
+                    "PLPAE": default_if_nan(
+                        obs_crop_summary_means_df.get("PLPAE", {}).get(i, None), None, int
+                    ),  # [plant/m²] plant_density_emergence
+                    "LnoSM": default_if_nan(
+                        obs_crop_summary_means_df.get("LnoSM", {}).get(i, None), None, float
+                    ),  # [number] leaf_no_per_stem_matur
+                    "EnoAM": default_if_nan(
+                        obs_crop_summary_means_df.get("EnoAM", {}).get(i, None), None, float
+                    ),  # [ear/m²] ear_number_maturity
+                    "PHTM": default_if_nan(
+                        obs_crop_summary_means_df.get("PHTM", {}).get(i, None), None, float
+                    ),  # [m] plant_height_maturity
+                    "LAIX": default_if_nan(
+                        obs_crop_summary_means_df.get("LAIX", {}).get(i, None), None, float
+                    ),  # [m²/m²] leaf_area_index_maximum
+                    "LAIA": default_if_nan(
+                        obs_crop_summary_means_df.get("LAIA", {}).get(i, None), None, float
+                    ),  # [m²/m²] leaf_area_index_anthesis
+                    "SAIX": default_if_nan(
+                        obs_crop_summary_means_df.get("SAIX", {}).get(i, None), None, float
+                    ),  # [m²/m²] stem_area_index_maximum
+                    "SAIA": default_if_nan(
+                        obs_crop_summary_means_df.get("SAIA", {}).get(i, None), None, float
+                    ),  # [m²/m²] stem_area_index_anthesis
+                    "SLWA": default_if_nan(
+                        obs_crop_summary_means_df.get("SLWA", {}).get(i, None), None, float
+                    ),  # [g[DM]/m2] Specific_leaf_dry_wt_at_ant
+                    "SLNA": default_if_nan(
+                        obs_crop_summary_means_df.get("SLNA", {}).get(i, None), None, float
+                    ),  # [g[N]/m2] specific_leaf_N_anthesis
+                    "ETCM": default_if_nan(
+                        obs_crop_summary_means_df.get("ETCM", {}).get(i, None), None, int
+                    ),  # [mm] evapotrans_cumul_matur
+                    "WLVGA": default_if_nan(
+                        obs_crop_summary_means_df.get("WLVGA", {}).get(i, None), None, float
+                    ),  # [kg[DM]/ha] Lamina_green_dry_wt_at_ant
+                    "LDAA": default_if_nan(
+                        obs_crop_summary_means_df.get("LDAA", {}).get(i, None), None, float
+                    ),  # [kg[DM]/ha] Lamina_dead_dry_wt_at_ant
+                    "LWAA": default_if_nan(
+                        obs_crop_summary_means_df.get("LWAA", {}).get(i, None), None, float
+                    ),  # [kg[DM]/ha] Lamina_dry_wt_at_ant
+                    "SWAA": default_if_nan(
+                        obs_crop_summary_means_df.get("SWAA", {}).get(i, None), None, float
+                    ),  # [kg[DM]/ha] stem_dry_wt_at_ant
+                    "CRAA": default_if_nan(
+                        obs_crop_summary_means_df.get("CRAA", {}).get(i, None), None, float
+                    ),  # [kg[DM]/ha] crown_dry_wt_at_ant
+                    "CHWAA": default_if_nan(
+                        obs_crop_summary_means_df.get("CHWAA", {}).get(i, None), None, float
+                    ),  # [kg[DM]/ha] chaff_dry_wt_at_ant
+                    "GWAA": default_if_nan(
+                        obs_crop_summary_means_df.get("GWAA", {}).get(i, None), None, float
+                    ),  # [kg[DM]/ha] grain_dry_wt_at_ant
+                    "CWAA": default_if_nan(
+                        obs_crop_summary_means_df.get("CWAA", {}).get(i, None), None, float
+                    ),  # [kg[DM]/ha] tops_dry_weight_anthesis
+                    "LGNAA": default_if_nan(
+                        obs_crop_summary_means_df.get("LGNAA", {}).get(i, None), None, float
+                    ),  # [kg[N]/ha] green_leaf_N_anthesis
+                    "LDNAA": default_if_nan(
+                        obs_crop_summary_means_df.get("LDNAA", {}).get(i, None), None, float
+                    ),  # [kg[N]/ha] dead_leaf_N_anthesis
+                    "LNAA": default_if_nan(
+                        obs_crop_summary_means_df.get("LNAA", {}).get(i, None), None, float
+                    ),  # [kg[N]/ha] leaf_N_anthesis
+                    "SNAA": default_if_nan(
+                        obs_crop_summary_means_df.get("SNAA", {}).get(i, None), None, float
+                    ),  # [kg[N]/ha] stem_N_anthesis
+                    "CHNAA": default_if_nan(
+                        obs_crop_summary_means_df.get("CHNAA", {}).get(i, None), None, float
+                    ),  # [kg[N]/ha] chaff_N_content_anthesis
+                    "GNAA": default_if_nan(
+                        obs_crop_summary_means_df.get("GNAA", {}).get(i, None), None, float
+                    ),  # [kg[N]/ha] grain_N_anthesis
+                    "CNAA": default_if_nan(
+                        obs_crop_summary_means_df.get("CNAA", {}).get(i, None), None, float
+                    ),  # [kg[N]/ha] tops_N_anthesis
+                    "WLVGM": default_if_nan(
+                        obs_crop_summary_means_df.get("WLVGM", {}).get(i, None), None, float
+                    ),  # [kg[DM]/ha] Lamina_green_dry_wt_at_mat
+                    "LDAM": default_if_nan(
+                        obs_crop_summary_means_df.get("LDAM", {}).get(i, None), None, float
+                    ),  # [kg[DM]/ha] Lamina_dead_dry_wt_at_mat
+                    "LWAM": default_if_nan(
+                        obs_crop_summary_means_df.get("LWAM", {}).get(i, None), None, float
+                    ),  # [kg[DM]/ha] Lamina_dry_wt_at_mat
+                    "SWAM": default_if_nan(
+                        obs_crop_summary_means_df.get("SWAM", {}).get(i, None), None, float
+                    ),  # [kg[DM]/ha] stem_dry_wt_at_mat
+                    "CRAM": default_if_nan(
+                        obs_crop_summary_means_df.get("CRAM", {}).get(i, None), None, float
+                    ),  # [kg[DM]/ha] crown_dry_wt_at_mat
+                    "CHWAM": default_if_nan(
+                        obs_crop_summary_means_df.get("CHWAM", {}).get(i, None), None, float
+                    ),  # [kg[DM]/ha] chaff_dry_wt_at_mat
+                    "GWAM": default_if_nan(
+                        obs_crop_summary_means_df.get("GWAM", {}).get(i, None), None, float
+                    ),  # [kg[DM]/ha] grain_dry_wt_at_mat
+                    "CWAM": default_if_nan(
+                        obs_crop_summary_means_df.get("CWAM", {}).get(i, None), None, float
+                    ),  # [kg[DM]/ha] tops_dry_weight_maturity
+                    "HIAM": default_if_nan(
+                        obs_crop_summary_means_df.get("HIAM", {}).get(i, None), None, float
+                    ),  # [unitless] harvest_index_maturity
+                    "HWAM": default_if_nan(
+                        obs_crop_summary_means_df.get("HWAM", {}).get(i, None), None, float
+                    ),  # [kg[DM]/ha] harvest_yld_matur_dry_wt
+                    "LGNAM": default_if_nan(
+                        obs_crop_summary_means_df.get("LGNAM", {}).get(i, None), None, float
+                    ),  # [kgN/ha] green_leaf_N_maturity
+                    "LDNAM": default_if_nan(
+                        obs_crop_summary_means_df.get("LDNAM", {}).get(i, None), None, float
+                    ),  # [kg[N]/ha] dead_leaf_N_maturity
+                    "LNAM": default_if_nan(
+                        obs_crop_summary_means_df.get("LNAM", {}).get(i, None), None, float
+                    ),  # [kg[N]/ha] leaf_N_maturity
+                    "SNAM": default_if_nan(
+                        obs_crop_summary_means_df.get("SNAM", {}).get(i, None), None, float
+                    ),  # [kg[N]/ha] stem_N_maturity
+                    "CHNAM": default_if_nan(
+                        obs_crop_summary_means_df.get("CHNAM", {}).get(i, None), None, float
+                    ),  # [kg[N]/ha] chaff_N_content_maturity
+                    "GNAM": default_if_nan(
+                        obs_crop_summary_means_df.get("GNAM", {}).get(i, None), None, float
+                    ),  # [kg[N]/ha] grain_N_maturity
+                    "CNAM": default_if_nan(
+                        obs_crop_summary_means_df.get("CNAM", {}).get(i, None), None, float
+                    ),  # [kg[N]/ha] tops_N_maturity
+                    "NHIAM": default_if_nan(
+                        obs_crop_summary_means_df.get("NHIAM", {}).get(i, None), None, float
+                    ),  # [unitless] N_harvest_index_at_mat
+                    "GWPCM": default_if_nan(
+                        obs_crop_summary_means_df.get("GWPCM", {}).get(i, None), None, float
+                    ),  # [% of grain FM] grain_moisture_maturity
+                    "HnoUM": default_if_nan(
+                        obs_crop_summary_means_df.get("HnoUM", {}).get(i, None), None, float
+                    ),  # [grain/ear] harv_no_per_unit_maturity
+                    "HnoAM": default_if_nan(
+                        obs_crop_summary_means_df.get("HnoAM", {}).get(i, None), None, float
+                    ),  # [grain/m²] harvest_no_at_maturity
+                    "GWGM": default_if_nan(
+                        obs_crop_summary_means_df.get("GWGM", {}).get(i, None), None, float
+                    ),  # [mg[DM]/grain] grain_unit_dry_wt_matur
+                    "GNGM": default_if_nan(
+                        obs_crop_summary_means_df.get("GNGM", {}).get(i, None), None, float
+                    ),  # [mg[N]/grain] grain_unit_N_matur
+                    "GPRCM": default_if_nan(
+                        obs_crop_summary_means_df.get("GPRCM", {}).get(i, None), None, float
+                    ),  # [% of grain DM] grain_protein_conc_matur
+                    "GYFVM": default_if_nan(
+                        obs_crop_summary_means_df.get("GYFVM", {}).get(i, None), None, float
+                    ),  # [kg/l] test_wt_fresh_maturity
+                }
+
+        # load observed crop daily means per treatment (time series)
+        if enabled_sheets["Obs_crop_daily_means"]:
+            obs_crop_daily_means_df = dfs["Obs_crop_daily_means"]
+            for i in obs_crop_daily_means_df.axes[0]:
+                eid = str(obs_crop_daily_means_df["EID"][i])
+                tid = str(obs_crop_daily_means_df["TREAT_ID"][i])
+                treatment = experiments.get(eid, {}).get("treatments", {}).get(tid, None)
+                if treatment is None:
+                    logger.warning(
+                        "%s: Obs_crop_daily_means row references unknown treatment (EID=%s, TREAT_ID=%s)",
+                        self.name,
+                        eid,
+                        tid,
+                    )
+                    continue
+                treatment["obs_crop_daily_means"].append(
+                    {
+                        "EID": eid,  # [text] experiment id
+                        "TREAT_ID": tid,  # [text] treatment id
+                        "DATE": default_if_nan(
+                            obs_crop_daily_means_df.get("DATE", {}).get(i, None),
+                            None,
+                            lambda v: str(v)[:10],
+                        ),  # [-] date_of_measurement
+                        "GSTZD": default_if_nan(
+                            obs_crop_daily_means_df.get("GSTZD", {}).get(i, None), None, float
+                        ),  # [number] growth_stage_Zadoks
+                        "LNUM": default_if_nan(
+                            obs_crop_daily_means_df.get("LNUM", {}).get(i, None), None, float
+                        ),  # [leaf\mainstem] leaf_number_as_haun_stg
+                        "TnoPD": default_if_nan(
+                            obs_crop_daily_means_df.get("TnoPD", {}).get(i, None), None, float
+                        ),  # [tiller/m²] tiller_number_per_plant
+                        "EnoAD": default_if_nan(
+                            obs_crop_daily_means_df.get("EnoAD", {}).get(i, None), None, float
+                        ),  # [ear/m²] ear_number
+                        "CLAD": default_if_nan(
+                            obs_crop_daily_means_df.get("CLAD", {}).get(i, None), None, float
+                        ),  # [m] canopy_length
+                        "PHTD": default_if_nan(
+                            obs_crop_daily_means_df.get("PHTD", {}).get(i, None), None, float
+                        ),  # [cm] plant_height
+                        "LAID": default_if_nan(
+                            obs_crop_daily_means_df.get("LAID", {}).get(i, None), None, float
+                        ),  # [m²/m²] leaf_area_index
+                        "SAID": default_if_nan(
+                            obs_crop_daily_means_df.get("SAID", {}).get(i, None), None, float
+                        ),  # [m²/m²] stem_area_index
+                        "GAID": default_if_nan(
+                            obs_crop_daily_means_df.get("GAID", {}).get(i, None), None, float
+                        ),  # [m²/m²] green_area_index
+                        "SLAD": default_if_nan(
+                            obs_crop_daily_means_df.get("SLAD", {}).get(i, None), None, float
+                        ),  # [cm²/g[DM]] specific_leaf_area
+                        "SLWD": default_if_nan(
+                            obs_crop_daily_means_df.get("SLWD", {}).get(i, None), None, float
+                        ),  # [g[DM]/m2] specific_leaf_weigth
+                        "SLND": default_if_nan(
+                            obs_crop_daily_means_df.get("SLND", {}).get(i, None), None, float
+                        ),  # [g[N]/m2] specific_leaf_nitrogen
+                        "WLVG": default_if_nan(
+                            obs_crop_daily_means_df.get("WLVG", {}).get(i, None), None, float
+                        ),  # [kg[DM]/ha] green_leaf_dry_weight
+                        "LDAD": default_if_nan(
+                            obs_crop_daily_means_df.get("LDAD", {}).get(i, None), None, float
+                        ),  # [kg[DM]/ha] dead_leaf_dry_weight
+                        "LWAD": default_if_nan(
+                            obs_crop_daily_means_df.get("LWAD", {}).get(i, None), None, float
+                        ),  # [kg[DM]/ha] leaf_dry_weight
+                        "SWAD": default_if_nan(
+                            obs_crop_daily_means_df.get("SWAD", {}).get(i, None), None, float
+                        ),  # [kg[DM]/ha] stem_dry_weight
+                        "CRAD": default_if_nan(
+                            obs_crop_daily_means_df.get("CRAD", {}).get(i, None), None, float
+                        ),  # [kg[DM]/ha] Crown dry weight
+                        "CHWAD": default_if_nan(
+                            obs_crop_daily_means_df.get("CHWAD", {}).get(i, None), None, float
+                        ),  # [kg[DM]/ha] chaff_dry_weight
+                        "GWAD": default_if_nan(
+                            obs_crop_daily_means_df.get("GWAD", {}).get(i, None), None, float
+                        ),  # [kg[DM]/ha] grain_dry_weight
+                        "CWAD": default_if_nan(
+                            obs_crop_daily_means_df.get("CWAD", {}).get(i, None), None, float
+                        ),  # [kg[DM]/ha] tops_dry_weight
+                        "HIAD": default_if_nan(
+                            obs_crop_daily_means_df.get("HIAD", {}).get(i, None), None, float
+                        ),  # [unitless] harvest_index
+                        "LGNPCD": default_if_nan(
+                            obs_crop_daily_means_df.get("LGNPCD", {}).get(i, None), None, float
+                        ),  # [g[N]/100g[DM]] green_leaf_N_concentration
+                        "LGNAD": default_if_nan(
+                            obs_crop_daily_means_df.get("LGNAD", {}).get(i, None), None, float
+                        ),  # [kgN/ha] green_leaf_N
+                        "LDNAD": default_if_nan(
+                            obs_crop_daily_means_df.get("LDNAD", {}).get(i, None), None, float
+                        ),  # [kg[N]/ha] dead_leaf_N
+                        "LNAD": default_if_nan(
+                            obs_crop_daily_means_df.get("LNAD", {}).get(i, None), None, float
+                        ),  # [kg[N]/ha] leaf_N
+                        "SNAD": default_if_nan(
+                            obs_crop_daily_means_df.get("SNAD", {}).get(i, None), None, float
+                        ),  # [kg[N]/ha] stem_N
+                        "CHNAD": default_if_nan(
+                            obs_crop_daily_means_df.get("CHNAD", {}).get(i, None), None, float
+                        ),  # [kg[N]/ha] chaff_N_content
+                        "GNAD": default_if_nan(
+                            obs_crop_daily_means_df.get("GNAD", {}).get(i, None), None, float
+                        ),  # [kg[N]/ha] grain_N
+                        "CNAD": default_if_nan(
+                            obs_crop_daily_means_df.get("CNAD", {}).get(i, None), None, float
+                        ),  # [kg[N]/ha] tops_N
+                        "NHID": default_if_nan(
+                            obs_crop_daily_means_df.get("NHID", {}).get(i, None), None, float
+                        ),  # [unitless] N_harvest_index
+                        "HnoUD": default_if_nan(
+                            obs_crop_daily_means_df.get("HnoUD", {}).get(i, None), None, float
+                        ),  # [grain/ear] harv_no_per_unit
+                        "HnoAD": default_if_nan(
+                            obs_crop_daily_means_df.get("HnoAD", {}).get(i, None), None, float
+                        ),  # [grain/m²] harvest_no
+                        "GWGD": default_if_nan(
+                            obs_crop_daily_means_df.get("GWGD", {}).get(i, None), None, float
+                        ),  # [mg[DM]/grain] grain_unit_dry_weight
+                        "GNGD": default_if_nan(
+                            obs_crop_daily_means_df.get("GNGD", {}).get(i, None), None, float
+                        ),  # [mg[N]/grain] grain_unit_N
+                    }
+                )
+
+        # load observed crop daily data per plot (time series)
+        if enabled_sheets["Obs_crop_daily_plots"]:
+            obs_crop_daily_plots_df = dfs["Obs_crop_daily_plots"]
+            for i in obs_crop_daily_plots_df.axes[0]:
+                pid = str(obs_crop_daily_plots_df["PLTID"][i])
+                eid = str(obs_crop_daily_plots_df["EID"][i])
+                tid = str(obs_crop_daily_plots_df["TREAT_ID"][i])
+                plot = experiments.get(eid, {}).get("treatments", {}).get(tid, {}).get("plots", {}).get(pid, None)
+                if plot is None:
+                    logger.warning(
+                        "%s: Obs_crop_daily_plots row references unknown plot (EID=%s, TREAT_ID=%s, PLTID=%s)",
+                        self.name,
+                        eid,
+                        tid,
+                        pid,
+                    )
+                    continue
+                plot["obs_crop_daily_plots"].append(
+                    {
+                        "PLTID": pid,  # [text] plot id
+                        "EID": eid,  # [text] experiment id
+                        "TREAT_ID": tid,  # [text] treatment id
+                        "CUL_ID": str(obs_crop_daily_plots_df["CUL_ID"][i]),  # [text] cultivar identifier
+                        "CUL_NAME": default_if_nan(
+                            obs_crop_daily_plots_df.get("CUL_NAME", {}).get(i, None), None, str
+                        ),  # [text] cultivar name
+                        "BLOCK": default_if_nan(
+                            obs_crop_daily_plots_df.get("BLOCK", {}).get(i, None), None, int
+                        ),  # [-] Block
+                        "PLOTno": default_if_nan(
+                            obs_crop_daily_plots_df.get("PLOTno", {}).get(i, None), None, float
+                        ),  # [-] Plot number
+                        "RP": default_if_nan(
+                            obs_crop_daily_plots_df.get("RP", {}).get(i, None), None, int
+                        ),  # [-] Replicate
+                        "DATE": default_if_nan(
+                            obs_crop_daily_plots_df.get("DATE", {}).get(i, None),
+                            None,
+                            lambda v: str(v)[:10],
+                        ),  # [-] date of measurment
+                        "NPL": default_if_nan(
+                            obs_crop_daily_plots_df.get("NPL", {}).get(i, None), None, float
+                        ),  # [plant/sample] plant_no_in_sample
+                        "PLPAD": default_if_nan(
+                            obs_crop_daily_plots_df.get("PLPAD", {}).get(i, None), None, float
+                        ),  # [plant/m²] plant_density
+                        "GSTZD": default_if_nan(
+                            obs_crop_daily_plots_df.get("GSTZD", {}).get(i, None), None, float
+                        ),  # [number] growth_stage_Zadoks
+                        "LNUM": default_if_nan(
+                            obs_crop_daily_plots_df.get("LNUM", {}).get(i, None), None, float
+                        ),  # [leaf\mainstem] leaf_number_as_haun_stg
+                        "TnoPD": default_if_nan(
+                            obs_crop_daily_plots_df.get("TnoPD", {}).get(i, None), None, float
+                        ),  # [tiller/m²] tiller_number_per_plant
+                        "EnoAD": default_if_nan(
+                            obs_crop_daily_plots_df.get("EnoAD", {}).get(i, None), None, float
+                        ),  # [ear/m²] ear_number
+                        "CLAD": default_if_nan(
+                            obs_crop_daily_plots_df.get("CLAD", {}).get(i, None), None, float
+                        ),  # [cm] canopy_length
+                        "PHTD": default_if_nan(
+                            obs_crop_daily_plots_df.get("PHTD", {}).get(i, None), None, float
+                        ),  # [cm] plant_height
+                        "LAID": default_if_nan(
+                            obs_crop_daily_plots_df.get("LAID", {}).get(i, None), None, float
+                        ),  # [m²/m²] leaf_area_index
+                        "SAID": default_if_nan(
+                            obs_crop_daily_plots_df.get("SAID", {}).get(i, None), None, float
+                        ),  # [m²/m²] stem_area_index
+                        "GAID": default_if_nan(
+                            obs_crop_daily_plots_df.get("GAID", {}).get(i, None), None, float
+                        ),  # [m²/m²] green_area_index
+                        "SLAD": default_if_nan(
+                            obs_crop_daily_plots_df.get("SLAD", {}).get(i, None), None, float
+                        ),  # [m²/m²] Specific leaf area
+                        "SLWD": default_if_nan(
+                            obs_crop_daily_plots_df.get("SLWD", {}).get(i, None), None, float
+                        ),  # [g[DM]/m2] specific_leaf_weigth
+                        "SLND": default_if_nan(
+                            obs_crop_daily_plots_df.get("SLND", {}).get(i, None), None, float
+                        ),  # [g[N]/m2] specific_leaf_nitrogen
+                        "WLVG": default_if_nan(
+                            obs_crop_daily_plots_df.get("WLVG", {}).get(i, None), None, float
+                        ),  # [kg[DM]/ha] green_leaf_dry_weight
+                        "LDAD": default_if_nan(
+                            obs_crop_daily_plots_df.get("LDAD", {}).get(i, None), None, float
+                        ),  # [kg[DM]/ha] dead_leaf_dry_weight
+                        "LWAD": default_if_nan(
+                            obs_crop_daily_plots_df.get("LWAD", {}).get(i, None), None, float
+                        ),  # [kg[DM]/ha] leaf_dry_weight
+                        "SWAD": default_if_nan(
+                            obs_crop_daily_plots_df.get("SWAD", {}).get(i, None), None, float
+                        ),  # [kg[DM]/ha] stem_dry_weight
+                        "CRAD": default_if_nan(
+                            obs_crop_daily_plots_df.get("CRAD", {}).get(i, None), None, float
+                        ),  # [kg[DM]/ha] Crown dry weight
+                        "CHWAD": default_if_nan(
+                            obs_crop_daily_plots_df.get("CHWAD", {}).get(i, None), None, float
+                        ),  # [kg[DM]/ha] chaff_dry_weight
+                        "GWAD": default_if_nan(
+                            obs_crop_daily_plots_df.get("GWAD", {}).get(i, None), None, float
+                        ),  # [kg[DM]/ha] grain_dry_weight
+                        "CWAD": default_if_nan(
+                            obs_crop_daily_plots_df.get("CWAD", {}).get(i, None), None, float
+                        ),  # [kg[DM]/ha] tops_dry_weight
+                        "HIAD": default_if_nan(
+                            obs_crop_daily_plots_df.get("HIAD", {}).get(i, None), None, float
+                        ),  # [unitless] harvest_index
+                        "LGNPCD": default_if_nan(
+                            obs_crop_daily_plots_df.get("LGNPCD", {}).get(i, None), None, float
+                        ),  # [g[N]/100g[DM]] green_leaf_N_concentration
+                        "LGNAD": default_if_nan(
+                            obs_crop_daily_plots_df.get("LGNAD", {}).get(i, None), None, float
+                        ),  # [kg[N]/ha] green_leaf_N
+                        "LDNAD": default_if_nan(
+                            obs_crop_daily_plots_df.get("LDNAD", {}).get(i, None), None, float
+                        ),  # [kg[N]/ha] dead_leaf_N
+                        "LNAD": default_if_nan(
+                            obs_crop_daily_plots_df.get("LNAD", {}).get(i, None), None, float
+                        ),  # [kg[N]/ha] leaf_N
+                        "SNAD": default_if_nan(
+                            obs_crop_daily_plots_df.get("SNAD", {}).get(i, None), None, float
+                        ),  # [kg[N]/ha] stem_N
+                        "CHNAD": default_if_nan(
+                            obs_crop_daily_plots_df.get("CHNAD", {}).get(i, None), None, float
+                        ),  # [kg[N]/ha] chaff_N_content
+                        "GNAD": default_if_nan(
+                            obs_crop_daily_plots_df.get("GNAD", {}).get(i, None), None, float
+                        ),  # [kg[N]/ha] grain_N
+                        "CNAD": default_if_nan(
+                            obs_crop_daily_plots_df.get("CNAD", {}).get(i, None), None, float
+                        ),  # [kg[N]/ha] tops_N
+                        "NHID": default_if_nan(
+                            obs_crop_daily_plots_df.get("NHID", {}).get(i, None), None, float
+                        ),  # [unitless] N_harvest_index
+                        "HnoUD": default_if_nan(
+                            obs_crop_daily_plots_df.get("HnoUD", {}).get(i, None), None, float
+                        ),  # [grain/ear] harv_no_per_unit
+                        "HnoAD": default_if_nan(
+                            obs_crop_daily_plots_df.get("HnoAD", {}).get(i, None), None, float
+                        ),  # [grain/m²] harvest_no
+                        "GWGD": default_if_nan(
+                            obs_crop_daily_plots_df.get("GWGD", {}).get(i, None), None, float
+                        ),  # [mg[DM]/grain] grain_unit_dry_weight
+                        "GNGD": default_if_nan(
+                            obs_crop_daily_plots_df.get("GNGD", {}).get(i, None), None, float
+                        ),  # [mg[N]/grain] grain_unit_N
+                    }
+                )
 
         # load treatments of experiments
         initial_df = dfs["initial_condition_layers"]
