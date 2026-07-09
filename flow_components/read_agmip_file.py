@@ -61,10 +61,10 @@ type AgmipExcelSheetName = Literal[
     "Weather_daily",
     "Env_modifications",
     "Genotypes",
-    "Obs_crop_summary_plots",
-    "Obs_crop_summary_means",
-    "Obs_crop_daily_plots",
-    "Obs_crop_daily_means",
+    # "Obs_crop_summary_plots",
+    # "Obs_crop_summary_means",
+    # "Obs_crop_daily_plots",
+    # "Obs_crop_daily_means",
 ]
 
 
@@ -72,6 +72,14 @@ class CompConfig(process.ProcessConfig):
     file: str = Field(
         "/home/berg/GitHub/amei_exercises/maricopa_wheat_face/MARICOPA Wheat FACE data_2026-01-23 (ICASA data format v4.1)(PM7)(BAK1)(no soilT).xlsx",
         description="Path to AgMIP xlsx",
+    )
+    filter: dict = Field(
+        {"experiments": {}, "treatments": {}, "plots": {}},
+        description="""Send only messages which match filter. Add at each level which column key should pass. E.g.
+        {
+            "plots": { "BLOCK": 1 }
+        }
+        """,
     )
     weather_elements: list[AgmipClimateElement] = Field(
         ["SRAD", "TMAX", "TMIN", "TAVD", "RAIN", "VPRSD", "WIND", "TDEW", "RHAVD"],
@@ -95,10 +103,10 @@ class CompConfig(process.ProcessConfig):
             "Weather_daily",
             "Env_modifications",
             "Genotypes",
-            "Obs_crop_summary_plots",
-            "Obs_crop_summary_means",
-            "Obs_crop_daily_plots",
-            "Obs_crop_daily_means",
+            # "Obs_crop_summary_plots",
+            # "Obs_crop_summary_means",
+            # "Obs_crop_daily_plots",
+            # "Obs_crop_daily_means",
         ],
         description="Which sheets in the xlsx file are supposed to be read and included in the output.",
     )
@@ -213,10 +221,10 @@ class Component(process.Process[CompConfig]):
             "Weather_daily": True,
             "Env_modifications": False,
             "Genotypes": True,
-            "Obs_crop_summary_plots": True,
-            "Obs_crop_summary_means": True,
-            "Obs_crop_daily_plots": True,
-            "Obs_crop_daily_means": True,
+            # "Obs_crop_summary_plots": True,
+            # "Obs_crop_summary_means": True,
+            # "Obs_crop_daily_plots": True,
+            # "Obs_crop_daily_means": True,
         }
 
         enabled_sheets.update((k, True) for k in self.config.enabled_sheets)
@@ -688,7 +696,7 @@ class Component(process.Process[CompConfig]):
             }
 
         # load observed crop summary data per plot
-        if enabled_sheets["Obs_crop_summary_plots"]:
+        if False:  # enabled_sheets["Obs_crop_summary_plots"]:
             obs_crop_summary_df = dfs["Obs_crop_summary_plots"]
             for i in obs_crop_summary_df.axes[0]:
                 pid = str(obs_crop_summary_df["PLTID"][i])
@@ -886,9 +894,8 @@ class Component(process.Process[CompConfig]):
                     ),  # [kg/l] test wt fresh maturity
                 }
 
-
         # load observed crop summary means per treatment
-        if enabled_sheets["Obs_crop_summary_means"]:
+        if False:  # enabled_sheets["Obs_crop_summary_means"]:
             obs_crop_summary_means_df = dfs["Obs_crop_summary_means"]
             for i in obs_crop_summary_means_df.axes[0]:
                 eid = str(obs_crop_summary_means_df["EID"][i])
@@ -1106,7 +1113,7 @@ class Component(process.Process[CompConfig]):
                 }
 
         # load observed crop daily means per treatment (time series)
-        if enabled_sheets["Obs_crop_daily_means"]:
+        if False:  # enabled_sheets["Obs_crop_daily_means"]:
             obs_crop_daily_means_df = dfs["Obs_crop_daily_means"]
             for i in obs_crop_daily_means_df.axes[0]:
                 eid = str(obs_crop_daily_means_df["EID"][i])
@@ -1235,7 +1242,7 @@ class Component(process.Process[CompConfig]):
                 )
 
         # load observed crop daily data per plot (time series)
-        if enabled_sheets["Obs_crop_daily_plots"]:
+        if False:  # enabled_sheets["Obs_crop_daily_plots"]:
             obs_crop_daily_plots_df = dfs["Obs_crop_daily_plots"]
             for i in obs_crop_daily_plots_df.axes[0]:
                 pid = str(obs_crop_daily_plots_df["PLTID"][i])
@@ -1720,8 +1727,7 @@ class Component(process.Process[CompConfig]):
                     )
                     continue
                 record = {
-                    c: (str(sheet_df[c][i]) if c in key_cols else convert_cell(sheet_df[c][i], kinds[c]))
-                    for c in cols
+                    c: (str(sheet_df[c][i]) if c in key_cols else convert_cell(sheet_df[c][i], kinds[c])) for c in cols
                 }
                 if as_list:
                     existing = target.get(sub_key)
@@ -1737,9 +1743,7 @@ class Component(process.Process[CompConfig]):
         # explicitly configured sheets
         for s in self.config.dynamic_sheets:
             if s in enabled_sheets:
-                logger.warning(
-                    "%s: sheet '%s' is handled explicitly and will not be read dynamically", self.name, s
-                )
+                logger.warning("%s: sheet '%s' is handled explicitly and will not be read dynamically", self.name, s)
             elif s not in all_sheet_names:
                 logger.warning("%s: dynamic sheet '%s' not found in file", self.name, s)
             elif s not in dynamic_sheet_names:
@@ -1760,14 +1764,23 @@ class Component(process.Process[CompConfig]):
                 for e_id, e in experiments.items():
                     if self.stopping:
                         break
+                    if f_ex := self.config.filter.get("experiments", None):
+                        if not all((k in e and e[k] == v for k, v in f_ex.items())):
+                            continue
 
                     for t_id, t in e["treatments"].items():
                         if self.stopping:
                             break
+                        if f_t := self.config.filter.get("treatments", None):
+                            if not all((k in t and t[k] == v for k, v in f_t.items())):
+                                continue
 
                         for p_id, p in t["plots"].items():
                             if self.stopping:
                                 break
+                            if f_p := self.config.filter.get("plots", None):
+                                if not all((k in p and p[k] == v for k, v in f_p.items())):
+                                    continue
 
                             content = field_exp_data_capnp.MixedType.new_message(
                                 soilProfile=p["soil"]["profile"],
