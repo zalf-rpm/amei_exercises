@@ -2,10 +2,10 @@
   "version": "0.3",
   "name": "",
   "pan": {
-    "x": 180.28989415668877,
-    "y": -795.8852845504122
+    "x": -115.52743654206085,
+    "y": -373.4526451273147
   },
-  "zoom": 0.8138534465491291,
+  "zoom": 0.5657645565497191,
   "services": {
     "channels": {
       "d5456d2c-c99e-43a2-a7ac-49b7749f3247": "capnp://W2zRg0jsUAXtW1NxCHFlpAhKLSCcgpmBo6hp9dld1_8=@10.10.28.175:9989/local_mas_python_fbp_channel_starter"
@@ -388,11 +388,11 @@
       "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
     },
     {
-      "nodeId": "Read Excel file 1",
-      "processName": "Read Excel file 1",
+      "nodeId": "read obs phenology",
+      "processName": "read obs phenology",
       "location": {
-        "x": -142.35563965711776,
-        "y": 1702.1280997779586
+        "x": -837.3098594264657,
+        "y": 1715.0456488828331
       },
       "editable": false,
       "parallelProcesses": 1,
@@ -415,16 +415,16 @@
       "nodeId": "3864129f-f03c-4f08-97a9-9ff5a491dcdf",
       "componentId": "d5603568-5ce0-45a3-900d-77c8b3b894f5",
       "location": {
-        "x": 801.9939100061159,
-        "y": 1707.2887643819204
+        "x": 1712.8954071171859,
+        "y": 1832.3232375789598
       }
     },
     {
-      "nodeId": "Filter JSON 3",
-      "processName": "Filter JSON 3",
+      "nodeId": "get date and zadoks",
+      "processName": "get date and zadoks",
       "location": {
-        "x": 315.8626342397126,
-        "y": 1693.0948482326357
+        "x": -431.82615159249156,
+        "y": 1714.9804814405354
       },
       "editable": false,
       "parallelProcesses": 1,
@@ -440,6 +440,79 @@
         "values_only": false
       },
       "componentId": "161c9d39-a3c5-4885-beb2-9d85a7c777bf",
+      "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
+    },
+    {
+      "nodeId": "date -> DOY",
+      "processName": "date -> DOY",
+      "location": {
+        "x": -47.11955907350267,
+        "y": 1723.5152179241702
+      },
+      "editable": false,
+      "parallelProcesses": 1,
+      "config": {
+        "path_separator": "/",
+        "operations": [
+          {
+            "path": "DATE",
+            "op": "date_day_of_year"
+          }
+        ],
+        "max_abs_exponent": 100.0,
+        "on_error": "keep_original"
+      },
+      "componentId": "308d0b88-18f5-4d40-8b3f-bab35fdad44e",
+      "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
+    },
+    {
+      "nodeId": "interpol DOY at MONI...",
+      "processName": "interpol DOY at MONICA stages",
+      "location": {
+        "x": 379.9224455530723,
+        "y": 1725.187319291228
+      },
+      "editable": false,
+      "parallelProcesses": 1,
+      "config": {
+        "traversal_path": null,
+        "path_separator": "/",
+        "group_key": "TREAT_ID",
+        "x_key": "GSTZD",
+        "y_key": "DATE",
+        "inter_x": [
+          10,
+          61,
+          71,
+          91
+        ],
+        "extrapolation": "null",
+        "on_error": "null"
+      },
+      "componentId": "e1018222-9029-4fbe-935d-cef5ab1c8011",
+      "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
+    },
+    {
+      "nodeId": "round interpol DOYs",
+      "processName": "round interpol DOYs",
+      "location": {
+        "x": 865.8451022381231,
+        "y": 1748.441560246865
+      },
+      "editable": false,
+      "parallelProcesses": 1,
+      "config": {
+        "path_separator": "/",
+        "operations": [
+          {
+            "path": "DATE",
+            "op": "round"
+          }
+        ],
+        "max_abs_exponent": 100.0,
+        "on_error": "keep_original"
+      },
+      "componentId": "308d0b88-18f5-4d40-8b3f-bab35fdad44e",
       "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
     }
   ],
@@ -644,22 +717,55 @@
     },
     {
       "source": {
-        "nodeId": "Read Excel file 1",
+        "nodeId": "read obs phenology",
         "port": "out"
       },
       "target": {
-        "nodeId": "Filter JSON 3",
+        "nodeId": "get date and zadoks",
         "port": "in"
       },
       "bufferSize": 1
     },
     {
       "source": {
-        "nodeId": "Filter JSON 3",
+        "nodeId": "round interpol DOYs",
         "port": "out"
       },
       "target": {
         "nodeId": "3864129f-f03c-4f08-97a9-9ff5a491dcdf",
+        "port": "in"
+      },
+      "bufferSize": 1
+    },
+    {
+      "source": {
+        "nodeId": "get date and zadoks",
+        "port": "out"
+      },
+      "target": {
+        "nodeId": "date -> DOY",
+        "port": "in"
+      },
+      "bufferSize": 1
+    },
+    {
+      "source": {
+        "nodeId": "date -> DOY",
+        "port": "out"
+      },
+      "target": {
+        "nodeId": "interpol DOY at MONI...",
+        "port": "in"
+      },
+      "bufferSize": 1
+    },
+    {
+      "source": {
+        "nodeId": "interpol DOY at MONI...",
+        "port": "out"
+      },
+      "target": {
+        "nodeId": "round interpol DOYs",
         "port": "in"
       },
       "bufferSize": 1

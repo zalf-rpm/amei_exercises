@@ -1,0 +1,62 @@
+{
+  "crop.json": "crop.json",
+  "site.json": "site.json",
+  "climate.csv": "climate-iso.csv",
+
+  "climate.csv-options": {
+    "no-of-climate-file-header-lines": 2,
+    "lineNoOfHeaderLine": 1,
+    "csv-separator": ";",
+    "header-to-acd-names": {}
+  },
+
+  "debug?": false,
+  "path-to-output": "./",
+  "include-file-base-path": "/home/berg/GitHub/amei_exercises/maricopa_wheat_face/params/",
+  "_include-file-base-path": "params/",
+
+  "output": {
+    "write-file?": false,
+    "file-name": "out.csv",
+
+    "csv-options": {
+      "include-header-row": true,
+      "include-units-row": false,
+      "csv-separator": ","
+    },
+
+    "obj-outputs?": true,
+
+    "events": [
+      "Stage-2",
+      ["DOY|S2_10_DOY"],
+      "Stage-4",
+      ["DOY|S4_61_DOY"],
+      "Stage-5",
+      ["DOY|S5_71_DOY"],
+      "Stage-6",
+      ["DOY|S6_91_DOY"]
+    ]
+  },
+
+  "UseSecondaryYields": false,
+  "NitrogenResponseOn": false,
+  "WaterDeficitResponseOn": false,
+  "EmergenceMoistureControlOn": false,
+  "EmergenceFloodingControlOn": false,
+
+  "UseAutomaticIrrigation": false,
+  "AutoIrrigationParams": {
+    "irrigationParameters": {
+      "nitrateConcentration": [0, "mg dm-3"],
+      "sulfateConcentration": [0, "mg dm-3"]
+    },
+    "amount": [0, "mm"],
+    "threshold": 0.9
+  },
+
+  "UseNMinMineralFertilisingMethod": false,
+  "NMinUserParams": { "min": 40, "max": 120, "delayInDays": 10 },
+  "NMinFertiliserPartition": ["include-from-file", "fertilizers/AN.json"],
+  "JulianDayAutomaticFertilising": 89
+}
