@@ -29,13 +29,13 @@
 
     "events": [
       "Stage-2",
-      ["DOY|S2_10_DOY"],
+      ["Year", "DOY|S2_10_DOY"],
       "Stage-4",
-      ["DOY|S4_61_DOY"],
+      ["Year", "DOY|S4_61_DOY"],
       "Stage-5",
-      ["DOY|S5_71_DOY"],
+      ["Year", "DOY|S5_71_DOY"],
       "Stage-6",
-      ["DOY|S6_91_DOY"]
+      ["Year", "DOY|S6_91_DOY"]
     ]
   },
 

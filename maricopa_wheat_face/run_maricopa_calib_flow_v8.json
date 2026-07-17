@@ -2,10 +2,10 @@
   "version": "0.3",
   "name": "",
   "pan": {
-    "x": -143.4295753242186,
-    "y": -821.2651045096887
+    "x": 485.19917517258955,
+    "y": 185.40799697791726
   },
-  "zoom": 0.7836836328972876,
+  "zoom": 0.8228678145421519,
   "services": {
     "channels": {
       "d5456d2c-c99e-43a2-a7ac-49b7749f3247": "capnp://W2zRg0jsUAXtW1NxCHFlpAhKLSCcgpmBo6hp9dld1_8=@10.10.28.175:9989/local_mas_python_fbp_channel_starter"
@@ -29,7 +29,7 @@
       "parallelProcesses": 1,
       "config": {
         "to_attr": null,
-        "file": "/home/berg/GitHub/amei_exercises/maricopa_wheat_face/sim.json",
+        "file": "/home/berg/GitHub/amei_exercises/maricopa_wheat_face/sim_calib_phenology.json",
         "lines_mode": false,
         "skip_lines": 0.0
       },
@@ -299,8 +299,8 @@
       "nodeId": "create SpotPy calibr...",
       "processName": "create SpotPy calibration params 28",
       "location": {
-        "x": 788.365126581258,
-        "y": 1303.4966859527628
+        "x": 662.7901613902047,
+        "y": 1265.8533219179847
       },
       "editable": false,
       "parallelProcesses": 1,
@@ -314,8 +314,8 @@
       "nodeId": "Spotpy calibration c...",
       "processName": "Spotpy calibration component 30",
       "location": {
-        "x": 1272.2365015802282,
-        "y": 1549.3841649757
+        "x": 1122.4873526827532,
+        "y": 1280.8138748869883
       },
       "editable": false,
       "parallelProcesses": 1,
@@ -327,8 +327,8 @@
       "nodeId": "extract sim values",
       "processName": "extract sim values",
       "location": {
-        "x": 2587.122279572109,
-        "y": 1613.7349350369918
+        "x": 2262.5870231578238,
+        "y": 1622.7198839708403
       },
       "editable": true,
       "parallelProcesses": 1,
@@ -339,8 +339,8 @@
       "nodeId": "Wrap IPs into substr...",
       "processName": "Wrap IPs into substream 9",
       "location": {
-        "x": 1610.7978583701513,
-        "y": 886.2357227931861
+        "x": 1609.3910406777566,
+        "y": 852.6864180585409
       },
       "editable": false,
       "parallelProcesses": 1,
@@ -352,8 +352,8 @@
       "nodeId": "Copy IP on trigger 1...",
       "processName": "Copy IP on trigger 10",
       "location": {
-        "x": 1621.0603592600705,
-        "y": 1243.9717009792907
+        "x": 1598.267809789012,
+        "y": 1175.027672226397
       },
       "editable": false,
       "parallelProcesses": 1,
@@ -365,8 +365,8 @@
       "nodeId": "update calib params",
       "processName": "update calib params",
       "location": {
-        "x": 2118.7708167062347,
-        "y": 1258.5202639912127
+        "x": 2060.234011786752,
+        "y": 1213.6944361909666
       },
       "editable": false,
       "parallelProcesses": 1,
@@ -391,8 +391,8 @@
       "nodeId": "read obs phenology",
       "processName": "read obs phenology",
       "location": {
-        "x": -1133.8244285163,
-        "y": 1633.4872761230768
+        "x": 117.22667211689841,
+        "y": 1692.8209113761422
       },
       "editable": false,
       "parallelProcesses": 1,
@@ -412,19 +412,11 @@
       "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
     },
     {
-      "nodeId": "3864129f-f03c-4f08-97a9-9ff5a491dcdf",
-      "componentId": "d5603568-5ce0-45a3-900d-77c8b3b894f5",
-      "location": {
-        "x": 1712.8954071171859,
-        "y": 1832.3232375789598
-      }
-    },
-    {
       "nodeId": "get date and zadoks",
       "processName": "get date and zadoks",
       "location": {
-        "x": -718.5754419810527,
-        "y": 1643.741972882066
+        "x": 87.52560037945764,
+        "y": 2018.3071834821353
       },
       "editable": false,
       "parallelProcesses": 1,
@@ -446,8 +438,8 @@
       "nodeId": "date -> DOY",
       "processName": "date -> DOY",
       "location": {
-        "x": -302.48617101283116,
-        "y": 1649.4866297367657
+        "x": 68.8752321080739,
+        "y": 2368.9474856195666
       },
       "editable": false,
       "parallelProcesses": 1,
@@ -469,8 +461,8 @@
       "nodeId": "interpol DOY at MONI...",
       "processName": "interpol DOY at MONICA stages",
       "location": {
-        "x": 92.71576506140707,
-        "y": 1651.8448162584796
+        "x": 546.4584339115617,
+        "y": 2355.3800562328443
       },
       "editable": false,
       "parallelProcesses": 1,
@@ -496,8 +488,8 @@
       "nodeId": "round interpol DOYs",
       "processName": "round interpol DOYs",
       "location": {
-        "x": 490.9681737339724,
-        "y": 1682.6974503019342
+        "x": 571.4810097155101,
+        "y": 2005.0070771637984
       },
       "editable": false,
       "parallelProcesses": 1,
@@ -519,8 +511,8 @@
       "nodeId": "conv into Value.lf64",
       "processName": "conv into Value.lf64",
       "location": {
-        "x": 962.4975181390595,
-        "y": 1960.644128101689
+        "x": 990.7983098297128,
+        "y": 1698.3835642145364
       },
       "editable": false,
       "parallelProcesses": 1,
@@ -534,9 +526,8 @@
         "null_sentinel": "-9999",
         "nan_sentinel": "-8888",
         "attach_sentinel_attributes": true,
-        "null_sentinel_attr": "jsonNullSentinel",
-        "nan_sentinel_attr": "jsonNaNSentinel",
-        "selected_type_attr": "valueType",
+        "null_sentinel_attr": "null_sentinel",
+        "nan_sentinel_attr": "NaN_sentinel",
         "skip_on_error": true
       },
       "componentId": "48701153-3743-4f42-a30d-e133065cbf4d",
@@ -546,8 +537,8 @@
       "nodeId": "get just DOYs",
       "processName": "get just DOYs",
       "location": {
-        "x": 473.9231474147025,
-        "y": 2011.6981716556274
+        "x": 559.7335312691638,
+        "y": 1694.4552866390281
       },
       "editable": false,
       "parallelProcesses": 1,
