@@ -2,10 +2,10 @@
   "version": "0.3",
   "name": "",
   "pan": {
-    "x": -310.8115883878253,
-    "y": -290.97659208672826
+    "x": -1282.4558877405525,
+    "y": -480.61265303903673
   },
-  "zoom": 0.5760521343056175,
+  "zoom": 0.7071673429065242,
   "services": {
     "channels": {
       "d5456d2c-c99e-43a2-a7ac-49b7749f3247": "capnp://W2zRg0jsUAXtW1NxCHFlpAhKLSCcgpmBo6hp9dld1_8=@10.10.28.175:9989/local_mas_python_fbp_channel_starter"
@@ -231,8 +231,8 @@
       "nodeId": "Create model.capnp:E...",
       "processName": "Create model.capnp:Env with MONICA payload 7",
       "location": {
-        "x": 2064.0725269854433,
-        "y": 859.7056858294367
+        "x": 2322.807254819426,
+        "y": 795.50257435176
       },
       "editable": false,
       "parallelProcesses": 1,
@@ -252,8 +252,8 @@
       "nodeId": "MONICA 4",
       "processName": "MONICA 4",
       "location": {
-        "x": 2578.6112959401225,
-        "y": 895.6581857382354
+        "x": 2698.7262971516925,
+        "y": 856.41159647136
       },
       "editable": false,
       "parallelProcesses": 1,
@@ -327,8 +327,8 @@
       "nodeId": "Wrap IPs into substr...",
       "processName": "Wrap IPs into substream 9",
       "location": {
-        "x": 1609.3910406777566,
-        "y": 852.6864180585409
+        "x": 1551.794392361682,
+        "y": 799.1718569301116
       },
       "editable": false,
       "parallelProcesses": 1,
@@ -340,8 +340,8 @@
       "nodeId": "Copy IP on trigger 1...",
       "processName": "Copy IP on trigger 10",
       "location": {
-        "x": 1598.267809789012,
-        "y": 1175.027672226397
+        "x": 1561.1589305919863,
+        "y": 1213.3186443302648
       },
       "editable": false,
       "parallelProcesses": 1,
@@ -353,8 +353,8 @@
       "nodeId": "update calib params",
       "processName": "update calib params",
       "location": {
-        "x": 2060.234011786752,
-        "y": 1213.6944361909666
+        "x": 2135.2030067944984,
+        "y": 1395.5378870939276
       },
       "editable": false,
       "parallelProcesses": 1,
@@ -546,8 +546,8 @@
       "nodeId": "extract stage DOYs",
       "processName": "extract stage DOYs",
       "location": {
-        "x": 2529.1947780407586,
-        "y": 1330.9492428476476
+        "x": 2743.6311683991926,
+        "y": 1360.8163508688065
       },
       "editable": false,
       "parallelProcesses": 1,
@@ -575,14 +575,35 @@
       "nodeId": "Copy IP 28",
       "processName": "Copy IP 28",
       "location": {
-        "x": 2193.241375483109,
-        "y": 1635.3589481506156
+        "x": 2224.1415050199003,
+        "y": 1697.324921183101
       },
       "editable": false,
       "parallelProcesses": 1,
       "config": {},
       "componentId": "b1e875af-4ee7-4937-8824-17d185216ec4",
       "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
+    },
+    {
+      "nodeId": "Copy IP 41",
+      "processName": "Copy IP 41",
+      "location": {
+        "x": 1989.7479827155223,
+        "y": 1070.7764284996522
+      },
+      "editable": false,
+      "parallelProcesses": 1,
+      "config": {},
+      "componentId": "b1e875af-4ee7-4937-8824-17d185216ec4",
+      "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
+    },
+    {
+      "nodeId": "7ac2abe0-1285-4955-8261-b144e7cdbff5",
+      "componentId": "d5603568-5ce0-45a3-900d-77c8b3b894f5",
+      "location": {
+        "x": 2388.411577447251,
+        "y": 1102.1239857254818
+      }
     }
   ],
   "links": [
@@ -687,7 +708,7 @@
     },
     {
       "source": {
-        "nodeId": "update calib params",
+        "nodeId": "Copy IP 41",
         "port": "out"
       },
       "target": {
@@ -705,7 +726,7 @@
         "nodeId": "MONICA 4",
         "port": "env"
       },
-      "bufferSize": 1
+      "bufferSize": 32
     },
     {
       "source": {
@@ -749,7 +770,7 @@
         "nodeId": "Spotpy calibration c...",
         "port": "sim_values"
       },
-      "bufferSize": 1
+      "bufferSize": 64
     },
     {
       "source": {
@@ -792,6 +813,17 @@
       "target": {
         "nodeId": "update calib params",
         "port": "attrs"
+      },
+      "bufferSize": 1
+    },
+    {
+      "source": {
+        "nodeId": "update calib params",
+        "port": "out"
+      },
+      "target": {
+        "nodeId": "Copy IP 41",
+        "port": "in"
       },
       "bufferSize": 1
     },
@@ -870,7 +902,7 @@
         "nodeId": "Copy IP 28",
         "port": "in"
       },
-      "bufferSize": 1
+      "bufferSize": 32
     },
     {
       "source": {
@@ -879,6 +911,17 @@
       },
       "target": {
         "nodeId": "80bd8cfc-bb0c-4148-acc7-b953a8d39eff",
+        "port": "in"
+      },
+      "bufferSize": 1
+    },
+    {
+      "source": {
+        "nodeId": "Copy IP 41",
+        "port": "out"
+      },
+      "target": {
+        "nodeId": "7ac2abe0-1285-4955-8261-b144e7cdbff5",
         "port": "in"
       },
       "bufferSize": 1

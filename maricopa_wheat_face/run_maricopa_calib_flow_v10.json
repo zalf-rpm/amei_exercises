@@ -2,10 +2,10 @@
   "version": "0.3",
   "name": "",
   "pan": {
-    "x": -310.8115883878253,
-    "y": -290.97659208672826
+    "x": -641.2928035567104,
+    "y": -288.69420740100844
   },
-  "zoom": 0.5760521343056175,
+  "zoom": 0.5954925026844422,
   "services": {
     "channels": {
       "d5456d2c-c99e-43a2-a7ac-49b7749f3247": "capnp://W2zRg0jsUAXtW1NxCHFlpAhKLSCcgpmBo6hp9dld1_8=@10.10.28.175:9989/local_mas_python_fbp_channel_starter"
@@ -546,8 +546,8 @@
       "nodeId": "extract stage DOYs",
       "processName": "extract stage DOYs",
       "location": {
-        "x": 2529.1947780407586,
-        "y": 1330.9492428476476
+        "x": 2838.353267308183,
+        "y": 1316.222724527992
       },
       "editable": false,
       "parallelProcesses": 1,
@@ -749,7 +749,7 @@
         "nodeId": "Spotpy calibration c...",
         "port": "sim_values"
       },
-      "bufferSize": 1
+      "bufferSize": 64
     },
     {
       "source": {
@@ -870,7 +870,7 @@
         "nodeId": "Copy IP 28",
         "port": "in"
       },
-      "bufferSize": 1
+      "bufferSize": 32
     },
     {
       "source": {
