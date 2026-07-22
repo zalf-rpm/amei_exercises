@@ -2,8 +2,8 @@
   "version": "0.3",
   "name": "",
   "pan": {
-    "x": -852.4285513453358,
-    "y": -450.1127654965988
+    "x": -1088.8367620662898,
+    "y": -518.483889688081
   },
   "zoom": 0.7358546398916013,
   "services": {
@@ -364,9 +364,9 @@
         },
         "attr_sub_access_separator": "/",
         "update": {
-          "cropRotation/0/worksteps/0/crop/cropParams/cultivar/MaxAssimilationRate": "@attrs/lpair/0/snd/f64",
-          "cropRotation/0/worksteps/0/crop/cropParams/species/AssimilateReallocation": "@attrs/lpair/1/snd/f64",
-          "cropRotation/0/worksteps/0/crop/cropParams/species/RootPenetrationRate": "@attrs/lpair/2/snd/f64"
+          "cropRotation/0/worksteps/0/crop/cropParams/cultivar/MaxAssimilationRate": "@attrs/lpair/0/snd:@attrs/f64",
+          "cropRotation/0/worksteps/0/crop/cropParams/species/AssimilateReallocation": "@attrs/lpair/1/snd:@attrs/f64",
+          "cropRotation/0/worksteps/0/crop/cropParams/species/RootPenetrationRate": "@attrs/lpair/2/snd:@attrs/f64"
         },
         "replace": {},
         "add": {},
