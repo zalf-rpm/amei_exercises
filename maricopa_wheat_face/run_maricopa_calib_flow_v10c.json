@@ -2,10 +2,10 @@
   "version": "0.3",
   "name": "",
   "pan": {
-    "x": -981.7941284494314,
-    "y": -371.8137027705259
+    "x": -1362.63956327808,
+    "y": -493.1002934029532
   },
-  "zoom": 0.7337331780607178,
+  "zoom": 0.7227794824099453,
   "services": {
     "channels": {
       "d5456d2c-c99e-43a2-a7ac-49b7749f3247": "capnp://W2zRg0jsUAXtW1NxCHFlpAhKLSCcgpmBo6hp9dld1_8=@10.10.28.175:9989/local_mas_python_fbp_channel_starter"
@@ -616,7 +616,7 @@
       "parallelProcesses": 1,
       "config": {
         "queries": [
-          "data.#.results.0.[S2*,S4*,S5*,[S6*,!-9999]]|#.0|@flatten"
+          "[[data.0.results.0.S2_10_DOY,!-9999].0,[data.1.results.0.S4_61_DOY,!-9999].0,[data.2.results.0.S5_71_DOY,!-9999].0,[data.3.results.0.S6_91_DOY,!-9999].0]"
         ],
         "merge_substream_results": true
       },
