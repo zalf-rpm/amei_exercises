@@ -63,10 +63,6 @@ type AgmipExcelSheetName = Literal[
     "Weather_daily",
     "Env_modifications",
     "Genotypes",
-    # "Obs_crop_summary_plots",
-    # "Obs_crop_summary_means",
-    # "Obs_crop_daily_plots",
-    # "Obs_crop_daily_means",
 ]
 
 
@@ -105,10 +101,6 @@ class CompConfig(process.ProcessConfig):
             "Weather_daily",
             "Env_modifications",
             "Genotypes",
-            # "Obs_crop_summary_plots",
-            # "Obs_crop_summary_means",
-            # "Obs_crop_daily_plots",
-            # "Obs_crop_daily_means",
         ],
         description="Which sheets in the xlsx file are supposed to be read and included in the output.",
     )
