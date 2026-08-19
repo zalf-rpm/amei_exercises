@@ -102,13 +102,16 @@ class AddIrrFertIntoCropRotation(process.Process[CompConfig]):
 
                 kg_n_per_ha_nitrate_in_irr_water = 0.0
                 for e in t.get("fertilizer_events", []):
+                    feamn = e["FEAMN"]
+                    if int(feamn) == 0:
+                        continue
                     if e["FEACD"] == "Applied in irrigation water":
-                        kg_n_per_ha_nitrate_in_irr_water = e["FEAMN"]
+                        kg_n_per_ha_nitrate_in_irr_water = feamn
                         continue
                     mf = dict(
                         type="MineralFertilization",
                         date=e["FEDATE"],
-                        amount=[e["FEAMN"], "kg"],
+                        amount=[feamn, "kg"],
                         partition={
                             "Carbamid": 100.0,
                             "NH4": 0.0,
@@ -118,15 +121,18 @@ class AddIrrFertIntoCropRotation(process.Process[CompConfig]):
                     )
                     worksteps.append(mf)
                 for e in t.get("irrigation_events", []):
+                    irval = e["IRVAL"]
+                    if int(irval) == 0:
+                        continue
                     layer_size_cm = env["params"]["siteParameters"]["LayerThickness"][0] * 100.0  # m -> cm
                     irr = dict(
                         date=e["IDATE"],
                         type="Irrigation",
                         atLayer=int(e["IRADP"] / layer_size_cm),  # into which layer
-                        amount=[e["IRVAL"], "mm"],
+                        amount=[irval, "mm"],
                         parameters={
                             "nitrateConcentration": [
-                                kg_n_per_ha_nitrate_in_irr_water * 100.0 / e["IRVAL"],  # kg/ha -> mg/l (mg/dm3)
+                                kg_n_per_ha_nitrate_in_irr_water * 100.0 / irval,  # kg/ha -> mg/l (mg/dm3)
                                 "mg dm-3",
                             ],
                             "sulfateConcentration": [0.0, "mg dm-3"],
