@@ -60,20 +60,22 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/10/bd/c038d7cc38edc1aa5bf91ab8068b63d4308c66c4c8bb3cbba7dfbc049f9c/pyparsing-3.3.2-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/11/8d/d2532ad2a603ca2b93ad9f5135732124e57811d0168155852f37fbce2458/pillow-12.2.0-cp314-cp314-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/14/2f/967ba146e6d58cf6a652da73885f52fc68001525b4197effc174321d70b4/jmespath-1.1.0-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/29/02/85440be2c931dba83231f01ca13c28a6d1b94ac5a1de3c56c47e4e4cef3f/pycapnp-2.2.4-cp314-cp314-manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/2b/58/a58fc997655386daa2e25784e30c288aa3e3819e401f77029ee4899fb55a/s3transfer-0.18.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/31/61/4031fd64c458ab7e01879e6ac8b42e256e37139df551315beafe04e74b57/boto3-1.43.30-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/32/5d/f7e914f7d9325abff4057cee62c0fa70263683189f774473cbfb534cd13b/matplotlib-3.10.9-cp314-cp314-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/36/e1/a8933a72c45a87177fbde2696e0d0755c8c9062f8c077a961c6215fa27b1/fonttools-4.63.0-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/37/dc/44d21524cf1b1c64254f92e22395a7a10f70c18f3a13a18ac9db258760f7/netcdf4-1.7.4-cp314-cp314-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
-      - pypi: https://files.pythonhosted.org/packages/3c/78/6a04792ace63a93e162f1305392d500ae8ddcb620e7eb88a22fd622b35bb/geopandas-1.1.3-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/41/3c/a36c2450754618e62008bf7435ccb0f88053e07592e6028a34776213d877/markupsafe-3.0.3-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/42/3d/ef4dcfffd22d27a61805d8ed9f7fb888495bc6aa88648fa07c1eaa5586b6/lxml-6.1.1-cp314-cp314-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/47/5c/032c2d5a07fe4d4855fea851209cca2b6f03ebeb6d4e3afdb3358386a684/charset_normalizer-3.4.7-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/50/36/e0703d73bc9f89b95014173c9c7754816630a3282f2727637de5b076e5e4/poetry_core-2.4.1-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/56/8f/65fc623b51448f2bfba1a9ec6ab3debb4664c0876c0113a5e782600b53ac/duckdb-1.5.3-cp314-cp314-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/58/3b/1cdec6772bdbaf7b25dab360c59f03cadf05492dd724c6540af905389b07/pandas-3.0.3-cp314-cp314-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/59/8c/57e832b7af6d7c5abe66eb3fbe3a3a32f4d11ea23a1aa7131371035be991/certifi-2026.5.20-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/59/a8/bd530cc264e62ddbc1d1bb7225823992e6f2432c664693e9281bb6b9c359/geopandas-1.1.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5a/3f/db9134de97db4a216bfa5d76102f5aba65d87bdca3d939bcb1e4f153553f/zalfmas_services-0.1.16-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5b/b2/a7f0d059c664b5fcdf4529df0e15d5075289146e04007fe8c7236051b7c7/spotpy-1.6.7-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/62/a1/3d680cbfd5f4b8f15abc1d571870c5fc3e594bb582bc3b64ea099db13e56/jinja2-3.1.6-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/64/0d/a17e966e620545c1548125af0b29ac812dd17b197a18a7462ac12fa859ee/matplotlib-3.11.1-cp314-cp314-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/64/b4/17d4b0b2a2dc85a6df63d1157e028ed19f90d4cd97c36717afef2bc2f395/attrs-26.1.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/68/71/c64b65fba54bda45948aec187b5199ccee01c538214e51aff1fc795b5cc0/owslib-0.36.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/6a/43/8bd850ee71a191bf072e31302c73a66be413fecdd98fdcd111ecbcce13ca/tomlkit-0.15.0-py3-none-any.whl
@@ -81,13 +83,14 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/7f/3e/5db95bcf282c52709639744ca2a8b149baccf648e39c8cc87553df9eae0c/urllib3-2.7.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/7f/89/648397f9936e0b330999c4e776ebf296ec3c6a65f9901687dbca4ab820da/cftime-1.6.5-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/88/f9/16491d7ed2a919954993e48aa941b200f38040928474c9e85ea9e64222c3/pyyaml-6.0.3-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl
+      - pypi: https://files.pythonhosted.org/packages/89/2b/71dbe7308960c9cbf8f91c80479cbe92a236b6514bd11b3131a6f9cc2ecf/soiltexture-1.0.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/89/4c/450d85e956435d6903a66e4f1ff330e102de6cf7a52b74ba98346afa39d7/zalfmas_capnp_schemas-0.1.67-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/8a/cb/4948be52ee1da6927831ab59e10d4c29baa2a714f599f1f0d1bc747f5777/shapely-2.1.2-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.whl
-      - pypi: https://files.pythonhosted.org/packages/8e/3a/28ba9c1c1ebdbb5f1b94dfebb46f207e52e6a554b7fe4132540fde29a3a0/pyarrow-24.0.0-cp314-cp314-manylinux_2_28_x86_64.whl
+      - pypi: https://files.pythonhosted.org/packages/8d/61/1c5d1229fa21da4cff5365e41e57177aaac57c563c727f35419b8513d1c1/pyarrow-25.0.1-cp314-cp314-manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/90/06/5d96d9b09e40470e05d79871a8a8a5f5b270bd2709364c45f85538306a85/pymep-1.0.7-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/95/97/d59d999f00aec90fc7a4efb742fc11e6c160552aa1b313438d3497998644/geojson_pydantic-2.1.1-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/a0/a8/74a746ff5c4633caeca57a5dc4740716469c838a7c0a6512d818ae891780/pycapnp-2.2.3-cp314-cp314-manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/a0/f4/c67b0b3f1b9245e8d266f0f112c500d50e5b4e83cb6f3b71b6528104182a/requests-2.34.2-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/a1/43/3a5e81d1728f4d234c79bfe385808ee7c04834f7c37a4b5c257459c25614/duckdb-1.5.5-cp314-cp314-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/b5/70/5d8df3b09e25bce090399cf48e452d25c935ab72dad19406c77f4e828045/psutil-7.2.2-cp36-abi3-manylinux2010_x86_64.manylinux_2_12_x86_64.manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/b7/ce/149a00dd41f10bc29e5921b496af8b574d8413afcd5e30dfa0ed46c2cc5e/six-1.17.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c2/b1/43b3e325518ce0969b5fde2280839b06d07c717a3f60070e0f8afdc2c437/gjson-1.2.0-py3-none-any.whl
@@ -228,6 +231,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/26/b6/3ba4dfc5dcbefe37f7438f6c568537a4f15697bb6c7c214e9eb84d2103bd/types_boto3_workspaces-1.43.30-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/27/54/8aa171d3645b18270f8399e223f1a33c2b70c0f23b794712a2b87a1270f2/types_boto3_pca_connector_scep-1.43.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/28/28/88ae0617f04b1cc897063e2ae9b97313cd0723e59078a71d72147c2d98af/types_boto3_qapps-1.43.0-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/29/02/85440be2c931dba83231f01ca13c28a6d1b94ac5a1de3c56c47e4e4cef3f/pycapnp-2.2.4-cp314-cp314-manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/29/12/4d0e41558f8c612b1d48eeca1a441ab55f1b8a49b27884a0ffd51b8bf92d/types_boto3_sdb-1.43.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/29/31/45edc82558bef35673dcfa0292684f8cdcee559e67e9dee2038259a0e370/types_boto3_scheduler-1.43.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/29/61/81686c6562f6f1eb6933d19b9498503cd5005a215c0740a91c228bc372ba/types_boto3_appfabric-1.43.0-py3-none-any.whl
@@ -246,7 +250,6 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/31/fb/784ec66e816bdc580866ceaeb38ec7ba47773b589264102475e6774e1f2a/types_boto3_codestar_connections-1.43.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/31/ff/3ee65a3e4e9832794a8bcfd622f1f6da4168f754563ab6fb971a31958602/types_boto3_servicediscovery-1.43.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/32/0a/33a55afd5ebbf89d74c7732d6ce18393f5f81751411706b31c44cc082ff9/types_boto3_qconnect-1.43.14-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/32/5d/f7e914f7d9325abff4057cee62c0fa70263683189f774473cbfb534cd13b/matplotlib-3.10.9-cp314-cp314-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/33/5a/30c6596a9bfd6ebbd6df00fc328a24da3ccb353a54dc44fe47a64732ee7c/types_boto3_ssm_sap-1.43.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/33/cf/d532e35e0ccdff4456346ea9d48ef39e3248c33b2ba4394f94ed96102585/types_boto3_kinesisanalytics-1.43.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/36/0f/91d49a99cda0f80e58f5c7aea817e93d1272e30c35b7bc8e4c318d786456/types_boto3_iot_jobs_data-1.43.0-py3-none-any.whl
@@ -267,10 +270,10 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/3b/05/0d0df2376287f4a9773ffff2f858f59fade7c9ed1b3995196678e947a871/types_boto3_kinesisvideo-1.43.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/3b/1e/e21fb363d71cadf39405bb0d9f7dbbe4a444de3425d86e249c4a8734c3cc/types_boto3_stepfunctions-1.43.7-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/3c/05/96f7367d0367984cd469d7ff2da783d8c8b5deea7750b1e7ddef00852ae6/types_boto3_sagemaker-1.43.27-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/3c/78/6a04792ace63a93e162f1305392d500ae8ddcb620e7eb88a22fd622b35bb/geopandas-1.1.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/3c/fc/2cdb34cdf64e9aca5ad08871eafa97e81ff8ecbe3923af9bfe4e3c032f45/types_boto3_clouddirectory-1.43.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/40/b1/c2d97450162ed1881e5faaf5747659b385013196532b7cd1f9e578b832da/types_boto3_odb-1.43.26-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/41/23/2765b30772e1b064ec4b2885e921e2b07511f170bc4f05d28f7b97d027fd/types_boto3_serverlessrepo-1.43.0-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/41/3c/a36c2450754618e62008bf7435ccb0f88053e07592e6028a34776213d877/markupsafe-3.0.3-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/42/0c/fb94362e43a8e3a1ce6177064c277f38cbad2aa44d77fc68329875b0fb27/types_boto3_ssm_contacts-1.43.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/42/3d/ef4dcfffd22d27a61805d8ed9f7fb888495bc6aa88648fa07c1eaa5586b6/lxml-6.1.1-cp314-cp314-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/42/5a/660f4b1e30668360b75c24343b1ab39f51db275ed09481d23f6a488f13c2/types_boto3_imagebuilder-1.43.5-py3-none-any.whl
@@ -322,7 +325,6 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/54/da/788730eb4a404c0f5e337b4ea0b701e9b99fb2d8c9ff2d9ed522d291f28f/types_boto3_sagemaker_metrics-1.43.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/54/f2/d9735de7318a9185db14fbbe51a91a363970a6d03bd2185b033d313795c3/types_boto3_ssm_incidents-1.43.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/56/18/167b2aae0614a6f4d7fe11f85517d3f4ba56e1b0807534a172a9dfe6f4c5/types_boto3_sts-1.43.0-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/56/8f/65fc623b51448f2bfba1a9ec6ab3debb4664c0876c0113a5e782600b53ac/duckdb-1.5.3-cp314-cp314-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/57/09/d74cf74ec1f11703ccd24d6852da49d3a5ddcf647b920768001dfd4c9bb8/types_boto3_chime_sdk_identity-1.43.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/57/27/a9dee63bb70caef3b803c5448481a3808ce32700ee44c81e0e5b248b692a/types_boto3_account-1.43.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/57/9d/bd72d46e743e846293ce57ba6f659ae72dff8c97c89abab46956ec80f7b9/types_boto3_frauddetector-1.43.0-py3-none-any.whl
@@ -333,6 +335,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/59/07/a6f95db3bf579afac184c47e92f776d023a1c8757b1e47e28228cb4dbbf7/types_boto3_chime-1.43.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/59/2c/eaf21b0363fcc8f87a29b9c104f70bc0547700f2ef77380f7015cdbef5a9/types_boto3_workspaces_thin_client-1.43.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/59/8c/57e832b7af6d7c5abe66eb3fbe3a3a32f4d11ea23a1aa7131371035be991/certifi-2026.5.20-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/59/a8/bd530cc264e62ddbc1d1bb7225823992e6f2432c664693e9281bb6b9c359/geopandas-1.1.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5a/3f/db9134de97db4a216bfa5d76102f5aba65d87bdca3d939bcb1e4f153553f/zalfmas_services-0.1.16-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5a/fb/c6d3a63acbf7d2c92f78b4b1e572e9ae3fd5f7ae57c3be25b9513fd5c67e/types_boto3_codeguru_reviewer-1.43.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5b/3e/6459e2ed8221c544046f3ec264091f39a9bd78a7a2d0c1737c420a79dfed/types_boto3_freetier-1.43.0-py3-none-any.whl
@@ -353,9 +356,11 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/60/f6/e19abd73bbcc17ec712e50f6d6ed2849d429e4d3c9cb31643a183d31101a/types_boto3_marketplace_deployment-1.43.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/61/45/62058d816710e738ea3d7e6eb87ac5091175837e7ddd4aecbb46bd67dc27/types_boto3_cloudfront_keyvaluestore-1.43.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/62/87/ab62e33422443f5ae460847fc5ab762d117078ee5023534896190fe4d2f0/types_boto3_snow_device_management-1.43.0-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/62/a1/3d680cbfd5f4b8f15abc1d571870c5fc3e594bb582bc3b64ea099db13e56/jinja2-3.1.6-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/62/b8/d1af3bea3d0769043f86e25febf904fa116b8682e044fdd81597aa681333/types_boto3_pricing-1.43.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/63/66/055100fbab4b9580853869781cb521cd0506b6c71832b0befeacbf3ed19c/types_boto3_rum-1.43.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/64/03/b2a49b3ab45cfe82be164f8bfa77b19219a4cd8cc2b08a3d32dd27d675cb/types_boto3_rtbfabric-1.43.11-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/64/0d/a17e966e620545c1548125af0b29ac812dd17b197a18a7462ac12fa859ee/matplotlib-3.11.1-cp314-cp314-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/64/32/41ab955deaf346b773fd827bd238c1a6b310910c2ffdbf12f54885a633be/types_boto3_uxc-1.43.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/64/b4/17d4b0b2a2dc85a6df63d1157e028ed19f90d4cd97c36717afef2bc2f395/attrs-26.1.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/64/be/7889ec39698807f99332416434db331a73810d96e95bb984b7cab9aed4f5/types_boto3_bedrock-1.43.26-py3-none-any.whl
@@ -416,6 +421,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/87/01/34c968b833595f6b2703aff3f892e31d00bcd3152fdf15fdc394c778ac9e/types_boto3_swf-1.43.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/88/23/35f046eccbdc68a0769bb9ebf93fa6e8ac793c1af48e9fe6eef40953ce23/types_boto3_notificationscontacts-1.43.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/88/f9/16491d7ed2a919954993e48aa941b200f38040928474c9e85ea9e64222c3/pyyaml-6.0.3-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl
+      - pypi: https://files.pythonhosted.org/packages/89/2b/71dbe7308960c9cbf8f91c80479cbe92a236b6514bd11b3131a6f9cc2ecf/soiltexture-1.0.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/89/4c/450d85e956435d6903a66e4f1ff330e102de6cf7a52b74ba98346afa39d7/zalfmas_capnp_schemas-0.1.67-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/89/ca/f017727b11895908c5dedc829cf2ec35e0c4b2a26ba875db325fef2cefdf/botocore_stubs-1.43.14-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/8a/13/d584e29477a2df1d6f6142bf8dfe050667c000169865b11e3e55b5225c2b/types_boto3_wisdom-1.43.0-py3-none-any.whl
@@ -426,8 +432,8 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/8b/23/e564ab71dfcde7c97ff62a7e76f0302fe27aa7713d44d81c4a2e4dad31a6/types_boto3_bedrock_data_automation-1.43.16-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/8b/5a/ba30a81239b909821b3153e303e7def45178bf353da4f72380e6c5e8793b/pytest-9.1.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/8c/05/9ed3cd43c3d15c5ecb941c77f6fd1007905c73b617970ca0784c7010389b/types_boto3_route53globalresolver-1.43.1-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/8d/61/1c5d1229fa21da4cff5365e41e57177aaac57c563c727f35419b8513d1c1/pyarrow-25.0.1-cp314-cp314-manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/8d/b7/6319125d6e3f01451dbd2fd225bd43010b853869f181a49f026faf02fc0a/types_boto3_connecthealth-1.43.27-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/8e/3a/28ba9c1c1ebdbb5f1b94dfebb46f207e52e6a554b7fe4132540fde29a3a0/pyarrow-24.0.0-cp314-cp314-manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/8f/bb/ea4fd979dc1a9847fd450045a9a1386bb21f9b14184ae06bb016538fe348/types_boto3_iotsitewise-1.43.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/90/06/5d96d9b09e40470e05d79871a8a8a5f5b270bd2709364c45f85538306a85/pymep-1.0.7-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/90/89/1138ab5879ae815ec03c2d700e3e6c8bdb19efe69d56deb54ca8394512b0/types_boto3_mgh-1.43.0-py3-none-any.whl
@@ -470,9 +476,9 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/9f/e6/fc9ebe631ca492cf255e9fcce0ad56ed3e8ce8b40505f5be2f717de8bdad/types_boto3_support_app-1.43.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/a0/0d/150ab8dbe8c4492eb8c3e4a412601e535668f2ee0e0f8cfbf75ac97b3a79/types_boto3_gameliftstreams-1.43.14-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/a0/13/d8970cdc39a65b06696cf30799a2cb34bd081ab04e145ff47712a65c7660/types_boto3_cloudtrail-1.43.0-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/a0/a8/74a746ff5c4633caeca57a5dc4740716469c838a7c0a6512d818ae891780/pycapnp-2.2.3-cp314-cp314-manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/a0/ea/a30d26ef6877a8dd5fbaa5d68905d0fa87a61092524a6c39838767cca248/types_boto3_networkmonitor-1.43.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/a0/f4/c67b0b3f1b9245e8d266f0f112c500d50e5b4e83cb6f3b71b6528104182a/requests-2.34.2-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/a1/43/3a5e81d1728f4d234c79bfe385808ee7c04834f7c37a4b5c257459c25614/duckdb-1.5.5-cp314-cp314-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/a1/d4/d9c6b6167a9ed4d867f52bb711582abb70dd366e39e01eab67eadeed7bf6/types_boto3_bedrock_agent-1.43.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/a1/dd/1e48aef93d99cb48a194c16a43ccaaff000eb20c956a1f72f216ac4d1a57/types_boto3_mwaa-1.43.12-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/a2/15/b77d5c2d8e74aca8c1f6232640029935953017c192faf3631e1234b5f0cc/types_boto3_ssm-1.43.0-py3-none-any.whl
@@ -1176,6 +1182,7 @@ packages:
   name: amei-exercises
   requires_dist:
   - zalfmas-capnp-schemas>=0.1.63,<0.2
+  - soiltexture>=1.0.4,<2
   requires_python: '>=3.12'
 - pypi: ../mas_python_common
   name: zalfmas-common
@@ -1195,8 +1202,8 @@ packages:
   - tomli-w>=1.2.0,<2
   - netcdf4>=1.7.4,<2
   - spotpy>=1.6.7,<2
-  - matplotlib>=3.10.9,<4
-  - pycapnp>=2.2.3,<3
+  - matplotlib>=3.11.0,<4
+  - pycapnp>=2.2.4,<3
   - zalfmas-common>=0.1.47,<0.2
   - zalfmas-capnp-schemas>=0.1.67,<0.2
   - zalfmas-services>=0.1.16,<0.2
@@ -1204,9 +1211,9 @@ packages:
   - pydantic>=2.13.4,<3
   - geojson-pydantic>=2.1.1,<3
   - rasterio>=1.5.0,<2
-  - geopandas>=1.1.3,<2
-  - pyarrow>=24.0.0,<25
-  - duckdb>=1.5.3,<2
+  - geopandas>=1.1.4,<2
+  - pyarrow>=25.0.0,<26
+  - duckdb>=1.5.4,<2
   - owslib>=0.36.0,<0.37
   - boto3>=1.43.23,<2
   - gjson>=1.2.0,<2
@@ -1801,6 +1808,13 @@ packages:
   requires_dist:
   - typing-extensions ; python_full_version < '3.12'
   requires_python: '>=3.9'
+- pypi: https://files.pythonhosted.org/packages/29/02/85440be2c931dba83231f01ca13c28a6d1b94ac5a1de3c56c47e4e4cef3f/pycapnp-2.2.4-cp314-cp314-manylinux_2_28_x86_64.whl
+  name: pycapnp
+  version: 2.2.4
+  sha256: 45bd2a2eba74f94c96a532af1f8b944fafc5ab74483ed66c2d88bf6606e5a126
+  requires_dist:
+  - jinja2
+  requires_python: '>=3.9'
 - pypi: https://files.pythonhosted.org/packages/29/12/4d0e41558f8c612b1d48eeca1a441ab55f1b8a49b27884a0ffd51b8bf92d/types_boto3_sdb-1.43.0-py3-none-any.whl
   name: types-boto3-sdb
   version: 1.43.0
@@ -1931,25 +1945,6 @@ packages:
   requires_dist:
   - typing-extensions ; python_full_version < '3.12'
   requires_python: '>=3.9'
-- pypi: https://files.pythonhosted.org/packages/32/5d/f7e914f7d9325abff4057cee62c0fa70263683189f774473cbfb534cd13b/matplotlib-3.10.9-cp314-cp314-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
-  name: matplotlib
-  version: 3.10.9
-  sha256: 34cf8167e023ad956c15f36302911d5406bd99a9862c1a8499ea6f7c0e015dc2
-  requires_dist:
-  - contourpy>=1.0.1
-  - cycler>=0.10
-  - fonttools>=4.22.0
-  - kiwisolver>=1.3.1
-  - numpy>=1.23
-  - packaging>=20.0
-  - pillow>=8
-  - pyparsing>=3
-  - python-dateutil>=2.7
-  - meson-python>=0.13.1,<0.17.0 ; extra == 'dev'
-  - pybind11>=2.13.2,!=2.13.3 ; extra == 'dev'
-  - setuptools-scm>=7,<10 ; extra == 'dev'
-  - setuptools>=64 ; extra == 'dev'
-  requires_python: '>=3.10'
 - pypi: https://files.pythonhosted.org/packages/33/5a/30c6596a9bfd6ebbd6df00fc328a24da3ccb353a54dc44fe47a64732ee7c/types_boto3_ssm_sap-1.43.0-py3-none-any.whl
   name: types-boto3-ssm-sap
   version: 1.43.0
@@ -2125,35 +2120,6 @@ packages:
   requires_dist:
   - typing-extensions ; python_full_version < '3.12'
   requires_python: '>=3.9'
-- pypi: https://files.pythonhosted.org/packages/3c/78/6a04792ace63a93e162f1305392d500ae8ddcb620e7eb88a22fd622b35bb/geopandas-1.1.3-py3-none-any.whl
-  name: geopandas
-  version: 1.1.3
-  sha256: 90d62a64f95eaa3be2ccc115c5f3d6e24208bb11983b390fdc0621a3eccd0230
-  requires_dist:
-  - numpy>=1.24
-  - pyogrio>=0.7.2
-  - packaging
-  - pandas>=2.0.0
-  - pyproj>=3.5.0
-  - shapely>=2.0.0
-  - psycopg[binary]>=3.1.0 ; extra == 'all'
-  - sqlalchemy>=2.0 ; extra == 'all'
-  - geopy ; extra == 'all'
-  - matplotlib>=3.7 ; extra == 'all'
-  - mapclassify>=2.5 ; extra == 'all'
-  - xyzservices ; extra == 'all'
-  - folium ; extra == 'all'
-  - geoalchemy2 ; extra == 'all'
-  - pyarrow>=10.0.0 ; extra == 'all'
-  - scipy ; extra == 'all'
-  - pointpats>=2.5.3 ; extra == 'all'
-  - pytest>=3.1.0 ; extra == 'dev'
-  - pytest-cov ; extra == 'dev'
-  - pytest-xdist ; extra == 'dev'
-  - codecov ; extra == 'dev'
-  - pre-commit ; extra == 'dev'
-  - ruff ; extra == 'dev'
-  requires_python: '>=3.10'
 - pypi: https://files.pythonhosted.org/packages/3c/fc/2cdb34cdf64e9aca5ad08871eafa97e81ff8ecbe3923af9bfe4e3c032f45/types_boto3_clouddirectory-1.43.0-py3-none-any.whl
   name: types-boto3-clouddirectory
   version: 1.43.0
@@ -2174,6 +2140,11 @@ packages:
   sha256: 33afd27dfb704e9af5031e1776ece6bccdb77ee1b4b77d46f46e3142bfbe214f
   requires_dist:
   - typing-extensions ; python_full_version < '3.12'
+  requires_python: '>=3.9'
+- pypi: https://files.pythonhosted.org/packages/41/3c/a36c2450754618e62008bf7435ccb0f88053e07592e6028a34776213d877/markupsafe-3.0.3-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl
+  name: markupsafe
+  version: 3.0.3
+  sha256: 457a69a9577064c05a97c41f4e65148652db078a3a509039e64d3467b9e7ef97
   requires_python: '>=3.9'
 - pypi: https://files.pythonhosted.org/packages/42/0c/fb94362e43a8e3a1ce6177064c277f38cbad2aa44d77fc68329875b0fb27/types_boto3_ssm_contacts-1.43.0-py3-none-any.whl
   name: types-boto3-ssm-contacts
@@ -2535,18 +2506,6 @@ packages:
   requires_dist:
   - typing-extensions ; python_full_version < '3.12'
   requires_python: '>=3.9'
-- pypi: https://files.pythonhosted.org/packages/56/8f/65fc623b51448f2bfba1a9ec6ab3debb4664c0876c0113a5e782600b53ac/duckdb-1.5.3-cp314-cp314-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl
-  name: duckdb
-  version: 1.5.3
-  sha256: d0405eae18ec6e8210a471c97dbfe87a7e4d605274b7fe572a1f276e92158f13
-  requires_dist:
-  - ipython ; extra == 'all'
-  - fsspec ; extra == 'all'
-  - numpy ; extra == 'all'
-  - pandas ; extra == 'all'
-  - pyarrow ; extra == 'all'
-  - adbc-driver-manager ; extra == 'all'
-  requires_python: '>=3.10.0'
 - pypi: https://files.pythonhosted.org/packages/57/09/d74cf74ec1f11703ccd24d6852da49d3a5ddcf647b920768001dfd4c9bb8/types_boto3_chime_sdk_identity-1.43.0-py3-none-any.whl
   name: types-boto3-chime-sdk-identity
   version: 1.43.0
@@ -2698,6 +2657,35 @@ packages:
   version: 2026.5.20
   sha256: 3c52e209ba0a4ad7aebe60436a4ab349c39e1e602e8c134221e546902ad25897
   requires_python: '>=3.7'
+- pypi: https://files.pythonhosted.org/packages/59/a8/bd530cc264e62ddbc1d1bb7225823992e6f2432c664693e9281bb6b9c359/geopandas-1.1.4-py3-none-any.whl
+  name: geopandas
+  version: 1.1.4
+  sha256: 1a0c459cbdb1537cd154dafe6174be20d1760844b7f1c967dc8520b180f2e773
+  requires_dist:
+  - numpy>=1.24
+  - pyogrio>=0.7.2
+  - packaging
+  - pandas>=2.0.0
+  - pyproj>=3.5.0
+  - shapely>=2.0.0
+  - psycopg[binary]>=3.1.0 ; extra == 'all'
+  - sqlalchemy>=2.0 ; extra == 'all'
+  - geopy ; extra == 'all'
+  - matplotlib>=3.7 ; extra == 'all'
+  - mapclassify>=2.5 ; extra == 'all'
+  - xyzservices ; extra == 'all'
+  - folium ; extra == 'all'
+  - geoalchemy2 ; extra == 'all'
+  - pyarrow>=10.0.0 ; extra == 'all'
+  - scipy ; extra == 'all'
+  - pointpats>=2.5.3 ; extra == 'all'
+  - pytest>=3.1.0 ; extra == 'dev'
+  - pytest-cov ; extra == 'dev'
+  - pytest-xdist ; extra == 'dev'
+  - codecov ; extra == 'dev'
+  - pre-commit ; extra == 'dev'
+  - ruff ; extra == 'dev'
+  requires_python: '>=3.10'
 - pypi: https://files.pythonhosted.org/packages/5a/3f/db9134de97db4a216bfa5d76102f5aba65d87bdca3d939bcb1e4f153553f/zalfmas_services-0.1.16-py3-none-any.whl
   name: zalfmas-services
   version: 0.1.16
@@ -2857,6 +2845,14 @@ packages:
   requires_dist:
   - typing-extensions ; python_full_version < '3.12'
   requires_python: '>=3.9'
+- pypi: https://files.pythonhosted.org/packages/62/a1/3d680cbfd5f4b8f15abc1d571870c5fc3e594bb582bc3b64ea099db13e56/jinja2-3.1.6-py3-none-any.whl
+  name: jinja2
+  version: 3.1.6
+  sha256: 85ece4451f492d0c13c5dd7c13a64681a86afae63a5f347908daf103ce6d2f67
+  requires_dist:
+  - markupsafe>=2.0
+  - babel>=2.7 ; extra == 'i18n'
+  requires_python: '>=3.7'
 - pypi: https://files.pythonhosted.org/packages/62/b8/d1af3bea3d0769043f86e25febf904fa116b8682e044fdd81597aa681333/types_boto3_pricing-1.43.0-py3-none-any.whl
   name: types-boto3-pricing
   version: 1.43.0
@@ -2878,6 +2874,21 @@ packages:
   requires_dist:
   - typing-extensions ; python_full_version < '3.12'
   requires_python: '>=3.9'
+- pypi: https://files.pythonhosted.org/packages/64/0d/a17e966e620545c1548125af0b29ac812dd17b197a18a7462ac12fa859ee/matplotlib-3.11.1-cp314-cp314-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
+  name: matplotlib
+  version: 3.11.1
+  sha256: 5af0dcda57d471440a7b5b623e70e0a61003518443d9098f211a96ecfbbc25be
+  requires_dist:
+  - contourpy>=1.0.1
+  - cycler>=0.10
+  - fonttools>=4.28.2
+  - kiwisolver>=1.3.1
+  - numpy>=1.25
+  - packaging>=20.0
+  - pillow>=9
+  - pyparsing>=3
+  - python-dateutil>=2.7
+  requires_python: '>=3.11'
 - pypi: https://files.pythonhosted.org/packages/64/32/41ab955deaf346b773fd827bd238c1a6b310910c2ffdbf12f54885a633be/types_boto3_uxc-1.43.0-py3-none-any.whl
   name: types-boto3-uxc
   version: 1.43.0
@@ -3321,6 +3332,12 @@ packages:
   version: 6.0.3
   sha256: c458b6d084f9b935061bc36216e8a69a7e293a2f1e68bf956dcd9e6cbcd143f5
   requires_python: '>=3.8'
+- pypi: https://files.pythonhosted.org/packages/89/2b/71dbe7308960c9cbf8f91c80479cbe92a236b6514bd11b3131a6f9cc2ecf/soiltexture-1.0.4-py3-none-any.whl
+  name: soiltexture
+  version: 1.0.4
+  sha256: 3ddec4ae8fe27b46e48d3ddcf13a90b3b24dbd96853fe2b1dd31305c2c53c36e
+  requires_dist:
+  - matplotlib
 - pypi: https://files.pythonhosted.org/packages/89/4c/450d85e956435d6903a66e4f1ff330e102de6cf7a52b74ba98346afa39d7/zalfmas_capnp_schemas-0.1.67-py3-none-any.whl
   name: zalfmas-capnp-schemas
   version: 0.1.67
@@ -3413,6 +3430,11 @@ packages:
   requires_dist:
   - typing-extensions ; python_full_version < '3.12'
   requires_python: '>=3.9'
+- pypi: https://files.pythonhosted.org/packages/8d/61/1c5d1229fa21da4cff5365e41e57177aaac57c563c727f35419b8513d1c1/pyarrow-25.0.1-cp314-cp314-manylinux_2_28_x86_64.whl
+  name: pyarrow
+  version: 25.0.1
+  sha256: 9171748cdf796972d85a4b60157c279913e242992e350c90c7450182a9838b2a
+  requires_python: '>=3.10'
 - pypi: https://files.pythonhosted.org/packages/8d/b7/6319125d6e3f01451dbd2fd225bd43010b853869f181a49f026faf02fc0a/types_boto3_connecthealth-1.43.27-py3-none-any.whl
   name: types-boto3-connecthealth
   version: 1.43.27
@@ -3420,11 +3442,6 @@ packages:
   requires_dist:
   - typing-extensions ; python_full_version < '3.12'
   requires_python: '>=3.9'
-- pypi: https://files.pythonhosted.org/packages/8e/3a/28ba9c1c1ebdbb5f1b94dfebb46f207e52e6a554b7fe4132540fde29a3a0/pyarrow-24.0.0-cp314-cp314-manylinux_2_28_x86_64.whl
-  name: pyarrow
-  version: 24.0.0
-  sha256: ae8a1145af31d903fa9bb166824d7abe9b4681a000b0159c9fb99c11bc11ad26
-  requires_python: '>=3.10'
 - pypi: https://files.pythonhosted.org/packages/8f/bb/ea4fd979dc1a9847fd450045a9a1386bb21f9b14184ae06bb016538fe348/types_boto3_iotsitewise-1.43.0-py3-none-any.whl
   name: types-boto3-iotsitewise
   version: 1.43.0
@@ -3714,11 +3731,6 @@ packages:
   requires_dist:
   - typing-extensions ; python_full_version < '3.12'
   requires_python: '>=3.9'
-- pypi: https://files.pythonhosted.org/packages/a0/a8/74a746ff5c4633caeca57a5dc4740716469c838a7c0a6512d818ae891780/pycapnp-2.2.3-cp314-cp314-manylinux_2_28_x86_64.whl
-  name: pycapnp
-  version: 2.2.3
-  sha256: 6998178c06120cc8f6b3a813e6994ad20eb2ed9de7d1a4eba0372b1a014e3605
-  requires_python: '>=3.8'
 - pypi: https://files.pythonhosted.org/packages/a0/ea/a30d26ef6877a8dd5fbaa5d68905d0fa87a61092524a6c39838767cca248/types_boto3_networkmonitor-1.43.0-py3-none-any.whl
   name: types-boto3-networkmonitor
   version: 1.43.0
@@ -3738,6 +3750,18 @@ packages:
   - pysocks>=1.5.6,!=1.5.7 ; extra == 'socks'
   - chardet>=3.0.2,<8 ; extra == 'use-chardet-on-py3'
   requires_python: '>=3.10'
+- pypi: https://files.pythonhosted.org/packages/a1/43/3a5e81d1728f4d234c79bfe385808ee7c04834f7c37a4b5c257459c25614/duckdb-1.5.5-cp314-cp314-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl
+  name: duckdb
+  version: 1.5.5
+  sha256: fbf0f2d48b43c6c304d00463b463c27ead6c4b01c3c1816b750f728decf71afe
+  requires_dist:
+  - ipython ; extra == 'all'
+  - fsspec ; extra == 'all'
+  - numpy ; extra == 'all'
+  - pandas ; extra == 'all'
+  - pyarrow ; extra == 'all'
+  - adbc-driver-manager ; extra == 'all'
+  requires_python: '>=3.10.0'
 - pypi: https://files.pythonhosted.org/packages/a1/d4/d9c6b6167a9ed4d867f52bb711582abb70dd366e39e01eab67eadeed7bf6/types_boto3_bedrock_agent-1.43.0-py3-none-any.whl
   name: types-boto3-bedrock-agent
   version: 1.43.0

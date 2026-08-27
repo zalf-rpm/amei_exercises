@@ -25,6 +25,7 @@ import numpy as np
 import pandas
 import zalfmas_fbp.run.process as process
 from pydantic import Field
+from soiltexture import getTexture
 from zalfmas_capnp_schemas_with_stubs import (
     climate_capnp,
     common_capnp,
@@ -137,6 +138,31 @@ class CompConfig(process.ProcessConfig):
             "considerably increase the output size."
         ),
     )
+    derive_SLSAT_from_BD: bool = Field(
+        False,
+        description=(
+            "If True, will derive the SLSAT value from the bulk density via SLSAT = f_coarse_or_fine * (1 - BD/PD) "
+            "where PD is the Particle Density (by default 2.65 g*cm-3 for mineral soils) and f being a "
+            "reduction factor to reduce the raw porosity."
+        ),
+    )
+    particle_density_g_per_cm3: float = Field(
+        2.65, description="Particle Density to be used to derive the SLSAT value from the bulk density, if enabled."
+    )
+    f_coarse: float = Field(
+        0.93,
+        description=(
+            "Reduction factor for coarser soils (sand, sandy loam, loamy sand) "
+            "— reflecting that coarser soils tend to trap relatively more air."
+        ),
+    )
+    f_fine: float = Field(
+        0.95,
+        description=(
+            "Reduction factor for finer-textured classes (loam, silt loam, silt, etc.) "
+            "— reflecting that coarser soils tend to trap relatively more air."
+        ),
+    )
 
 
 METADATA = meta.Component(
@@ -171,6 +197,23 @@ class Component(process.Process[CompConfig]):
         con_man: common.ConnectionManager | None = None,
     ):
         process.Process.__init__(self, metadata=metadata, con_man=con_man)
+
+    def normalize(self, name: str) -> str:
+        return " ".join(name.strip().lower().split())
+
+    def f_class_for(self, texture_class: str | None) -> float:
+        if texture_class is None:
+            return self.config.f_fine
+        return (
+            self.config.f_coarse
+            if self.normalize(texture_class) in {"sand", "loamy sand", "sandy loam"}
+            else self.config.f_fine
+        )
+
+    def classify_layer(self, sand: float, silt: float, clay: float) -> float:
+        total = sand + silt + clay
+        assert 95 <= total <= 105
+        return self.f_class_for(getTexture(clay, silt, classification="USDA"))
 
     @override
     async def run(self):
@@ -215,10 +258,6 @@ class Component(process.Process[CompConfig]):
             "Weather_daily": True,
             "Env_modifications": False,
             "Genotypes": True,
-            # "Obs_crop_summary_plots": True,
-            # "Obs_crop_summary_means": True,
-            # "Obs_crop_daily_plots": True,
-            # "Obs_crop_daily_means": True,
         }
 
         enabled_sheets.update((k, True) for k in self.config.enabled_sheets)
@@ -383,9 +422,11 @@ class Component(process.Process[CompConfig]):
                 ),
             }
 
-        def append_if_not_nan(list, name, value, factor=1.0):
+        def append_if_not_nan(list, name, value, factor=1.0) -> bool:
             if value is not None and not np.isnan(value):
                 list.append({"name": name, "f32Value": float(value) * factor})
+                return True
+            return False
 
         soil_profiles_dfs = dfs["Soil_profile_layers"]
         soil_layers = defaultdict(list)
@@ -395,23 +436,50 @@ class Component(process.Process[CompConfig]):
             sllb = int(soil_profiles_dfs["SLLB"][i])  # [cm] soil layer base depth
             layer_size_cm = sllb - sllt  # [cm]
             props = []
-            append_if_not_nan(
-                props, "saturation", soil_profiles_dfs.get("SLSAT", {}).get(i, None), 100
-            )  # [cm3/cm3] soil water saturated
-            append_if_not_nan(
-                props, "fieldCapacity", soil_profiles_dfs.get("SLDUL", {}).get(i, None), 100
-            )  # [cm3/cm3] soil water drained upper limit
-            append_if_not_nan(
-                props, "permanentWiltingPoint", soil_profiles_dfs.get("SLLL", {}).get(i, None), 100
-            )  # [cm3/cm3] soil water lower limit
-            # append_if_not_nan(props, "", soil_profiles_dfs.get("SLAWC", {}).get(i, None), 100.0 / layer_size_cm) # [mm -> %] soil layer available water
-            # append_if_not_nan(props, "", default_if_nan(soil_profiles_dfs.get("SLRGF"][i], 0.0))
-            append_if_not_nan(
+            succ = append_if_not_nan(
                 props,
                 "bulkDensity",
                 soil_profiles_dfs.get("SLBDM", {}).get(i, None),
                 1000,
             )  # [g/cm3 -> kg/m3] soil bulk density moist
+            bd_g_per_cm3 = props[-1]["f32Value"] / 1000.0 if succ else None
+            succ = append_if_not_nan(
+                props, "clay", soil_profiles_dfs.get("SLCLY", {}).get(i, None)
+            )  # [%-wt] soil clay fraction
+            clay_perc = props[-1]["f32Value"] if succ else 0.0
+            succ = append_if_not_nan(
+                props, "silt", soil_profiles_dfs.get("SLSIL", {}).get(i, None)
+            )  # [%-wt] soil silt fraction
+            silt_perc = props[-1]["f32Value"] if succ else 0.0
+            succ = append_if_not_nan(
+                props, "sand", soil_profiles_dfs.get("SLSND", {}).get(i, None)
+            )  # [%-wt] soil sand fraction
+            sand_perc = props[-1]["f32Value"] if succ else 0.0
+            if self.config.derive_SLSAT_from_BD and bd_g_per_cm3 is not None:
+                f_class = self.classify_layer(sand_perc, silt_perc, clay_perc)
+                append_if_not_nan(
+                    props, "saturation", f_class * (1 - bd_g_per_cm3 / self.config.particle_density_g_per_cm3), 100
+                )
+            else:
+                append_if_not_nan(
+                    props, "saturation", soil_profiles_dfs.get("SLSAT", {}).get(i, None), 100
+                )  # [cm3/cm3] soil water saturated
+            append_if_not_nan(
+                props, "fieldCapacity", soil_profiles_dfs.get("SLDUL", {}).get(i, None), 100
+            )  # [cm3/cm3] soil water drained upper limit
+            succ = append_if_not_nan(
+                props, "permanentWiltingPoint", soil_profiles_dfs.get("SLLL", {}).get(i, None), 100
+            )  # [cm3/cm3] soil water lower limit
+            pwp_mm = props[-1]["f32Value"] / 100.0 * layer_size_cm * 10 if succ else 0.0
+            succ = append_if_not_nan(
+                props,
+                "soilMoisture",
+                soil_profiles_dfs.get("SLAWC", {}).get(i, None),
+            )  # [mm] soil layer available water
+            if succ:
+                props[-1]["f32Value"] = (props[-1]["f32Value"] + pwp_mm) / (layer_size_cm * 10) * 100.0
+            # append_if_not_nan(props, "", default_if_nan(soil_profiles_dfs.get("SLRGF"][i], 0.0))
+
             # append_if_not_nan(props, "", soil_profiles_dfs.get("SLNI", {}).get(i, None)) # [%] soil organic N concentration
             # append_if_not_nan(props, "", soil_profiles_dfs.get("SKSAT", {}).get(i, None)) # [cm/h] saturated hydraulic conductivity
             append_if_not_nan(
@@ -425,15 +493,7 @@ class Component(process.Process[CompConfig]):
                 default_if_nan(soil_profiles_dfs.get("SLOC", {}).get(i, None), 0.0),
             )  # [g[C]/100g[soil]] soil organic C percent layer
             append_if_not_nan(props, "cnRatio", soil_profiles_dfs.get("C_N", {}).get(i, None))  # [-] soil CN ratio
-            append_if_not_nan(
-                props, "clay", soil_profiles_dfs.get("SLCLY", {}).get(i, None)
-            )  # [%-wt] soil clay fraction
-            append_if_not_nan(
-                props, "silt", soil_profiles_dfs.get("SLSIL", {}).get(i, None)
-            )  # [%-wt] soil silt fraction
-            append_if_not_nan(
-                props, "sand", soil_profiles_dfs.get("SLSND", {}).get(i, None)
-            )  # [%-wt] soil sand fraction
+
             append_if_not_nan(
                 props, "sceleton", soil_profiles_dfs.get("SLCF", {}).get(i, None)
             )  # [%-wt] soil coarse fraction
@@ -1082,6 +1142,7 @@ class Component(process.Process[CompConfig]):
                             and (endat := t["ENDAT"]) is not None
                         ):
                             sub_df = ts.dataframe.loc[sdat:endat]
+                            sub_df.to_csv(f"{e_id}_{t_id}_timeseries.csv", index=True)
                             ts = csv_file_based.TimeSeries.from_dataframe(sub_df)
 
                         for p_id, p in t["plots"].items():
