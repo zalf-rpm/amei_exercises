@@ -1142,7 +1142,7 @@ class Component(process.Process[CompConfig]):
                             and (endat := t["ENDAT"]) is not None
                         ):
                             sub_df = ts.dataframe.loc[sdat:endat]
-                            sub_df.to_csv(f"{e_id}_{t_id}_timeseries.csv", index=True)
+                            # sub_df.to_csv(f"{e_id}_{t_id}_timeseries.csv", index=True)
                             ts = csv_file_based.TimeSeries.from_dataframe(sub_df)
 
                         for p_id, p in t["plots"].items():

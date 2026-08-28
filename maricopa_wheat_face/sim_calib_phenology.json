@@ -35,7 +35,9 @@
       "Stage-5",
       ["Year", "DOY|S5_71_DOY"],
       "Stage-6",
-      ["Year", "DOY|S6_91_DOY"]
+      ["Year", "DOY|S6_91_DOY"],
+      "daily",
+      ["Date", "Crop", "Yield"]
     ]
   },
 
