@@ -1,6 +1,6 @@
 {
-    "id": "ad48c4f1-2955-4b22-bd07-c99d0d84bf8c",
-    "name": "local debuggable python execution",
-    "ba5ccca8-ecbe-4598-aa1d-0123a0a95423": "python -m flow_components.read_agmip_file",
-    "210add72-f24e-4525-936a-d022403b7f4f": "python -m flow_components.add_irr_fert_into_crop_rotation"
+  "id": "ad48c4f1-2955-4b22-bd07-c99d0d84bf8c",
+  "name": "local debuggable python execution",
+  "ba5ccca8-ecbe-4598-aa1d-0123a0a95423": "python -m flow_components.read_agmip_file",
+  "210add72-f24e-4525-936a-d022403b7f4f": "python -m flow_components.add_irr_fert_into_crop_rotation"
 }
