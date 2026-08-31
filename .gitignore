@@ -12,3 +12,4 @@ maricopa_wheat_face/~$MARICOPA Wheat FACE data_2024-10-25 (ICASA data format v4.
 # pixi environments
 .pixi/*
 !.pixi/config.toml
+flow_components/__pycache__/
