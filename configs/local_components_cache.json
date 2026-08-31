@@ -1,0 +1,210 @@
+{
+    "ba5ccca8-ecbe-4598-aa1d-0123a0a95423": {
+        "category": {
+            "id": "amei_exercises",
+            "name": "AMEI Exercises"
+        },
+        "info": {
+            "id": "ba5ccca8-ecbe-4598-aa1d-0123a0a95423",
+            "name": "Read AgMIP file",
+            "description": "Read an AgMIP file and stream plots"
+        },
+        "type": "process",
+        "inPorts": [
+            {
+                "name": "conf",
+                "contentType": "@0xed6c098b67cad454 = common/common.capnp:StructuredText[JSON | TOML]"
+            }
+        ],
+        "outPorts": [
+            {
+                "name": "out",
+                "contentType": "@0xa23434cc8f8d6a77 = data/field_exp_data.capnp:MixedType",
+                "desc": "Structure containing capabilities to the timeseries and soil profile as well as JSON data structures for the remaining data."
+            }
+        ],
+        "defaultConfig": {
+            "file": {
+                "value": "/home/berg/GitHub/amei_exercises/maricopa_wheat_face/MARICOPA Wheat FACE data_2026-01-23 (ICASA data format v4.1)(PM7)(BAK1)(no soilT).xlsx",
+                "type": "string",
+                "desc": "Path to AgMIP xlsx"
+            },
+            "filter": {
+                "value": {
+                    "experiments": {},
+                    "treatments": {},
+                    "plots": {}
+                },
+                "desc": "Send only messages which match filter. Add at each level which column key should pass. E.g.\n        {\n            \"plots\": { \"BLOCK\": 1 }\n        }\n        "
+            },
+            "weather_elements": {
+                "value": [
+                    "SRAD",
+                    "TMAX",
+                    "TMIN",
+                    "TAVD",
+                    "RAIN",
+                    "VPRSD",
+                    "WIND",
+                    "TDEW",
+                    "RHAVD"
+                ],
+                "type": "list",
+                "desc": "Weather elements to read from file."
+            },
+            "enabled_sheets": {
+                "value": [
+                    "Experiment_description",
+                    "Fields",
+                    "Treatments",
+                    "Plots",
+                    "Residue",
+                    "initial_condition_layers",
+                    "Planting_events",
+                    "Harvest_events",
+                    "Irrigation_events",
+                    "Fertilizer_events",
+                    "Soil_metadata",
+                    "Soil_profile_layers",
+                    "Weather_stations",
+                    "Weather_daily",
+                    "Env_modifications",
+                    "Genotypes"
+                ],
+                "type": "list",
+                "desc": "Which sheets in the xlsx file are supposed to be read and included in the output."
+            },
+            "agmip_elem_to_schema_elem": {
+                "value": {
+                    "SRAD": [
+                        "globrad",
+                        1.0
+                    ],
+                    "TMAX": [
+                        "tmax",
+                        1.0
+                    ],
+                    "TMIN": [
+                        "tmin",
+                        1.0
+                    ],
+                    "TAVD": [
+                        "tavg",
+                        1.0
+                    ],
+                    "RAIN": [
+                        "precip",
+                        1.0
+                    ],
+                    "VPRSD": [
+                        "vaporpress",
+                        10.0
+                    ],
+                    "WIND": [
+                        "wind",
+                        [
+                            5.0,
+                            432
+                        ]
+                    ],
+                    "TDEW": [
+                        "dewpointTemp",
+                        1.0
+                    ],
+                    "RHAVD": [
+                        "relhumid",
+                        1.0
+                    ]
+                },
+                "type": "object",
+                "desc": "Map AgMIP climate element names to schema climate element names with conversion fractor."
+            },
+            "dynamic_sheets": {
+                "value": [],
+                "type": "list[string]",
+                "desc": "Names of additional (custom/optional) sheets to read dynamically. Their columns are read generically and the resulting sub-object is attached based on the key columns present in the sheet: PLTID(+TREAT_ID+EID) -> plot, TREAT_ID(+EID) -> treatment, EID -> experiment. The sub-object key is the lower-cased sheet name. If the key columns are unique per row a single object is stored, otherwise a list of rows is stored."
+            },
+            "auto_discover_dynamic_sheets": {
+                "value": false,
+                "type": "bool",
+                "desc": "If True, automatically read every sheet located after 'Weather_daily' that is not already handled explicitly and attach it dynamically (see 'dynamic_sheets'). Note: some of these sheets can be very large; since a treatment is serialized once per plot in the output this may considerably increase the output size."
+            },
+            "derive_SLSAT_from_BD": {
+                "value": false,
+                "type": "bool",
+                "desc": "If True, will derive the SLSAT value from the bulk density via SLSAT = f_coarse_or_fine * (1 - BD/PD) where PD is the Particle Density (by default 2.65 g*cm-3 for mineral soils) and f being a reduction factor to reduce the raw porosity."
+            },
+            "particle_density_g_per_cm3": {
+                "value": 2.65,
+                "type": "float",
+                "desc": "Particle Density to be used to derive the SLSAT value from the bulk density, if enabled."
+            },
+            "f_coarse": {
+                "value": 0.93,
+                "type": "float",
+                "desc": "Reduction factor for coarser soils (sand, sandy loam, loamy sand) \u2014 reflecting that coarser soils tend to trap relatively more air."
+            },
+            "f_fine": {
+                "value": 0.95,
+                "type": "float",
+                "desc": "Reduction factor for finer-textured classes (loam, silt loam, silt, etc.) \u2014 reflecting that coarser soils tend to trap relatively more air."
+            }
+        }
+    },
+    "210add72-f24e-4525-936a-d022403b7f4f": {
+        "category": {
+            "id": "amei_exercises",
+            "name": "AMEI Exercises"
+        },
+        "info": {
+            "id": "210add72-f24e-4525-936a-d022403b7f4f",
+            "name": "Add irr/fert data",
+            "description": "Add irrigation and fertilization data into crop rotation"
+        },
+        "type": "process",
+        "inPorts": [
+            {
+                "name": "conf",
+                "contentType": "@0xed6c098b67cad454 = common/common.capnp:StructuredText[JSON | TOML]"
+            },
+            {
+                "name": "env",
+                "contentType": "Text (JSON)"
+            }
+        ],
+        "outPorts": [
+            {
+                "name": "env",
+                "contentType": "Text (JSON)",
+                "desc": "Updated environment with irrigation and fertilization merged into crop rotation"
+            }
+        ],
+        "defaultConfig": {
+            "agmip_attr": {
+                "value": "agmip",
+                "type": "string",
+                "desc": "Attribute name where to get the agmip irrigation and fertilization data from"
+            }
+        }
+    },
+    "d5603568-5ce0-45a3-900d-77c8b3b894f5": {
+        "category": {
+            "id": "console",
+            "name": "Console"
+        },
+        "info": {
+            "id": "2de9c491-d8a6-4b36-84de-db7f4a312731",
+            "name": "output to console",
+            "description": "Output input to console."
+        },
+        "type": "standard",
+        "inPorts": [
+            {
+                "name": "in",
+                "contentType": "Text"
+            }
+        ],
+        "outPorts": [],
+        "defaultConfig": {}
+    }
+}
