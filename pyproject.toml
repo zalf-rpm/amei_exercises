@@ -43,6 +43,9 @@ platforms = ["linux-64", "win-64"]
 build-backend = "hatchling.build"
 requires = ["hatchling"]
 
+[tool.hatch.build.targets.wheel]
+packages = ["src/amei_exercises", "src/flow_components"]
+
 [tool.ruff]
 line-length = 120
 target-version = "py312"
@@ -74,4 +77,4 @@ venv = "dev"
 
 [tool.pixi.tasks]
 components-service = { cmd = "python -m zalfmas_fbp.run.local_components_service configs/local_components_service.toml" }
-maricopa = { cmd = "python -m zalfmas_fbp.run.run_fbp_flow maricopa_wheat_face/run_maricopa_calib_flow_v14b_debug_win.json --cmds configs/local_cmds.json ../mas_python_fbp/configs/local_cmds_win.json --components ../mas_python_fbp/configs/local_components_cache.json configs/local_components_cache.json --path_to_channel=../monica/build/common/channel.exe --channel_host=127.0.0.1 --host=127.0.0.1" }
+maricopa = { cwd="maricopa_wheat_face", cmd = "python -m zalfmas_fbp.run.run_fbp_flow run_maricopa_calib_flow_v14b_debug_win.json --cmds ../configs/local_cmds.json ../../mas_python_fbp/configs/local_cmds_win.json --components ../../mas_python_fbp/configs/local_components_cache.json ../configs/local_components_cache.json --path_to_channel=../../monica/build/common/channel.exe --channel_host=127.0.0.1 --host=127.0.0.1" }
