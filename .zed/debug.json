@@ -1,0 +1,11 @@
+[
+  {
+    "label": "Debug Component Service",
+    "adapter": "Debugpy",
+    "request": "launch",
+    "module": "zalfmas_fbp.run.local_components_service",
+    "args": ["configs/local_components_service.toml"],
+    "cwd": "${ZED_WORKTREE_ROOT}",
+    "python": "${ZED_WORKTREE_ROOT}/.pixi/envs/default/python.exe",
+  },
+]
