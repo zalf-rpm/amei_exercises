@@ -41,5 +41,9 @@ WORKDIR /workspace/amei_exercises
 
 RUN pixi install
 
-ENTRYPOINT ["pixi", "run"]
+# Use an absolute --manifest-path rather than relying on the container's working
+# directory: Docker starts new processes at the image's WORKDIR, but Singularity/
+# Apptainer instead carries over the *host's* current directory into the container
+# by default, so a bare `pixi run` there looks for pyproject.toml in the wrong place.
+ENTRYPOINT ["pixi", "run", "--manifest-path", "/workspace/amei_exercises/pyproject.toml"]
 CMD ["maricopa"]
