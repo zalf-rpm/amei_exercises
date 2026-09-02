@@ -2,10 +2,10 @@
   "version": "0.3",
   "name": "",
   "pan": {
-    "x": -2138.0723223812,
-    "y": -392.02078611722345
+    "x": -71.66203565553224,
+    "y": -17.67672214866883
   },
-  "zoom": 0.683633002713456,
+  "zoom": 0.345281121280665,
   "services": {
     "channels": {},
     "components": {
@@ -95,7 +95,17 @@
       "parallelProcesses": 1,
       "config": {
         "file": "MARICOPA Wheat FACE data_2026-07-03 (ICASA data format v4.1)(MBM)(no soilT).xlsx",
-        "weather_elements": ["SRAD", "TMAX", "TMIN", "TAVD", "RAIN", "VPRSD", "WIND", "TDEW", "RHAVD"],
+        "weather_elements": [
+          "SRAD",
+          "TMAX",
+          "TMIN",
+          "TAVD",
+          "RAIN",
+          "VPRSD",
+          "WIND",
+          "TDEW",
+          "RHAVD"
+        ],
         "enabled_sheets": [
           "Experiment_description",
           "Fields",
@@ -115,15 +125,45 @@
           "Genotypes"
         ],
         "agmip_elem_to_schema_elem": {
-          "SRAD": ["globrad", 1.0],
-          "TMAX": ["tmax", 1.0],
-          "TMIN": ["tmin", 1.0],
-          "TAVD": ["tavg", 1.0],
-          "RAIN": ["precip", 1.0],
-          "VPRSD": ["vaporpress", 10.0],
-          "WIND": ["wind", [5.0, 432]],
-          "TDEW": ["dewpointTemp", 1.0],
-          "RHAVD": ["relhumid", 1.0]
+          "SRAD": [
+            "globrad",
+            1.0
+          ],
+          "TMAX": [
+            "tmax",
+            1.0
+          ],
+          "TMIN": [
+            "tmin",
+            1.0
+          ],
+          "TAVD": [
+            "tavg",
+            1.0
+          ],
+          "RAIN": [
+            "precip",
+            1.0
+          ],
+          "VPRSD": [
+            "vaporpress",
+            10.0
+          ],
+          "WIND": [
+            "wind",
+            [
+              5.0,
+              432
+            ]
+          ],
+          "TDEW": [
+            "dewpointTemp",
+            1.0
+          ],
+          "RHAVD": [
+            "relhumid",
+            1.0
+          ]
         },
         "filter": {
           "experiments": {},
@@ -182,7 +222,10 @@
       "config": {
         "lift_from_attr": "agmip",
         "lift_from_type": "@0xa23434cc8f8d6a77 = data/field_exp_data.capnp:MixedType",
-        "lifted_attrs": ["timeseries", "soilProfile"]
+        "lifted_attrs": [
+          "timeseries",
+          "soilProfile"
+        ]
       },
       "componentId": "1ccc2798-23b2-4148-a40f-6b70a69be2fb",
       "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
@@ -284,7 +327,7 @@
         "param_set_id": "no-param-set-id-given",
         "path_to_db_dir": null,
         "algorithm": "SCE-UA",
-        "repetitions": 100,
+        "repetitions": 5.0,
         "ngs": 20.0,
         "peps": {
           "SCE-UA": 0.001,
@@ -325,7 +368,7 @@
         "adaptationRate": "auto",
         "eps": {
           "DE-MC_Z": 0.05,
-          "DREAM": 1e-5
+          "DREAM": 1E-05
         },
         "mConvergence": true,
         "mAccept": true,
@@ -385,8 +428,8 @@
       "nodeId": "update calib params",
       "processName": "update calib params",
       "location": {
-        "x": 2289.389788764915,
-        "y": 1158.0532743378824
+        "x": 2296.1631598304148,
+        "y": 1112.3330196457594
       },
       "editable": false,
       "parallelProcesses": 1,
@@ -421,7 +464,9 @@
       "parallelProcesses": 1,
       "config": {
         "file": "MARICOPA Wheat FACE data_2026-07-03 (ICASA data format v4.1)(MBM)(no soilT).xlsx",
-        "sheets_to_load": ["Obs_crop_daily_means"],
+        "sheets_to_load": [
+          "Obs_crop_daily_means"
+        ],
         "load_all": false,
         "index_of_header_row": 2.0,
         "nesting_by_key_cols": {},
@@ -444,7 +489,12 @@
       "config": {
         "traversal_path": "obs_crop_daily_means",
         "path_separator": "/",
-        "filter_paths": ["DATE", "CWAD", "GSTZD", "TREAT_ID"],
+        "filter_paths": [
+          "DATE",
+          "CWAD",
+          "GSTZD",
+          "TREAT_ID"
+        ],
         "values_only": false
       },
       "componentId": "161c9d39-a3c5-4885-beb2-9d85a7c777bf",
@@ -488,7 +538,12 @@
         "group_key": "TREAT_ID",
         "x_key": "GSTZD",
         "y_key": "DATE",
-        "inter_x": [10, 61, 71, 91],
+        "inter_x": [
+          10,
+          61,
+          71,
+          91
+        ],
         "extrapolation": "null",
         "on_error": "null"
       },
@@ -556,7 +611,9 @@
       "config": {
         "traversal_path": null,
         "path_separator": "/",
-        "filter_paths": ["DATE"],
+        "filter_paths": [
+          "DATE"
+        ],
         "values_only": true,
         "flatten_values_only_lists": true
       },
@@ -564,50 +621,11 @@
       "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
     },
     {
-      "nodeId": "Copy IP 28",
-      "processName": "Copy IP 28",
-      "location": {
-        "x": 2224.1415050199003,
-        "y": 1696.4564117949474
-      },
-      "editable": false,
-      "parallelProcesses": 1,
-      "config": {},
-      "componentId": "b1e875af-4ee7-4937-8824-17d185216ec4",
-      "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
-    },
-    {
-      "nodeId": "Copy IP 41",
-      "processName": "Copy IP 41",
-      "location": {
-        "x": 2039.6443686437983,
-        "y": 846.7734360534807
-      },
-      "editable": false,
-      "parallelProcesses": 1,
-      "config": {},
-      "componentId": "b1e875af-4ee7-4937-8824-17d185216ec4",
-      "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
-    },
-    {
-      "nodeId": "Copy IP 49",
-      "processName": "Copy IP 49",
-      "location": {
-        "x": 2790.5985893296597,
-        "y": 1172.2039925302927
-      },
-      "editable": false,
-      "parallelProcesses": 1,
-      "config": {},
-      "componentId": "b1e875af-4ee7-4937-8824-17d185216ec4",
-      "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
-    },
-    {
       "nodeId": "Apply GJSON queries ...",
       "processName": "Apply GJSON queries 57",
       "location": {
-        "x": 2714.5191608391356,
-        "y": 1562.7963059273245
+        "x": 2739.9193023347593,
+        "y": 1670.3235715921323
       },
       "editable": false,
       "parallelProcesses": 1,
@@ -647,19 +665,6 @@
       "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
     },
     {
-      "nodeId": "Copy IP 98",
-      "processName": "Copy IP 98",
-      "location": {
-        "x": 1945.6896372832891,
-        "y": 1456.5737169130837
-      },
-      "editable": false,
-      "parallelProcesses": 1,
-      "config": {},
-      "componentId": "b1e875af-4ee7-4937-8824-17d185216ec4",
-      "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
-    },
-    {
       "nodeId": "remove agmip attr",
       "processName": "remove agmip attr",
       "location": {
@@ -669,94 +674,16 @@
       "editable": false,
       "parallelProcesses": 1,
       "config": {
-        "remove_attrs": ["agmip"]
+        "remove_attrs": [
+          "agmip"
+        ]
       },
       "componentId": "f07fa00e-dd80-45da-bc49-397d5e25fe0f",
       "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
     },
     {
-      "nodeId": "write file 12",
-      "processName": "write file 12",
-      "location": {
-        "x": 1910.1571436286788,
-        "y": 2003.5972318943373
-      },
-      "editable": false,
-      "parallelProcesses": 1,
-      "config": {
-        "from_attr": null,
-        "path_to_out_dir": "log/simulated",
-        "append": false,
-        "debug": false,
-        "create_missing_dirs": true,
-        "filename_pattern": "run_{count}.json"
-      },
-      "componentId": "b3867019-5f42-4c59-9438-a49fe9452e6f",
-      "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
-    },
-    {
-      "nodeId": "write file 13",
-      "processName": "write file 13",
-      "location": {
-        "x": 3219.8030471829134,
-        "y": 1363.202368814657
-      },
-      "editable": false,
-      "parallelProcesses": 1,
-      "config": {
-        "from_attr": null,
-        "path_to_out_dir": "log/monica_full_results",
-        "append": false,
-        "debug": false,
-        "create_missing_dirs": true,
-        "filename_pattern": "csv_{count}.json"
-      },
-      "componentId": "b3867019-5f42-4c59-9438-a49fe9452e6f",
-      "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
-    },
-    {
-      "nodeId": "write file 14",
-      "processName": "write file 14",
-      "location": {
-        "x": 2384.431533731637,
-        "y": 1420.108270083235
-      },
-      "editable": false,
-      "parallelProcesses": 1,
-      "config": {
-        "from_attr": null,
-        "path_to_out_dir": "log/monica_env_after_copy",
-        "append": false,
-        "debug": false,
-        "create_missing_dirs": true,
-        "filename_pattern": "run_{count}.json"
-      },
-      "componentId": "b3867019-5f42-4c59-9438-a49fe9452e6f",
-      "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
-    },
-    {
-      "nodeId": "write file 15",
-      "processName": "write file 15",
-      "location": {
-        "x": 2450.5878415475345,
-        "y": 858.8651507771071
-      },
-      "editable": false,
-      "parallelProcesses": 1,
-      "config": {
-        "from_attr": null,
-        "path_to_out_dir": "log/monica_env_after_update_params",
-        "append": false,
-        "debug": false,
-        "create_missing_dirs": true,
-        "filename_pattern": "run_{count}.json"
-      },
-      "componentId": "b3867019-5f42-4c59-9438-a49fe9452e6f",
-      "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
-    },
-    {
-      "nodeId": "write file 16",
-      "processName": "write file 16",
+      "nodeId": "write best params",
+      "processName": "write best params",
       "location": {
         "x": 1576.445952298239,
         "y": 1457.5243733536179
@@ -856,105 +783,6 @@
       "parallelProcesses": 1,
       "config": {},
       "componentId": "e8206aa9-2254-40f0-b2c0-06d31fb25629",
-      "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
-    },
-    {
-      "nodeId": "Copy IP 6",
-      "processName": "Copy IP 6",
-      "location": {
-        "x": 4288.592780978184,
-        "y": 763.1132282294425
-      },
-      "editable": false,
-      "parallelProcesses": 1,
-      "config": {},
-      "componentId": "b1e875af-4ee7-4937-8824-17d185216ec4",
-      "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
-    },
-    {
-      "nodeId": "write file 7",
-      "processName": "write file 7",
-      "location": {
-        "x": 4270.1892028686025,
-        "y": 1097.6356740065128
-      },
-      "editable": false,
-      "parallelProcesses": 1,
-      "config": {
-        "from_attr": null,
-        "path_to_out_dir": "log/direct_monica_out",
-        "append": false,
-        "create_missing_dirs": true,
-        "debug": false,
-        "filename_pattern": "out_{count}.json"
-      },
-      "componentId": "b3867019-5f42-4c59-9438-a49fe9452e6f",
-      "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
-    },
-    {
-      "nodeId": "write file 8",
-      "processName": "write file 8",
-      "location": {
-        "x": 3519.7648379603575,
-        "y": 1538.0567751099707
-      },
-      "editable": false,
-      "parallelProcesses": 1,
-      "config": {
-        "from_attr": null,
-        "path_to_out_dir": "log/after_recreate_substream",
-        "append": false,
-        "create_missing_dirs": true,
-        "debug": false,
-        "filename_pattern": "order_{@count}_count_{count}.json"
-      },
-      "componentId": "b3867019-5f42-4c59-9438-a49fe9452e6f",
-      "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
-    },
-    {
-      "nodeId": "Copy IP 9",
-      "processName": "Copy IP 9",
-      "location": {
-        "x": 3790.6037708742383,
-        "y": 1286.9523373079053
-      },
-      "editable": false,
-      "parallelProcesses": 1,
-      "config": {},
-      "componentId": "b1e875af-4ee7-4937-8824-17d185216ec4",
-      "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
-    },
-    {
-      "nodeId": "Copy IP 10",
-      "processName": "Copy IP 10",
-      "location": {
-        "x": 3559.8651650336587,
-        "y": 480.1200463464958
-      },
-      "editable": false,
-      "parallelProcesses": 1,
-      "config": {},
-      "componentId": "b1e875af-4ee7-4937-8824-17d185216ec4",
-      "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
-    },
-    {
-      "nodeId": "write file 11",
-      "processName": "write file 11",
-      "location": {
-        "x": 3683.9110449645027,
-        "y": 101.95239850176878
-      },
-      "editable": false,
-      "parallelProcesses": 1,
-      "config": {
-        "from_attr": null,
-        "filename_pattern": "env_{@count}.json",
-        "path_to_out_dir": "log/after_unwrap_stream",
-        "append": false,
-        "create_missing_dirs": true,
-        "debug": false
-      },
-      "componentId": "b3867019-5f42-4c59-9438-a49fe9452e6f",
       "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
     }
   ],
@@ -1060,7 +888,7 @@
     },
     {
       "source": {
-        "nodeId": "Copy IP 41",
+        "nodeId": "update calib params",
         "port": "out"
       },
       "target": {
@@ -1097,7 +925,7 @@
         "port": "result"
       },
       "target": {
-        "nodeId": "Copy IP 6",
+        "nodeId": "recreate substream",
         "port": "in"
       },
       "bufferSize": 1
@@ -1152,7 +980,7 @@
         "port": "best"
       },
       "target": {
-        "nodeId": "write file 16",
+        "nodeId": "write best params",
         "port": "in"
       },
       "bufferSize": 1
@@ -1185,7 +1013,7 @@
         "port": "out"
       },
       "target": {
-        "nodeId": "Copy IP 98",
+        "nodeId": "update calib params",
         "port": "in"
       },
       "bufferSize": 1
@@ -1198,28 +1026,6 @@
       "target": {
         "nodeId": "update calib params",
         "port": "attrs"
-      },
-      "bufferSize": 1
-    },
-    {
-      "source": {
-        "nodeId": "Copy IP 98",
-        "port": "out"
-      },
-      "target": {
-        "nodeId": "update calib params",
-        "port": "in"
-      },
-      "bufferSize": 1
-    },
-    {
-      "source": {
-        "nodeId": "update calib params",
-        "port": "out"
-      },
-      "target": {
-        "nodeId": "Copy IP 41",
-        "port": "in"
       },
       "bufferSize": 1
     },
@@ -1291,65 +1097,10 @@
     },
     {
       "source": {
-        "nodeId": "Apply GJSON queries ...",
-        "port": "out"
-      },
-      "target": {
-        "nodeId": "Copy IP 28",
-        "port": "in"
-      },
-      "bufferSize": 1
-    },
-    {
-      "source": {
-        "nodeId": "Copy IP 28",
-        "port": "out"
-      },
-      "target": {
-        "nodeId": "JSON to common Value...",
-        "port": "in"
-      },
-      "bufferSize": 1
-    },
-    {
-      "source": {
-        "nodeId": "Copy IP 28",
-        "port": "out"
-      },
-      "target": {
-        "nodeId": "write file 12",
-        "port": "in"
-      },
-      "bufferSize": 1
-    },
-    {
-      "source": {
-        "nodeId": "Copy IP 41",
-        "port": "out"
-      },
-      "target": {
-        "nodeId": "write file 15",
-        "port": "in"
-      },
-      "bufferSize": 1
-    },
-    {
-      "source": {
         "nodeId": "sort substream",
         "port": "out"
       },
       "target": {
-        "nodeId": "Copy IP 49",
-        "port": "in"
-      },
-      "bufferSize": 1
-    },
-    {
-      "source": {
-        "nodeId": "Copy IP 49",
-        "port": "out"
-      },
-      "target": {
         "nodeId": "Apply GJSON queries ...",
         "port": "in"
       },
@@ -1357,22 +1108,11 @@
     },
     {
       "source": {
-        "nodeId": "Copy IP 49",
+        "nodeId": "Apply GJSON queries ...",
         "port": "out"
       },
       "target": {
-        "nodeId": "write file 13",
-        "port": "in"
-      },
-      "bufferSize": 1
-    },
-    {
-      "source": {
-        "nodeId": "Copy IP 98",
-        "port": "out"
-      },
-      "target": {
-        "nodeId": "write file 14",
+        "nodeId": "JSON to common Value...",
         "port": "in"
       },
       "bufferSize": 1
@@ -1401,7 +1141,7 @@
     },
     {
       "source": {
-        "nodeId": "Copy IP 9",
+        "nodeId": "recreate substream",
         "port": "out"
       },
       "target": {
@@ -1412,7 +1152,7 @@
     },
     {
       "source": {
-        "nodeId": "Copy IP 10",
+        "nodeId": "unwrap substream",
         "port": "out"
       },
       "target": {
@@ -1424,77 +1164,11 @@
     {
       "source": {
         "nodeId": "unwrap substream",
-        "port": "out"
-      },
-      "target": {
-        "nodeId": "Copy IP 10",
-        "port": "in"
-      },
-      "bufferSize": 1
-    },
-    {
-      "source": {
-        "nodeId": "unwrap substream",
         "port": "brackets"
       },
       "target": {
         "nodeId": "recreate substream",
         "port": "brackets"
-      },
-      "bufferSize": 1
-    },
-    {
-      "source": {
-        "nodeId": "Copy IP 6",
-        "port": "out"
-      },
-      "target": {
-        "nodeId": "recreate substream",
-        "port": "in"
-      },
-      "bufferSize": 1
-    },
-    {
-      "source": {
-        "nodeId": "recreate substream",
-        "port": "out"
-      },
-      "target": {
-        "nodeId": "Copy IP 9",
-        "port": "in"
-      },
-      "bufferSize": 1
-    },
-    {
-      "source": {
-        "nodeId": "Copy IP 6",
-        "port": "out"
-      },
-      "target": {
-        "nodeId": "write file 7",
-        "port": "in"
-      },
-      "bufferSize": 1
-    },
-    {
-      "source": {
-        "nodeId": "Copy IP 9",
-        "port": "out"
-      },
-      "target": {
-        "nodeId": "write file 8",
-        "port": "in"
-      },
-      "bufferSize": 1
-    },
-    {
-      "source": {
-        "nodeId": "Copy IP 10",
-        "port": "out"
-      },
-      "target": {
-        "nodeId": "write file 11",
-        "port": "in"
       },
       "bufferSize": 1
     }
