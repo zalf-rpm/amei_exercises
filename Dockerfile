@@ -19,9 +19,15 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends ca-certificates curl git && \
     rm -rf /var/lib/apt/lists/*
 
-# install pixi
-RUN curl -fsSL https://pixi.sh/install.sh | sh
-ENV PATH="/root/.pixi/bin:${PATH}"
+# Install pixi directly under /usr/local, which is already part of the base image's
+# default PATH. Do NOT let it land under /root: some runtimes (notably Singularity/
+# Apptainer) run the container as the invoking host user rather than root, even
+# though the image itself was built as root, and /root defaults to mode 700 (owner
+# only) - a non-root user can't traverse into it at all, no matter what PATH or
+# symlinks point there. PIXI_HOME controls where the installer places the binary.
+ENV PIXI_HOME=/usr/local
+RUN curl -fsSL https://pixi.sh/install.sh | sh && \
+    test -x /usr/local/bin/pixi
 
 WORKDIR /workspace
 
