@@ -45,5 +45,13 @@ RUN pixi install
 # directory: Docker starts new processes at the image's WORKDIR, but Singularity/
 # Apptainer instead carries over the *host's* current directory into the container
 # by default, so a bare `pixi run` there looks for pyproject.toml in the wrong place.
-ENTRYPOINT ["pixi", "run", "--manifest-path", "/workspace/amei_exercises/pyproject.toml"]
+#
+# --as-is (= --frozen --no-install) stops `pixi run` from trying to verify/update
+# the environment before running the task, which by default requires acquiring a
+# write lock on .pixi/envs/default. The environment was already fully installed
+# above during the build and never changes afterwards, so there's nothing to check
+# or install at runtime - but the environment can be running from a read-only
+# filesystem (e.g. a Singularity/Apptainer SIF image), where even that check-only
+# lock acquisition fails outright.
+ENTRYPOINT ["pixi", "run", "--manifest-path", "/workspace/amei_exercises/pyproject.toml", "--as-is"]
 CMD ["maricopa"]
