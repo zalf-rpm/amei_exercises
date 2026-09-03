@@ -4,9 +4,9 @@ name = "amei_exercises"
 requires-python = ">= 3.12"
 version = "0.1.0"
 dependencies = [
-    #"zalfmas-common>=0.1.42,<0.2",
+    "zalfmas-common>=0.1.48,<0.2",
     "zalfmas-capnp-schemas>=0.1.63,<0.2", "soiltexture>=1.0.4,<2",
-    #"zalfmas-fbp>=0.2.33,<0.3"
+    "zalfmas-fbp>=0.2.35,<0.3"
 ]
 
 [dependency-groups]
@@ -29,8 +29,8 @@ libsodium = ">=1.0.22,<2"
 [tool.pixi.pypi-dependencies]
 amei_exercises = { path = ".", editable = true }
 #zalfmas-capnp-schemas = { path = "../mas_capnproto_schemas", editable = true }
-zalfmas-common = { path = "../mas_python_common", editable = true }
-zalfmas-fbp = { path = "../mas_python_fbp", editable = true }
+#zalfmas-common = { path = "../mas_python_common", editable = true }
+#zalfmas-fbp = { path = "../mas_python_fbp", editable = true }
 
 [tool.pixi.environments]
 dev = ["dev"]
@@ -78,3 +78,4 @@ venv = "dev"
 [tool.pixi.tasks]
 components-service = { cmd = "python -m zalfmas_fbp.run.local_components_service configs/local_components_service.toml" }
 maricopa = { cwd="maricopa_wheat_face", cmd = "python -m zalfmas_fbp.run.run_fbp_flow run_maricopa_calib_flow_v16_min_win.json --cmds ../configs/local_cmds.json ../../mas_python_fbp/configs/local_cmds_win.json --components ../../mas_python_fbp/configs/local_components_cache.json ../configs/local_components_cache.json --path_to_channel=../../monica/build/common/channel.exe --channel_host=127.0.0.1 --host=127.0.0.1" }
+flow = { cmd = "python -m zalfmas_fbp.run.run_fbp_flow" }
