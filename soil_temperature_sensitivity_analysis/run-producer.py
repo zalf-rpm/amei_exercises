@@ -15,13 +15,14 @@
 # Landscape Systems Analysis at the ZALF.
 # Copyright (C: Leibniz Centre for Agricultural Landscape Research (ZALF)
 
-from collections import defaultdict
-from datetime import date, timedelta, datetime
 import json
 import os
-from pathlib import Path
 import sys
 import time
+from collections import defaultdict
+from datetime import date, datetime, timedelta
+from pathlib import Path
+
 import zmq
 from zalfmas_common import common, csv
 from zalfmas_common.model import monica_io
@@ -75,22 +76,21 @@ def run_producer(server=None, port=None):
     # connect to monica proxy (if local, it will try to connect to a locally started monica)
     socket.connect("tcp://" + config["server"] + ":" + str(config["server-port"]))
 
-    soil_data_csv = csv.read_csv("input_data/SoilData.csv",
-                                            key=("SOIL_ID", "SLID"), key_type=(str, int),
-                                            header_row_line=3, data_row_start=4)
+    soil_data_csv = csv.read_csv(
+        "input_data/SoilData.csv", key=("SOIL_ID", "SLID"), key_type=(str, int), header_row_line=3, data_row_start=4
+    )
 
-    soil_metadata_csv = csv.read_csv("input_data/SoilMetadata.csv",
-                                            key="SOIL_ID", key_type=(str,),
-                                            header_row_line=3, data_row_start=4)
+    soil_metadata_csv = csv.read_csv(
+        "input_data/SoilMetadata.csv", key="SOIL_ID", key_type=(str,), header_row_line=3, data_row_start=4
+    )
 
+    treatment_csv = csv.read_csv(
+        "input_data/Treatment.csv", key="SM", key_type=(str,), header_row_line=3, data_row_start=4
+    )
 
-    treatment_csv = csv.read_csv("input_data/Treatment.csv",
-                                            key="SM", key_type=(str,),
-                                            header_row_line=3, data_row_start=4)
-
-    weather_metadata_csv = csv.read_csv("input_data/WeatherMetadata.csv",
-                                                   key="WST_ID", key_type=(str,),
-                                                   header_row_line=3, data_row_start=4)
+    weather_metadata_csv = csv.read_csv(
+        "input_data/WeatherMetadata.csv", key="WST_ID", key_type=(str,), header_row_line=3, data_row_start=4
+    )
 
     soil_profiles_dict = defaultdict(dict)
     for (soil_id, layer_id), soil_data in soil_data_csv.items():
@@ -100,7 +100,7 @@ def run_producer(server=None, port=None):
             "SoilBulkDensity": [float(soil_data["SLBDM"]) * 1000, "kg m-3"],
             "FieldCapacity": [float(soil_data["SLDUL"]), "m3/m3"],
             "PoreVolume": [float(soil_data["SLSAT"]), "m3/m3"],
-            #"PoreVolume": [float(soil_data["SLSAT"])+0.1, "m3/m3"],
+            # "PoreVolume": [float(soil_data["SLSAT"])+0.1, "m3/m3"],
             "PermanentWiltingPoint": [float(soil_data["SLLL"]), "m3/m3"],
             "Clay": [float(soil_data["SLCLY"]), "%"],
             "Sand": [float(soil_data["SLSND"]), "%"],
@@ -121,12 +121,9 @@ def run_producer(server=None, port=None):
     with open(config["crop.json"]) as _:
         crop_json = json.load(_)
     # create environment template from json templates
-    env_template = monica_io.create_env_json_from_json_config({
-        "crop": crop_json,
-        "site": site_json,
-        "sim": sim_json,
-        "climate": ""
-    })
+    env_template = monica_io.create_env_json_from_json_config(
+        {"crop": crop_json, "site": site_json, "sim": sim_json, "climate": ""}
+    )
 
     sent_env_count = 0
     start_time = time.perf_counter()
@@ -145,7 +142,7 @@ def run_producer(server=None, port=None):
         awc = float(t_data["AWC"])
         env_template["params"]["userSoilTemperatureParameters"]["PlantAvailableWaterContentConst"] = awc
 
-        #env_template["params"]["userEnvironmentParameters"]["Albedo"] = float(soil_metadata_csv[soil_id]["SALB"])
+        # env_template["params"]["userEnvironmentParameters"]["Albedo"] = float(soil_metadata_csv[soil_id]["SALB"])
         env_template["params"]["simulationParameters"]["customData"] = {
             "LAI": float(t_data["LAID"]),
             "AWC": awc,
@@ -161,10 +158,10 @@ def run_producer(server=None, port=None):
             "TAV": float(weather_metadata_csv[wst_id]["TAV"]),
         }
 
-        #if wst_id != "CAQC" or soil_id != "SALO" or int(t_data['LAID']) != 0 or int(float(t_data['AWC'])*100) != 0:
-        #if wst_id != "FRLU" or soil_id != "SILO" or int(t_data['LAID']) != 7 or int(float(t_data['AWC'])*100) != 75:
-        #if wst_id != "USMA" or soil_id != "SILO" or int(t_data['LAID']) != 7 or int(float(t_data['AWC'])*100) != 0:
-           #continue
+        # if wst_id != "CAQC" or soil_id != "SALO" or int(t_data['LAID']) != 0 or int(float(t_data['AWC'])*100) != 0:
+        # if wst_id != "FRLU" or soil_id != "SILO" or int(t_data['LAID']) != 7 or int(float(t_data['AWC'])*100) != 75:
+        # if wst_id != "USMA" or soil_id != "SILO" or int(t_data['LAID']) != 7 or int(float(t_data['AWC'])*100) != 0:
+        # continue
 
         env_template["customId"] = {
             "env_id": sent_env_count + 1,
@@ -172,18 +169,23 @@ def run_producer(server=None, port=None):
             "soil": soil_id,
             "lai": f"L{t_data['LAID']}",
             "aw": f"AW{t_data['AWC']}",
-            
             "layerThickness": site_json["SiteParameters"]["LayerThickness"][0],
-            "profileLTs": list(map(lambda layer: layer["Thickness"][0], soil_profile))
+            "profileLTs": list(map(lambda layer: layer["Thickness"][0], soil_profile)),
         }
 
-        #with open(f"debug_out/env_{sent_env_count + 1}_{wst_id}_{soil_id}.json", "w") as _:
+        # with open(f"debug_out/env_{sent_env_count + 1}_{wst_id}_{soil_id}.json", "w") as _:
         #    json.dump(env_template, _, indent=2)
         socket.send_json(env_template)
         sent_env_count += 1
 
         stop_setup_time = time.perf_counter()
-        print("Setup: ", sent_env_count, " customId: " + str(env_template["customId"]) + " took ", (stop_setup_time - start_setup_time), " seconds")
+        print(
+            "Setup: ",
+            sent_env_count,
+            " customId: " + str(env_template["customId"]) + " took ",
+            (stop_setup_time - start_setup_time),
+            " seconds",
+        )
 
     env_template["customId"] = {
         "no_of_sent_envs": sent_env_count,
