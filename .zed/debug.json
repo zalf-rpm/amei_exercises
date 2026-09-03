@@ -8,4 +8,22 @@
     "cwd": "${ZED_WORKTREE_ROOT}",
     "python": "${ZED_WORKTREE_ROOT}/.pixi/envs/default/python.exe",
   },
+  {
+    "label": "Debug run-producer.py (soil_temperature_sensitivity_analysis)",
+    "adapter": "Debugpy",
+    "request": "launch",
+    "program": "${ZED_WORKTREE_ROOT}/soil_temperature_sensitivity_analysis/run-producer.py",
+    "cwd": "${ZED_WORKTREE_ROOT}/soil_temperature_sensitivity_analysis",
+    "python": "${ZED_WORKTREE_ROOT}/.pixi/envs/default/python.exe",
+    "env": { "MONICA_PARAMETERS": "C:/Users/berg/GitHub/monica-parameters" },
+  },
+  {
+    "label": "Debug run-consumer.py (soil_temperature_sensitivity_analysis)",
+    "adapter": "Debugpy",
+    "request": "launch",
+    "program": "${ZED_WORKTREE_ROOT}/soil_temperature_sensitivity_analysis/run-consumer.py",
+    "cwd": "${ZED_WORKTREE_ROOT}/soil_temperature_sensitivity_analysis",
+    "python": "${ZED_WORKTREE_ROOT}/.pixi/envs/default/python.exe",
+    "env": { "MONICA_PARAMETERS": "C:/Users/berg/GitHub/monica-parameters" },
+  },
 ]
