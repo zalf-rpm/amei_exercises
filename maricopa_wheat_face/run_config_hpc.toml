@@ -9,7 +9,7 @@ path_to_flow = "run_maricopa_calib_flow_v18_min.json"
 # multiple --cmds flags on the command line).
 cmds = [
     "../../mas_python_fbp/configs/local_cmds_hpc.json",
-    "../configs/local_cmds.json",
+    "../configs/local_cmds_hpc.json",
 ]
 
 # Repeated --components/-m files work the same way.
