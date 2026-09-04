@@ -94,18 +94,8 @@
       "editable": false,
       "parallelProcesses": 1,
       "config": {
-        "file": "${FLOW_DIR}/MARICOPA Wheat FACE data_2026-09-03 (ICASA data format v4.1)(PM8)(BAK1)(no soilT).xlsx",
-        "weather_elements": [
-          "SRAD",
-          "TMAX",
-          "TMIN",
-          "TAVD",
-          "RAIN",
-          "VPRSD",
-          "WIND",
-          "TDEW",
-          "RHAVD"
-        ],
+        "file": "${FLOW_DIR}/MARICOPA_Wheat_FACE_data_2026-09-03_PM8.xlsx",
+        "weather_elements": ["SRAD", "TMAX", "TMIN", "TAVD", "RAIN", "VPRSD", "WIND", "TDEW", "RHAVD"],
         "enabled_sheets": [
           "Experiment_description",
           "Fields",
@@ -125,45 +115,15 @@
           "Genotypes"
         ],
         "agmip_elem_to_schema_elem": {
-          "SRAD": [
-            "globrad",
-            1.0
-          ],
-          "TMAX": [
-            "tmax",
-            1.0
-          ],
-          "TMIN": [
-            "tmin",
-            1.0
-          ],
-          "TAVD": [
-            "tavg",
-            1.0
-          ],
-          "RAIN": [
-            "precip",
-            1.0
-          ],
-          "VPRSD": [
-            "vaporpress",
-            10.0
-          ],
-          "WIND": [
-            "wind",
-            [
-              5.0,
-              432
-            ]
-          ],
-          "TDEW": [
-            "dewpointTemp",
-            1.0
-          ],
-          "RHAVD": [
-            "relhumid",
-            1.0
-          ]
+          "SRAD": ["globrad", 1.0],
+          "TMAX": ["tmax", 1.0],
+          "TMIN": ["tmin", 1.0],
+          "TAVD": ["tavg", 1.0],
+          "RAIN": ["precip", 1.0],
+          "VPRSD": ["vaporpress", 10.0],
+          "WIND": ["wind", [5.0, 432]],
+          "TDEW": ["dewpointTemp", 1.0],
+          "RHAVD": ["relhumid", 1.0]
         },
         "filter": {
           "experiments": {},
@@ -222,10 +182,7 @@
       "config": {
         "lift_from_attr": "agmip",
         "lift_from_type": "@0xa23434cc8f8d6a77 = data/field_exp_data.capnp:MixedType",
-        "lifted_attrs": [
-          "timeseries",
-          "soilProfile"
-        ]
+        "lifted_attrs": ["timeseries", "soilProfile"]
       },
       "componentId": "1ccc2798-23b2-4148-a40f-6b70a69be2fb",
       "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
@@ -368,7 +325,7 @@
         "adaptationRate": "auto",
         "eps": {
           "DE-MC_Z": 0.05,
-          "DREAM": 1E-05
+          "DREAM": 1e-5
         },
         "mConvergence": true,
         "mAccept": true,
@@ -463,10 +420,8 @@
       "editable": false,
       "parallelProcesses": 1,
       "config": {
-        "file": "${FLOW_DIR}/MARICOPA Wheat FACE data_2026-09-03 (ICASA data format v4.1)(PM8)(BAK1)(no soilT).xlsx",
-        "sheets_to_load": [
-          "Obs_crop_daily_means"
-        ],
+        "file": "${FLOW_DIR}/MARICOPA_Wheat_FACE_data_2026-09-03_PM8.xlsx",
+        "sheets_to_load": ["Obs_crop_daily_means"],
         "load_all": false,
         "index_of_header_row": 2.0,
         "nesting_by_key_cols": {},
@@ -489,12 +444,7 @@
       "config": {
         "traversal_path": "obs_crop_daily_means",
         "path_separator": "/",
-        "filter_paths": [
-          "DATE",
-          "CWAD",
-          "GSTZD",
-          "TREAT_ID"
-        ],
+        "filter_paths": ["DATE", "CWAD", "GSTZD", "TREAT_ID"],
         "values_only": false
       },
       "componentId": "161c9d39-a3c5-4885-beb2-9d85a7c777bf",
@@ -538,12 +488,7 @@
         "group_key": "TREAT_ID",
         "x_key": "GSTZD",
         "y_key": "DATE",
-        "inter_x": [
-          10,
-          61,
-          71,
-          91
-        ],
+        "inter_x": [10, 61, 71, 91],
         "extrapolation": "null",
         "on_error": "null"
       },
@@ -611,9 +556,7 @@
       "config": {
         "traversal_path": null,
         "path_separator": "/",
-        "filter_paths": [
-          "DATE"
-        ],
+        "filter_paths": ["DATE"],
         "values_only": true,
         "flatten_values_only_lists": true
       },
@@ -674,9 +617,7 @@
       "editable": false,
       "parallelProcesses": 1,
       "config": {
-        "remove_attrs": [
-          "agmip"
-        ]
+        "remove_attrs": ["agmip"]
       },
       "componentId": "f07fa00e-dd80-45da-bc49-397d5e25fe0f",
       "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
