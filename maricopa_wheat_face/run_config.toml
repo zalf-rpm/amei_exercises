@@ -15,7 +15,7 @@ cmds = [
 # Repeated --components/-m files work the same way.
 components = [
     "../../mas_python_fbp/configs/local_components_cache.json",
-    "configs/local_components_cache.json",
+    "../configs/local_components_cache.json",
 ]
 
 path_to_channel = "/home/berg/GitHub/monica/_cmake_debug/common/channel"
