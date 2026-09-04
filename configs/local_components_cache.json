@@ -206,5 +206,52 @@
         ],
         "outPorts": [],
         "defaultConfig": {}
+    },
+    "66f86dbb-efb1-4b16-8837-3a2aa1eca30e": {
+        "category": {
+            "id": "models/monica",
+            "name": "Models/MONICA"
+        },
+        "info": {
+            "id": "66f86dbb-efb1-4b16-8837-3a2aa1eca30e",
+            "name": "MONICA",
+            "description": "MONICA FBP component"
+        },
+        "type": "standard",
+        "inPorts": [
+            {
+                "name": "conf",
+                "contentType": "@0xed6c098b67cad454 = common/common.capnp:StructuredText[JSON | TOML]"
+            },
+            {
+                "name": "env",
+                "contentType": "@0xb7fc866ef1127f7c = model/model.capnp:Env[@0xed6c098b67cad454 = common/common.capnp:StructuredText[JSON]]",
+                "desc": "Env IP content will be used as MONICA input. Forwards open/close brackets downstream."
+            }
+        ],
+        "outPorts": [
+            {
+                "name": "result",
+                "contentType": "Text (JSON object)",
+                "desc": "MONICA output."
+            }
+        ],
+        "defaultConfig": {
+            "from_attr": {
+                "value": null,
+                "type": "string",
+                "desc": "Get Env from this attribute instead of content of env IP."
+            },
+            "to_attr": {
+                "value": null,
+                "type": "string",
+                "desc": "Send content instead in 'to_attr'"
+            },
+            "monica_sr": {
+                "value": null,
+                "type": "string",
+                "desc": "Use this sturdy ref to connect to an external MONICA, else a MONICA instance will be created."
+            }
+        }
     }
 }

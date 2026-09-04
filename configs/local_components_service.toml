@@ -3,7 +3,7 @@ id = "f0377174-af8e-435b-9c7d-f22e453aeb18"
 name = "local AMEI Exercises components service"
 description = ""
 path_to_components_cache_json = "./configs/local_components_cache.json"
-path_to_cmds_json = "./configs/local_cmds.json"
+path_to_cmds_json = "./configs/local_cmds_win.json"
 fixed_sturdy_ref_token = "local_amei_exercises_components"
 # sturdy ref to a container which is used by the service to store it's data/state etc.
 #storage_container_sr = "capnp://the_host_key@host:port/a_sturdy_ref_token"
