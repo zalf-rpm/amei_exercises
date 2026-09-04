@@ -2,8 +2,8 @@
   "version": "0.3",
   "name": "",
   "pan": {
-    "x": 642.6435605516322,
-    "y": -191.40090381243476
+    "x": -94.85643944836784,
+    "y": -595.4009038124348
   },
   "zoom": 0.6200752859078965,
   "services": {
@@ -94,7 +94,7 @@
       "editable": false,
       "parallelProcesses": 1,
       "config": {
-        "file": "${FLOW_DIR}/MARICOPA_Wheat_FACE_data_2026-09-03_PM8.xlsx",
+        "file": "${FLOW_DIR}/MARICOPA Wheat FACE data_2026-09-03 (ICASA data format v4.1)(PM8)(BAK1)(no soilT).xlsx",
         "weather_elements": ["SRAD", "TMAX", "TMIN", "TAVD", "RAIN", "VPRSD", "WIND", "TDEW", "RHAVD"],
         "enabled_sheets": [
           "Experiment_description",
@@ -284,7 +284,7 @@
         "param_set_id": "no-param-set-id-given",
         "path_to_db_dir": null,
         "algorithm": "SCE-UA",
-        "repetitions": 5.0,
+        "repetitions": 5,
         "ngs": 20.0,
         "peps": {
           "SCE-UA": 0.001,
@@ -350,7 +350,8 @@
         "Tini": 80.0,
         "Ntemp": 50.0,
         "alpha": 0.99,
-        "num_levels": 4.0
+        "num_levels": 4.0,
+        "display_best": true
       },
       "componentId": "09dbe4c2-c9df-46ab-a30c-239b84d5c6ab",
       "componentServiceId": "45579662-bdf0-49db-9808-860135170794"
@@ -420,7 +421,7 @@
       "editable": false,
       "parallelProcesses": 1,
       "config": {
-        "file": "${FLOW_DIR}/MARICOPA_Wheat_FACE_data_2026-09-03_PM8.xlsx",
+        "file": "${FLOW_DIR}/MARICOPA Wheat FACE data_2026-09-03 (ICASA data format v4.1)(PM8)(BAK1)(no soilT).xlsx",
         "sheets_to_load": ["Obs_crop_daily_means"],
         "load_all": false,
         "index_of_header_row": 2.0,
