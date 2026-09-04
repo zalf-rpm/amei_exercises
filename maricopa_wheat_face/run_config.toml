@@ -18,7 +18,8 @@ components = [
     "../configs/local_components_cache.json",
 ]
 
-path_to_channel = "/home/berg/GitHub/monica/_cmake_debug/common/channel"
+#path_to_channel = "/home/berg/GitHub/monica/_cmake_debug/common/channel"
+path_to_channel = "C:/Users/berg/GitHub/monica/build-release/common/channel"
 host = "127.0.0.1"
 channel_host = "127.0.0.1"
 log_level = "INFO"
