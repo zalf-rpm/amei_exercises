@@ -1,22 +1,17 @@
-# Runs the amei_exercises "maricopa" pixi task in a container.
+# Generic runtime for running an FBP flow built on amei_exercises/zalfmas_fbp components.
 #
-# amei_exercises depends on mas_python_fbp and mas_python_common as editable pypi
-# dependencies via relative paths (see pyproject.toml: path = "../mas_python_fbp" /
-# "../mas_python_common"), so those two sibling repos are cloned here to match that
-# layout. amei_exercises itself comes from the build context (not a fresh clone), so
-# the image reflects whatever commit/PR actually triggered the build.
-#
-# Known limitation: the "maricopa" task's --path_to_channel currently points at a
-# Windows channel.exe built from a 4th, separate repo (monica), which is not part of
-# this image. Override that argument (e.g. via `docker run ... pixi run maricopa
-# --path_to_channel=/path/to/channel`) once a Linux-built channel binary is available.
+# amei_exercises' own dependencies (zalfmas-fbp, zalfmas-common, ...) come straight from
+# PyPI (see pyproject.toml), so this image only ever needs amei_exercises itself - no sibling
+# repos to clone. It provides the Python components; the actual flow/config/data is expected
+# to live outside the image on a writable filesystem (e.g. a fresh amei_exercises checkout,
+# or any other project shaped like it) and be pointed at via `flow -e /path/to/run_config.toml`
+# at `docker run`/`singularity run` time - see run_config.toml's own header comment, and
+# run_fbp_flow.py's '${FLOW_DIR}'/'${PKG:<package>}' placeholders for making that config
+# portable regardless of where it's checked out or how its dependencies were installed.
 FROM debian:13
 
-ARG MAS_PYTHON_FBP_REF=main
-ARG MAS_PYTHON_COMMON_REF=main
-
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends ca-certificates curl git && \
+    apt-get install -y --no-install-recommends ca-certificates curl && \
     rm -rf /var/lib/apt/lists/*
 
 # Install pixi directly under /usr/local, which is already part of the base image's
@@ -28,13 +23,6 @@ RUN apt-get update && \
 ENV PIXI_HOME=/usr/local
 RUN curl -fsSL https://pixi.sh/install.sh | sh && \
     test -x /usr/local/bin/pixi
-
-WORKDIR /workspace
-
-# sibling repos amei_exercises' editable pypi-dependencies expect at ../mas_python_fbp
-# and ../mas_python_common
-RUN git clone --depth 1 --branch "${MAS_PYTHON_FBP_REF}" https://github.com/zalf-rpm/mas_python_fbp.git
-RUN git clone --depth 1 --branch "${MAS_PYTHON_COMMON_REF}" https://github.com/zalf-rpm/mas_python_common.git
 
 COPY . /workspace/amei_exercises
 WORKDIR /workspace/amei_exercises
@@ -53,5 +41,8 @@ RUN pixi install
 # or install at runtime - but the environment can be running from a read-only
 # filesystem (e.g. a Singularity/Apptainer SIF image), where even that check-only
 # lock acquisition fails outright.
+#
+# CMD is just the default task name, not baked-in args - override it (and/or append
+# "-e /path/to/run_config.toml") at `docker run`/`singularity run` time to run any flow.
 ENTRYPOINT ["pixi", "run", "--manifest-path", "/workspace/amei_exercises/pyproject.toml", "--as-is"]
-CMD ["maricopa"]
+CMD ["flow"]

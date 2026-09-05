@@ -8,14 +8,14 @@ path_to_flow = "run_maricopa_calib_flow_v18_min.json"
 # Later entries win on duplicate component ids (same rule as passing
 # multiple --cmds flags on the command line).
 cmds = [
-    "../../mas_python_fbp/configs/local_cmds_win.json",
+    "${PKG:zalfmas_fbp}/configs/local_cmds.json",
     "../configs/local_cmds_win.json",
 ]
 
 # Repeated --components/-m files work the same way.
 components = [
     "../configs/local_components_cache.json",
-    "../../mas_python_fbp/configs/local_components_cache.json",
+    "${PKG:zalfmas_fbp}/configs/local_components_cache.json",
 ]
 
 #path_to_channel = "/home/berg/GitHub/monica/_cmake_debug/common/channel"
