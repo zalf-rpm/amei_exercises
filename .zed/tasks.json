@@ -1,0 +1,17 @@
+[
+  {
+    "label": "Run Components Service",
+    "command": "pixi run components-service",
+    "cwd": "${ZED_WORKTREE_ROOT}",
+  },
+  {
+    "label": "Run Channel Service",
+    "command": "pixi run channel-service",
+    "cwd": "${ZED_WORKTREE_ROOT}",
+  },
+  {
+    "label": "Run Flow",
+    "command": "pixi run flow",
+    "cwd": "${ZED_WORKTREE_ROOT}",
+  },
+]
