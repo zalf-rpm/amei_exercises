@@ -15,3 +15,5 @@ maricopa_wheat_face/~$MARICOPA Wheat FACE data_2024-10-25 (ICASA data format v4.
 **/__pycache__/
 soil_temperature_sensitivity_analysis/logs/
 maricopa_wheat_face/logs/
+maricopa_wheat_face/out_direct_runs/
+maricopa_wheat_face/load-balance-test-out/
