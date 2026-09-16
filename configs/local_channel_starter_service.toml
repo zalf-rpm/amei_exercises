@@ -1,0 +1,12 @@
+[service]
+id = "d5456d2c-c99e-43a2-a7ac-49b7749f3247"
+name = "local AMEI Exercises channel starter service"
+description = ""
+path_to_channel = "/home/berg/GitHub/monica/build/common/channel"
+verbose = false
+fixed_sturdy_ref_token = "local_amei_exercises_channel_starter"
+
+[vat]
+#host = "localhost"
+port = "9989"
+serve_bootstrap = true
