@@ -4,10 +4,10 @@ name = "amei_exercises"
 requires-python = ">= 3.12"
 version = "0.1.0"
 dependencies = [
-    "zalfmas-common>=0.1.48,<0.2",
+    #"zalfmas-common>=0.1.48,<0.2",
+    #"zalfmas-fbp>=0.2.37,<0.3",
     "zalfmas-capnp-schemas>=0.1.63,<0.2",
     "soiltexture>=1.0.4,<2",
-    "zalfmas-fbp>=0.2.36,<0.3"
 ]
 
 [dependency-groups]
@@ -30,8 +30,8 @@ libsodium = ">=1.0.22,<2"
 [tool.pixi.pypi-dependencies]
 amei_exercises = { path = ".", editable = true }
 #zalfmas-capnp-schemas = { path = "../mas_capnproto_schemas", editable = true }
-#zalfmas-common = { path = "../mas_python_common", editable = true }
-#zalfmas-fbp = { path = "../mas_python_fbp", editable = true }
+zalfmas-common = { path = "../mas_python_common", editable = true }
+zalfmas-fbp = { path = "../mas_python_fbp", editable = true }
 
 [tool.pixi.environments]
 dev = ["dev"]
@@ -78,4 +78,5 @@ venv = "dev"
 
 [tool.pixi.tasks]
 components-service = { cmd = "python -m zalfmas_fbp.run.local_components_service configs/local_components_service.toml" }
+channel-service = { cmd = "python -m zalfmas_fbp.run.channel_starter_service configs/local_channel_starter_service.toml" }
 flow = { cmd = "python -m zalfmas_fbp.run.run_fbp_flow" }
