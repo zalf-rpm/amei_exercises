@@ -18,9 +18,9 @@ components = [
     "${PKG:zalfmas_fbp}/configs/local_components_cache.json",
 ]
 
-path_to_channel = "/home/berg/GitHub/monica/build/common/channel"
+path_to_channel = "/home/berg/GitHub/monica_amei/build/common/channel"
 host = "127.0.0.1"
 channel_host = "127.0.0.1"
-log_level = "INFO"
-component_log_level = "INFO"
+#log_level = "INFO"
+#component_log_level = "INFO"
 verbose_channels = false
