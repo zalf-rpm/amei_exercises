@@ -1,0 +1,12 @@
+name,position in array,low,high,step,optguess,minbound,maxbound,derived params
+StageKcFactor,0,0.48,0.72,0.02,,,,
+StageKcFactor,1,0.56,0.84,0.02,,,,
+StageKcFactor,2,0.88,1.32,0.02,,,,
+StageKcFactor,3,0.88,1.32,0.02,,,,
+StageKcFactor,4,0.64,0.96,0.02,,,,
+StageKcFactor,5,0.2,0.3,0.02,,,,
+SpecificLeafArea,,0.8,1.2,0.02,,,,
+AssimilatePartitioningCoeff,0,0.8,1.2,0.02,,,,
+AssimilatePartitioningCoeff,1,0.8,1.2,0.02,,,,
+AssimilatePartitioningCoeff,2,0.8,1.2,0.02,,,,
+AssimilatePartitioningCoeff,3,0.8,1.2,0.02,,,,
