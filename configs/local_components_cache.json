@@ -253,5 +253,92 @@
                 "desc": "Use this sturdy ref to connect to an external MONICA, else a MONICA instance will be created."
             }
         }
+    },
+    "02d892bd-646e-466d-91ca-344e3edd43e6": {
+        "category": {
+            "id": "amei_exercises",
+            "name": "AMEI Exercises"
+        },
+        "info": {
+            "id": "02d892bd-646e-466d-91ca-344e3edd43e6",
+            "name": "Obs to calibration data",
+            "description": "Split observation rows into the measured values to calibrate against and the MONICA output descriptions for the dates those measurements were taken at."
+        },
+        "type": "process",
+        "inPorts": [
+            {
+                "name": "conf",
+                "contentType": "@0xed6c098b67cad454 = common/common.capnp:StructuredText[JSON | TOML]"
+            },
+            {
+                "name": "in",
+                "contentType": "Text (JSON)",
+                "desc": "The observation sheet as JSON, as read by the 'Read Excel file' component."
+            }
+        ],
+        "outPorts": [
+            {
+                "name": "measured",
+                "contentType": "Text (JSON)",
+                "desc": "JSON object keyed by group (e.g. TREAT_ID), each holding a list of measured value lists, one per date, in the order given by 'measured_cols'."
+            },
+            {
+                "name": "monica",
+                "contentType": "Text (JSON)",
+                "desc": "JSON object keyed by group (e.g. TREAT_ID), each holding a list of [ISO date, MONICA outputs] pairs, one per date, matching the 'measured' values position by position."
+            }
+        ],
+        "defaultConfig": {
+            "data_key": {
+                "value": "obs_crop_daily_means",
+                "type": "string",
+                "desc": "Key in the incoming JSON object holding the list of observation rows."
+            },
+            "group_col": {
+                "value": "TREAT_ID",
+                "type": "string",
+                "desc": "Column the rows are grouped by. Its values become the keys of both output objects."
+            },
+            "date_col": {
+                "value": "DATE",
+                "type": "string",
+                "desc": "Column holding the measurement date as ISO date. Rows are ordered by it per group."
+            },
+            "measured_cols": {
+                "value": [
+                    "LAID",
+                    "LWAD",
+                    [
+                        "SWAD",
+                        "CRAD",
+                        "CHWAD"
+                    ],
+                    "GWAD",
+                    "CWAD"
+                ],
+                "type": "list",
+                "desc": "Columns making up one measured value list, in order. A list of columns instead of a single column name is summed up, where columns without a value count as 0 - unless none of them has a value, in which case the sum stays null. A row is skipped if it has no value at all."
+            },
+            "monica_outputs": {
+                "value": [
+                    "LAI",
+                    [
+                        "OrgBiom",
+                        "Leaf"
+                    ],
+                    [
+                        "OrgBiom",
+                        "Shoot"
+                    ],
+                    [
+                        "OrgBiom",
+                        "Fruit"
+                    ],
+                    "Yield"
+                ],
+                "type": "list",
+                "desc": "The MONICA outputs to request at every date a measurement exists for. Same order as, and one output per, 'measured_cols'."
+            }
+        }
     }
 }
