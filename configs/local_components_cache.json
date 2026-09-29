@@ -187,26 +187,6 @@
             }
         }
     },
-    "d5603568-5ce0-45a3-900d-77c8b3b894f5": {
-        "category": {
-            "id": "console",
-            "name": "Console"
-        },
-        "info": {
-            "id": "2de9c491-d8a6-4b36-84de-db7f4a312731",
-            "name": "output to console",
-            "description": "Output input to console."
-        },
-        "type": "standard",
-        "inPorts": [
-            {
-                "name": "in",
-                "contentType": "Text"
-            }
-        ],
-        "outPorts": [],
-        "defaultConfig": {}
-    },
     "66f86dbb-efb1-4b16-8837-3a2aa1eca30e": {
         "category": {
             "id": "models/monica",
