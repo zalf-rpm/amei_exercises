@@ -265,7 +265,7 @@
             {
                 "name": "monica",
                 "contentType": "Text (JSON)",
-                "desc": "A list of [ISO date, MONICA outputs] pairs per group (e.g. TREAT_ID), one per date, matching the 'measured' values position by position. Either as one JSON object keyed by group or, see 'as_substream', as a substream of one IP per group."
+                "desc": "A flat MONICA output events list per group (e.g. TREAT_ID): an ISO date followed by the outputs to produce at it, for every date there is a measurement for, in the same order as the 'measured' values. Either as one JSON object keyed by group or, see 'as_substream', as a substream of one IP per group."
             }
         ],
         "defaultConfig": {

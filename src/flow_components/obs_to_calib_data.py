@@ -110,9 +110,10 @@ METADATA = meta.Component(
             name="monica",
             contentType="Text (JSON)",
             desc=(
-                "A list of [ISO date, MONICA outputs] pairs per group (e.g. TREAT_ID), one per date, "
-                "matching the 'measured' values position by position. Either as one JSON object keyed by "
-                "group or, see 'as_substream', as a substream of one IP per group."
+                "A flat MONICA output events list per group (e.g. TREAT_ID): an ISO date followed by the "
+                "outputs to produce at it, for every date there is a measurement for, in the same order as "
+                "the 'measured' values. Either as one JSON object keyed by group or, see 'as_substream', as "
+                "a substream of one IP per group."
             ),
         ),
     ],
@@ -167,7 +168,7 @@ class ObsToCalibData(process.Process[CompConfig]):
                 rows: list[dict[str, Any]] = json.loads(in_ip.content.as_text())[self.config.data_key]
 
                 measured: dict[str, list[list[float | None]]] = defaultdict(list)
-                monica: dict[str, list[list[Any]]] = defaultdict(list)
+                monica: dict[str, list[Any]] = defaultdict(list)
                 for row in sorted(rows, key=lambda r: str(r[self.config.date_col])):
                     values = [self.measured_value(row, cols) for cols in self.config.measured_cols]
                     # nothing was measured on that date, so there is nothing to calibrate against
@@ -175,7 +176,8 @@ class ObsToCalibData(process.Process[CompConfig]):
                         continue
                     group = str(row[self.config.group_col])
                     measured[group].append(values)
-                    monica[group].append([row[self.config.date_col], self.config.monica_outputs])
+                    # flat, as MONICA's output events are: a date followed by the outputs at that date
+                    monica[group] += [row[self.config.date_col], self.config.monica_outputs]
                 logger.info(
                     "%s: %d group(s), %d date(s) with measurements",
                     self.name,
