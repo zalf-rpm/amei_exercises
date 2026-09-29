@@ -60,6 +60,18 @@ class CompConfig(process.ProcessConfig):
             "output per, 'measured_cols'."
         ),
     )
+    as_substream: dict[str, bool] = Field(
+        {"measured": False, "monica": False},
+        description=(
+            "Per out port: if false send one JSON object keyed by group, if true send a substream of one IP "
+            "per group instead, whose content is just that group's value and whose group is given by the "
+            "'group_attr' attribute."
+        ),
+    )
+    group_attr: str | None = Field(
+        None,
+        description="Attribute holding the group on the IPs of a substream. If None, 'group_col' is used.",
+    )
 
 
 METADATA = meta.Component(
@@ -89,16 +101,18 @@ METADATA = meta.Component(
             name="measured",
             contentType="Text (JSON)",
             desc=(
-                "JSON object keyed by group (e.g. TREAT_ID), each holding a list of measured value lists, "
-                "one per date, in the order given by 'measured_cols'."
+                "A list of measured value lists per group (e.g. TREAT_ID), one per date, in the order given "
+                "by 'measured_cols'. Either as one JSON object keyed by group or, see 'as_substream', as a "
+                "substream of one IP per group."
             ),
         ),
         meta.Port(
             name="monica",
             contentType="Text (JSON)",
             desc=(
-                "JSON object keyed by group (e.g. TREAT_ID), each holding a list of [ISO date, MONICA "
-                "outputs] pairs, one per date, matching the 'measured' values position by position."
+                "A list of [ISO date, MONICA outputs] pairs per group (e.g. TREAT_ID), one per date, "
+                "matching the 'measured' values position by position. Either as one JSON object keyed by "
+                "group or, see 'as_substream', as a substream of one IP per group."
             ),
         ),
     ],
@@ -113,6 +127,22 @@ class ObsToCalibData(process.Process[CompConfig]):
         con_man: common.ConnectionManager | None = None,
     ):
         super().__init__(metadata=metadata, con_man=con_man)
+
+    async def write_groups(self, port_name: str, in_ip: Any, groups: dict[str, list[Any]]) -> bool:
+        if not self.config.as_substream.get(port_name, False):
+            out_ip = fbp_capnp.IP.new_message(content=json.dumps(groups))
+            common.copy_and_set_fbp_attrs(in_ip, out_ip)
+            return await self.write_out(port_name, out_ip)
+
+        group_attr = self.config.group_attr if self.config.group_attr else self.config.group_col
+        if not await self.write_out(port_name, fbp_capnp.IP.new_message(type="openBracket")):
+            return False
+        for group, values in groups.items():
+            out_ip = fbp_capnp.IP.new_message(content=json.dumps(values))
+            common.copy_and_set_fbp_attrs(in_ip, out_ip, **{group_attr: group})
+            if not await self.write_out(port_name, out_ip):
+                return False
+        return await self.write_out(port_name, fbp_capnp.IP.new_message(type="closeBracket"))
 
     def measured_value(self, row: dict[str, Any], cols: str | list[str]) -> float | None:
         if isinstance(cols, str):
@@ -153,12 +183,10 @@ class ObsToCalibData(process.Process[CompConfig]):
                     sum(len(v) for v in measured.values()),
                 )
 
-                for port_name, content in (("measured", measured), ("monica", monica)):
+                for port_name, groups in (("measured", measured), ("monica", monica)):
                     if not self.out_ports[port_name]:
                         continue
-                    out_ip = fbp_capnp.IP.new_message(content=json.dumps(content))
-                    common.copy_and_set_fbp_attrs(in_ip, out_ip)
-                    if not await self.write_out(port_name, out_ip):
+                    if not await self.write_groups(port_name, in_ip, groups):
                         logger.info("%s: process finished", self.name)
                         return
 

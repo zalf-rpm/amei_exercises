@@ -280,12 +280,12 @@
             {
                 "name": "measured",
                 "contentType": "Text (JSON)",
-                "desc": "JSON object keyed by group (e.g. TREAT_ID), each holding a list of measured value lists, one per date, in the order given by 'measured_cols'."
+                "desc": "A list of measured value lists per group (e.g. TREAT_ID), one per date, in the order given by 'measured_cols'. Either as one JSON object keyed by group or, see 'as_substream', as a substream of one IP per group."
             },
             {
                 "name": "monica",
                 "contentType": "Text (JSON)",
-                "desc": "JSON object keyed by group (e.g. TREAT_ID), each holding a list of [ISO date, MONICA outputs] pairs, one per date, matching the 'measured' values position by position."
+                "desc": "A list of [ISO date, MONICA outputs] pairs per group (e.g. TREAT_ID), one per date, matching the 'measured' values position by position. Either as one JSON object keyed by group or, see 'as_substream', as a substream of one IP per group."
             }
         ],
         "defaultConfig": {
@@ -338,6 +338,18 @@
                 ],
                 "type": "list",
                 "desc": "The MONICA outputs to request at every date a measurement exists for. Same order as, and one output per, 'measured_cols'."
+            },
+            "as_substream": {
+                "value": {
+                    "measured": false,
+                    "monica": false
+                },
+                "type": "object",
+                "desc": "Per out port: if false send one JSON object keyed by group, if true send a substream of one IP per group instead, whose content is just that group's value and whose group is given by the 'group_attr' attribute."
+            },
+            "group_attr": {
+                "type": "string",
+                "desc": "Attribute holding the group on the IPs of a substream. If None, 'group_col' is used."
             }
         }
     }
