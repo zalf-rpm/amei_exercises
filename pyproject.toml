@@ -20,6 +20,9 @@ dev = [
 ]
 
 [tool.pixi.dependencies]
+# Cap below 3.15: duckdb (via zalfmas-fbp) ships no cp315 wheels yet, so pixi would build the
+# sdist, which needs a C++ toolchain that the Docker image doesn't have.
+python = ">=3.12,<3.15"
 openpyxl = ">=3.1.5,<4"
 pixi-pycharm = ">=0.0.12,<0.0.13"
 pandas-stubs = ">=3.0.5.260914,<4"
@@ -31,7 +34,7 @@ libsodium = ">=1.0.22,<2"
 amei_exercises = { path = ".", editable = true }
 #zalfmas-capnp-schemas = { path = "../mas_capnproto_schemas", editable = true }
 zalfmas-common = ">=0.1.49, <0.2"
-zalfmas-fbp = ">=0.2.39, <0.3"
+zalfmas-fbp = ">=0.2.40, <0.3"
 
 [tool.pixi.environments]
 dev = ["dev"]
