@@ -8,7 +8,7 @@
 # at `docker run`/`singularity run` time - see run_config.toml's own header comment, and
 # run_fbp_flow.py's '${FLOW_DIR}'/'${PKG:<package>}' placeholders for making that config
 # portable regardless of where it's checked out or how its dependencies were installed.
-FROM debian:13
+FROM debian:13 AS build
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends ca-certificates curl && \
@@ -24,25 +24,26 @@ ENV PIXI_HOME=/usr/local
 RUN curl -fsSL https://pixi.sh/install.sh | sh && \
     test -x /usr/local/bin/pixi
 
+COPY --from=zalfrpm/monica-cluster:3.6.51 /run/monica /usr/local/bin
+
 COPY . /workspace/amei_exercises
 WORKDIR /workspace/amei_exercises
 
-RUN pixi install
+RUN pixi install --locked
+RUN pixi run regenerate-components-cache
+RUN pixi shell-hook > /shell-hook.sh && echo 'exec "$@"' >> /shell-hook.sh && chmod +x /shell-hook.sh
 
-# Use an absolute --manifest-path rather than relying on the container's working
-# directory: Docker starts new processes at the image's WORKDIR, but Singularity/
-# Apptainer instead carries over the *host's* current directory into the container
-# by default, so a bare `pixi run` there looks for pyproject.toml in the wrong place.
-#
-# --as-is (= --frozen --no-install) stops `pixi run` from trying to verify/update
-# the environment before running the task, which by default requires acquiring a
-# write lock on .pixi/envs/default. The environment was already fully installed
-# above during the build and never changes afterwards, so there's nothing to check
-# or install at runtime - but the environment can be running from a read-only
-# filesystem (e.g. a Singularity/Apptainer SIF image), where even that check-only
-# lock acquisition fails outright.
-#
-# CMD is just the default task name, not baked-in args - override it (and/or append
-# "-e /path/to/run_config.toml") at `docker run`/`singularity run` time to run any flow.
-ENTRYPOINT ["pixi", "run", "--manifest-path", "/workspace/amei_exercises/pyproject.toml", "--as-is"]
-CMD ["flow"]
+# Run as a non-root user; the service rewrites its components cache at startup, so
+# the configs directory (where the cache lives) must stay writable for it.
+RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /workspace/amei_exercises/configs
+USER appuser
+
+EXPOSE 9990
+
+FROM build AS dev
+ENTRYPOINT ["/bin/bash", "/shell-hook.sh"]
+CMD ["python", "-u", "-m", "zalfmas_fbp.run.local_components_service", "./configs/local_components_service.toml"]
+
+FROM build AS prod
+ENTRYPOINT ["/bin/bash", "/shell-hook.sh"]
+CMD ["python", "-u", "-m", "zalfmas_fbp.run.local_components_service", "./configs/local_components_service.toml"]

@@ -6,32 +6,32 @@ version = "0.1.0"
 dependencies = [
     #"zalfmas-common>=0.1.48,<0.2",
     #"zalfmas-fbp>=0.2.37,<0.3",
-    "zalfmas-capnp-schemas>=0.1.69,<0.2",
+    "zalfmas-capnp-schemas>=0.1.70,<0.2",
     "soiltexture>=1.0.4,<2",
 ]
 
 [dependency-groups]
 dev = [
-  "pytest>=9.0.3,<10",
-  "ruff>=0.15.16,<0.16",
-  "ty>=0.0.44,<0.0.45",
-  "types-boto3[all,s3]>=1.43.23,<2",
-  "basedpyright>=1.39.6,<2",
+  "pytest>=9.1.1,<10",
+  "ruff>=0.17.0,<0.18",
+  "ty>=0.0.86,<0.0.87",
+  "types-boto3[all,s3]>=1.43.111,<2",
+  "basedpyright>=1.40.2,<2",
 ]
 
 [tool.pixi.dependencies]
 openpyxl = ">=3.1.5,<4"
-pixi-pycharm = ">=0.0.11,<0.0.12"
-pandas-stubs = ">=3.0.0.260204,<4"
-numpy = ">=2.4.3,<3"
-pydantic = ">=2.13.5,<3"
+pixi-pycharm = ">=0.0.12,<0.0.13"
+pandas-stubs = ">=3.0.5.260914,<4"
+numpy = ">=2.5.4,<3"
+pydantic = ">=2.14.1,<3"
 libsodium = ">=1.0.22,<2"
 
 [tool.pixi.pypi-dependencies]
 amei_exercises = { path = ".", editable = true }
 #zalfmas-capnp-schemas = { path = "../mas_capnproto_schemas", editable = true }
-zalfmas-common = { path = "../mas_python_common", editable = true }
-zalfmas-fbp = { path = "../mas_python_fbp", editable = true }
+zalfmas-common = ">=0.1.49, <0.2"
+zalfmas-fbp = ">=0.2.39, <0.3"
 
 [tool.pixi.environments]
 dev = ["dev"]
@@ -78,5 +78,6 @@ venv = "dev"
 
 [tool.pixi.tasks]
 components-service = { cmd = "python -m zalfmas_fbp.run.local_components_service configs/local_components_service.toml" }
+regenerate-components-cache = { cmd = "python -m zalfmas_fbp.run.local_components_service configs/local_components_service.toml --regenerate_cache --force" }
 channel-service = { cmd = "python -m zalfmas_fbp.run.channel_starter_service configs/local_channel_starter_service.toml" }
 flow = { cmd = "python -m zalfmas_fbp.run.run_fbp_flow" }
