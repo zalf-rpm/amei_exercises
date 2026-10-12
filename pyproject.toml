@@ -1,7 +1,9 @@
 [project]
 authors = [{ name = "Michael Berg-Mohnicke", email = "michael.berg@zalf.de" }]
 name = "amei_exercises"
-requires-python = ">= 3.12"
+# Cap below 3.15: duckdb (via zalfmas-fbp) ships no cp315 wheels yet, so pixi would build the
+# sdist, which needs a C++ toolchain that the Docker image doesn't have.
+requires-python = ">=3.12,<3.15"
 version = "0.1.0"
 dependencies = [
     #"zalfmas-common>=0.1.48,<0.2",
@@ -20,9 +22,6 @@ dev = [
 ]
 
 [tool.pixi.dependencies]
-# Cap below 3.15: duckdb (via zalfmas-fbp) ships no cp315 wheels yet, so pixi would build the
-# sdist, which needs a C++ toolchain that the Docker image doesn't have.
-python = ">=3.12,<3.15"
 openpyxl = ">=3.1.5,<4"
 pixi-pycharm = ">=0.0.12,<0.0.13"
 pandas-stubs = ">=3.0.5.260914,<4"
