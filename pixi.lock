@@ -60,6 +60,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/typing-inspection-0.4.4-pyhcf101f3_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/typing_extensions-4.16.0-pyhcf101f3_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/tzdata-2026c-h151e31d_0.conda
+      - pypi: ../mas_python_fbp
       - pypi: ./
       - pypi: https://files.pythonhosted.org/packages/01/34/4b21a7796bf013bab15568ca83f1e2f90c0babbf8e59ecca7bf2e74adb8e/geojson_pydantic-2.2.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/0b/a7/71ac2cff56fec219ed242bb11b8efb69fcc4bec75db06fb7bfe35de520e6/certifi-2026.7.22-py3-none-any.whl
@@ -74,7 +75,6 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/4c/1c/6ec22372362b03350fe3da7bf33491a07cc9a553a36dd2383b76ec1741eb/fonttools-4.66.1-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/4f/d6/e95834b29360092376fe4da9956ba41bb7b021869efe6ee9d4172d05cb15/pyarrow-26.0.0-cp313-cp313-manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/50/fa/96d50e1e6cd0b08b5e2b7c838f65ae644940f75a124063380b5ef73b6866/pandas-3.0.6-cp313-cp313-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl
-      - pypi: https://files.pythonhosted.org/packages/51/ec/1a4e20347cb57e8980f5a1a340881862d007b35e4e4b2f96f07d4e0a1454/zalfmas_fbp-0.2.40-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/58/50/6c0d534c5f134586a8e1ba4e330569e32f057e33372ae556463212fb4cd3/click-8.5.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/58/a2/bb081bab032533a855d44de1d56f8e8426114ff1ba5d1f07a438a0a654f8/idna-3.20-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/5a/3f/db9134de97db4a216bfa5d76102f5aba65d87bdca3d939bcb1e4f153553f/zalfmas_services-0.1.16-py3-none-any.whl
@@ -161,6 +161,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/win-64/vc14_runtime-14.51.36247-habf1de7_41.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/vcomp14-14.51.36247-habf1de7_41.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/zstd-1.5.7-h534d264_7.conda
+      - pypi: ../mas_python_fbp
       - pypi: ./
       - pypi: https://files.pythonhosted.org/packages/01/34/4b21a7796bf013bab15568ca83f1e2f90c0babbf8e59ecca7bf2e74adb8e/geojson_pydantic-2.2.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/02/8b/b83f7780dad22e0878e4c7bd9158ebd24ed12bc3d5e3a471cd0576f77ded/pyzmq-27.2.0-cp312-abi3-win_amd64.whl
@@ -177,7 +178,6 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/38/bb/d215ee7c73b61497b28a5503f9f53523f294fcc936762b7caf90e0c1c2b5/pyparsing-3.3.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/3d/87/e62f55c956b583380e7d2a71705dfd431ee32dd1689d50491ba0c610fc11/affine-3.0.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/4e/0e/49522e1ab5788cbaf63a26fbd3b851f9028616828c961b8a31b35cb96df8/kiwisolver-1.5.1-cp314-cp314-win_amd64.whl
-      - pypi: https://files.pythonhosted.org/packages/51/ec/1a4e20347cb57e8980f5a1a340881862d007b35e4e4b2f96f07d4e0a1454/zalfmas_fbp-0.2.40-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/52/94/d73da0d28f16c45bb9b0a5691b91610b0275c5ef0eb5e43c87cf2dc1bf31/scipy-1.18.1-cp314-cp314-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/54/0b/bdacf05f963bd6026ebf6eeb0beda847d1d60e03e440725c64a4e08a0afd/tomli-2.5.0-cp314-cp314-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/58/50/6c0d534c5f134586a8e1ba4e330569e32f057e33372ae556463212fb4cd3/click-8.5.0-py3-none-any.whl
@@ -267,6 +267,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/typing-inspection-0.4.4-pyhcf101f3_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/typing_extensions-4.16.0-pyhcf101f3_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/tzdata-2026c-h151e31d_0.conda
+      - pypi: ../mas_python_fbp
       - pypi: ./
       - pypi: https://files.pythonhosted.org/packages/00/03/7d530db561684988209222e3a7c0f8bde1aae50b77a0d496c8e09c3e3145/types_boto3_redshift-1.43.75-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/01/34/4b21a7796bf013bab15568ca83f1e2f90c0babbf8e59ecca7bf2e74adb8e/geojson_pydantic-2.2.0-py3-none-any.whl
@@ -425,7 +426,6 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/50/88/fd6099c93fa3e8e9949706319ee2c155d65d8e7b33a39d113bc9768cb859/types_boto3_iotwireless-1.43.97-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/50/e5/0109d49754d765b0dd71b7190775e36d565a490d45bd4a31664d291104fa/types_boto3_codepipeline-1.43.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/50/fa/96d50e1e6cd0b08b5e2b7c838f65ae644940f75a124063380b5ef73b6866/pandas-3.0.6-cp313-cp313-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl
-      - pypi: https://files.pythonhosted.org/packages/51/ec/1a4e20347cb57e8980f5a1a340881862d007b35e4e4b2f96f07d4e0a1454/zalfmas_fbp-0.2.40-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/53/bd/6314de5fa247c28704f8ed17a5057d853d7b46348bdcaa37a4857261cc65/types_boto3_athena-1.43.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/53/c4/8839800c02abb42fb4fab97e93e47e6b1fd8ae2da2f970abf8e78f2e202d/types_boto3_route53-1.43.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/53/ce/b4e20155940aabd7f583a031f3557f29db8c6cedbe5b526997d68b0ff66b/types_boto3_marketplacecommerceanalytics-1.43.0-py3-none-any.whl
@@ -814,6 +814,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/win-64/vc14_runtime-14.51.36247-habf1de7_41.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/vcomp14-14.51.36247-habf1de7_41.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/zstd-1.5.7-h534d264_7.conda
+      - pypi: ../mas_python_fbp
       - pypi: ./
       - pypi: https://files.pythonhosted.org/packages/00/03/7d530db561684988209222e3a7c0f8bde1aae50b77a0d496c8e09c3e3145/types_boto3_redshift-1.43.75-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/01/34/4b21a7796bf013bab15568ca83f1e2f90c0babbf8e59ecca7bf2e74adb8e/geojson_pydantic-2.2.0-py3-none-any.whl
@@ -973,7 +974,6 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/50/6d/c1c85ef170176f227ff8c65dd596ee6a47c35d429b0fcb03e248515a6958/types_boto3_billingconductor-1.43.99-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/50/88/fd6099c93fa3e8e9949706319ee2c155d65d8e7b33a39d113bc9768cb859/types_boto3_iotwireless-1.43.97-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/50/e5/0109d49754d765b0dd71b7190775e36d565a490d45bd4a31664d291104fa/types_boto3_codepipeline-1.43.0-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/51/ec/1a4e20347cb57e8980f5a1a340881862d007b35e4e4b2f96f07d4e0a1454/zalfmas_fbp-0.2.40-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/52/94/d73da0d28f16c45bb9b0a5691b91610b0275c5ef0eb5e43c87cf2dc1bf31/scipy-1.18.1-cp314-cp314-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/53/bd/6314de5fa247c28704f8ed17a5057d853d7b46348bdcaa37a4857261cc65/types_boto3_athena-1.43.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/53/c4/8839800c02abb42fb4fab97e93e47e6b1fd8ae2da2f970abf8e78f2e202d/types_boto3_route53-1.43.0-py3-none-any.whl
@@ -1931,7 +1931,7 @@ packages:
   - python
   license: Apache-2.0 AND MIT
   purls:
-  - pkg:pypi/types-pytz?source=compressed-mapping
+  - pkg:pypi/types-pytz?source=hash-mapping
   run_exports: {}
   size: 20552
   timestamp: 1791300710323
@@ -2502,6 +2502,28 @@ packages:
     - zstd >=1.5.7,<1.6.0a0
   size: 387535
   timestamp: 1786599623274
+- pypi: ../mas_python_fbp
+  name: zalfmas-fbp
+  requires_dist:
+  - tomli-w>=1.2.0,<2
+  - netcdf4>=1.7.4,<2
+  - spotpy>=1.6.7,<2
+  - matplotlib>=3.11.2,<4
+  - pycapnp>=2.2.4,<3
+  - zalfmas-common>=0.1.49,<0.2
+  - zalfmas-capnp-schemas>=0.1.70,<0.2
+  - zalfmas-services>=0.1.16,<0.2
+  - pymep>=1.0.7,<2
+  - pydantic>=2.14.1,<3
+  - geojson-pydantic>=2.2.0,<3
+  - rasterio>=1.5.2,<2
+  - geopandas>=1.2.0,<2
+  - pyarrow>=26.0.0,<27
+  - duckdb>=1.5.6,<2
+  - owslib>=0.36.0,<0.37
+  - boto3>=1.43.111,<2
+  - gjson>=1.2.0,<2
+  requires_python: '>=3.12,<3.15'
 - pypi: ./
   name: amei-exercises
   requires_dist:
@@ -4734,30 +4756,6 @@ packages:
   - xlsxwriter>=3.2.0 ; extra == 'all'
   - zstandard>=0.23.0 ; extra == 'all'
   requires_python: '>=3.11'
-- pypi: https://files.pythonhosted.org/packages/51/ec/1a4e20347cb57e8980f5a1a340881862d007b35e4e4b2f96f07d4e0a1454/zalfmas_fbp-0.2.40-py3-none-any.whl
-  name: zalfmas-fbp
-  version: 0.2.40
-  sha256: e98d7c0394443117a83d0773a4ae332ac0e760541e2ace51aea4f18a74d067b3
-  requires_dist:
-  - boto3>=1.43.111,<2
-  - duckdb>=1.5.6,<2
-  - geojson-pydantic>=2.2.0,<3
-  - geopandas>=1.2.0,<2
-  - gjson>=1.2.0,<2
-  - matplotlib>=3.11.2,<4
-  - netcdf4>=1.7.4,<2
-  - owslib>=0.36.0,<0.37
-  - pyarrow>=26.0.0,<27
-  - pycapnp>=2.2.4,<3
-  - pydantic>=2.14.1,<3
-  - pymep>=1.0.7,<2
-  - rasterio>=1.5.2,<2
-  - spotpy>=1.6.7,<2
-  - tomli-w>=1.2.0,<2
-  - zalfmas-capnp-schemas>=0.1.70,<0.2
-  - zalfmas-common>=0.1.49,<0.2
-  - zalfmas-services>=0.1.16,<0.2
-  requires_python: '>=3.12,<3.15'
 - pypi: https://files.pythonhosted.org/packages/52/94/d73da0d28f16c45bb9b0a5691b91610b0275c5ef0eb5e43c87cf2dc1bf31/scipy-1.18.1-cp314-cp314-win_amd64.whl
   name: scipy
   version: 1.18.1

@@ -14,11 +14,11 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-  "pytest>=9.1.1,<10",
-  "ruff>=0.17.0,<0.18",
-  "ty>=0.0.86,<0.0.87",
-  "types-boto3[all,s3]>=1.43.111,<2",
-  "basedpyright>=1.40.2,<2",
+    "pytest>=9.1.1,<10",
+    "ruff>=0.17.0,<0.18",
+    "ty>=0.0.86,<0.0.87",
+    "types-boto3[all,s3]>=1.43.111,<2",
+    "basedpyright>=1.40.2,<2",
 ]
 
 [tool.pixi.dependencies]
@@ -33,7 +33,8 @@ libsodium = ">=1.0.22,<2"
 amei_exercises = { path = ".", editable = true }
 #zalfmas-capnp-schemas = { path = "../mas_capnproto_schemas", editable = true }
 zalfmas-common = ">=0.1.49, <0.2"
-zalfmas-fbp = ">=0.2.40, <0.3"
+zalfmas-fbp = { path = "../mas_python_fbp", editable = true }
+#zalfmas-fbp = ">=0.2.40, <0.3"
 
 [tool.pixi.environments]
 dev = ["dev"]
