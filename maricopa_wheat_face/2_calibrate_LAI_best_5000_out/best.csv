@@ -1,0 +1,40 @@
+
+*** Final SPOTPY summary ***
+Total Duration: 541.68 seconds
+Total Repetitions: 5028
+Minimal objective value: 3405.47
+Corresponding parameter setting:
+StageKcFactor_0: 0.613316
+StageKcFactor_1: 0.707259
+StageKcFactor_2: 1.09113
+StageKcFactor_3: 1.15667
+StageKcFactor_4: 0.746362
+StageKcFactor_5: 0.270321
+sla: 1.05866
+apc_s1_1: 0.78562
+apc_s2_1: 0.324473
+apc_s2_2: 0.333008
+apc_s3_1: 0.261187
+apc_s3_2: 0.257464
+apc_s4_1: 0.010493
+AssimilatePartitioningCoeff_5_3: 0.888229
+******************************
+
+Derived parameters of that setting:
+SpecificLeafArea_0: 0.00211732
+SpecificLeafArea_1: 0.00190559
+SpecificLeafArea_2: 0.00179973
+SpecificLeafArea_3: 0.00169386
+SpecificLeafArea_4: 0.00158799
+SpecificLeafArea_5: 0.00158799
+AssimilatePartitioningCoeff_0_0: 0.78562
+AssimilatePartitioningCoeff_0_1: 0.21438
+AssimilatePartitioningCoeff_1_0: 0.324473
+AssimilatePartitioningCoeff_1_1: 0.224956
+AssimilatePartitioningCoeff_1_2: 0.450571
+AssimilatePartitioningCoeff_2_0: 0.261187
+AssimilatePartitioningCoeff_2_1: 0.190218
+AssimilatePartitioningCoeff_2_2: 0.548596
+AssimilatePartitioningCoeff_3_2: 0.010493
+AssimilatePartitioningCoeff_3_3: 0.989507
+

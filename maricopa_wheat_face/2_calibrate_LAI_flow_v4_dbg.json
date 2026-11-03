@@ -2,10 +2,10 @@
   "version": "0.3",
   "name": "",
   "pan": {
-    "x": 109.5846420694707,
-    "y": -241.11562518087317
+    "x": -489.17065936952986,
+    "y": -479.2326420313759
   },
-  "zoom": 0.6318208350956249,
+  "zoom": 0.7679821739389515,
   "services": {
     "channels": {
       "d5456d2c-c99e-43a2-a7ac-49b7749f3247": "capnp://10.10.29.37:9989/local_amei_exercises_channel_starter"
@@ -319,8 +319,8 @@
       "nodeId": "Spotpy calibration c...",
       "processName": "Spotpy calibration component 30",
       "location": {
-        "x": 1159.0764893073408,
-        "y": 1418.732115172107
+        "x": 1179.7119373525968,
+        "y": 1389.688879200105
       },
       "editable": false,
       "parallelProcesses": 1,
@@ -1103,6 +1103,17 @@
       "target": {
         "nodeId": "Spotpy calibration c...",
         "port": "obs_values"
+      },
+      "bufferSize": 1
+    },
+    {
+      "source": {
+        "nodeId": "JSON to common Value...",
+        "port": "out"
+      },
+      "target": {
+        "nodeId": "Spotpy calibration c...",
+        "port": "sim_values"
       },
       "bufferSize": 1
     },

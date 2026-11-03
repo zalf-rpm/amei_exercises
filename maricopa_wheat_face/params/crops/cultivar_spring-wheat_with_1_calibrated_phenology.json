@@ -7,14 +7,14 @@
     [0, 0, 0, 1],
     [0, 0, 0, 0.80000000000000004]
   ],
-  "BaseDaylength": [[0, 0, 5.97453, 6.13392, 0, 0], "h"],
+  "BaseDaylength": [[0, 0, 5.87528, 6.7539, 0, 0], "h"],
   "BeginSensitivePhaseHeatStress": [780, "°C d"],
   "CriticalTemperatureHeatStress": [31, "°C"],
   "CropHeightP1": 6,
   "CropHeightP2": 0.5,
   "CropSpecificMaxRootingDepth": 1.2999999523162842,
   "CultivarName": "spring wheat",
-  "DaylengthRequirement": [[0, 20, 19.6381, 16.5666, 0, 0], "h"],
+  "DaylengthRequirement": [[0, 20, 20.6247, 17.0277, 0, 0], "h"],
   "Description": "",
   "DroughtStressThreshold": [
     1, 0.90000000000000002, 1, 1, 0.90000000000000002, 0.80000000000000004
@@ -75,7 +75,10 @@
     ],
     "1;0"
   ],
-  "StageTemperatureSum": [[136.001, 244.646, 332.169, 153.052, 438.012, 25.3938], "°C d"],
+  "StageTemperatureSum": [
+    [146.978, 266.208, 344.906, 151.718, 408.856, 26.1429],
+    "°C d"
+  ],
   "VernalisationRequirement": [0, 0, 0, 0, 0, 0],
   "type": "CultivarParameters"
 }

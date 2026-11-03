@@ -5,8 +5,27 @@ StageKcFactor,2,0.88,1.32,0.02,,,,
 StageKcFactor,3,0.88,1.32,0.02,,,,
 StageKcFactor,4,0.64,0.96,0.02,,,,
 StageKcFactor,5,0.2,0.3,0.02,,,,
-SpecificLeafArea,,0.8,1.2,0.02,,,,
-AssimilatePartitioningCoeff,0,0.8,1.2,0.02,,,,
-AssimilatePartitioningCoeff,1,0.8,1.2,0.02,,,,
-AssimilatePartitioningCoeff,2,0.8,1.2,0.02,,,,
-AssimilatePartitioningCoeff,3,0.8,1.2,0.02,,,,
+sla,,0.8,1.2,0.02,,,,
+SpecificLeafArea,0,0.8,1.2,0.02,,,,cultivar['SpecificLeafArea'][0][0] * sla
+SpecificLeafArea,1,0.8,1.2,0.02,,,,cultivar['SpecificLeafArea'][0][1] * sla
+SpecificLeafArea,2,0.8,1.2,0.02,,,,cultivar['SpecificLeafArea'][0][2] * sla
+SpecificLeafArea,3,0.8,1.2,0.02,,,,cultivar['SpecificLeafArea'][0][3] * sla
+SpecificLeafArea,4,0.8,1.2,0.02,,,,cultivar['SpecificLeafArea'][0][4] * sla
+SpecificLeafArea,5,0.8,1.2,0.02,,,,cultivar['SpecificLeafArea'][0][5] * sla
+apc_s1_1,,0,1,0.02,,,,
+AssimilatePartitioningCoeff,0_0,,,,,,,apc_s1_1
+AssimilatePartitioningCoeff,0_1,,,,,,,(1 - AssimilatePartitioningCoeff_0_0)
+apc_s2_1,,0,1,0.02,,,,
+apc_s2_2,,0,1,0.02,,,,
+AssimilatePartitioningCoeff,1_0,,,,,,,apc_s2_1
+AssimilatePartitioningCoeff,1_1,,,,,,,(1 - AssimilatePartitioningCoeff_1_0) * apc_s2_2
+AssimilatePartitioningCoeff,1_2,,,,,,,(1 - AssimilatePartitioningCoeff_1_0 - AssimilatePartitioningCoeff_1_1)
+apc_s3_1,,0,1,0.02,,,,
+apc_s3_2,,0,1,0.02,,,,
+AssimilatePartitioningCoeff,2_0,,,,,,,apc_s3_1
+AssimilatePartitioningCoeff,2_1,,,,,,,(1 - AssimilatePartitioningCoeff_2_0) * apc_s3_2
+AssimilatePartitioningCoeff,2_2,,,,,,,(1 - AssimilatePartitioningCoeff_2_0 - AssimilatePartitioningCoeff_2_1)
+apc_s4_1,,0,1,0.02,,,,
+AssimilatePartitioningCoeff,3_2,,,,,,,apc_s4_1
+AssimilatePartitioningCoeff,3_3,,,,,,,(1 - AssimilatePartitioningCoeff_3_2)
+AssimilatePartitioningCoeff,5_3,0.64,0.96,,,,
