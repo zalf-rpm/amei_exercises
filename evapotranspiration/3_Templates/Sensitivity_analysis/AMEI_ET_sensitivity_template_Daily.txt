@@ -1,0 +1,6 @@
+AMEI_ET Daily results
+Model:													
+Modeler_name:																								
+ET_module_ID	Date	Evapotranspiration_reference_daily	standardized_reference_evapotranspiration_short_reference_daily	standardized_reference_evapotranspiration_tall_reference_daily	potential evapotranspiration_daily
+text	YYYY-MM-DD	mm/d	mm/d	mm/d	mm/d
+MODEL_ID	Date	ETO	ETOS	ETRS	ETP

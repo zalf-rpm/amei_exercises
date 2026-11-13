@@ -1,0 +1,6 @@
+AMEI_ET Daily results
+Model:													
+Modeler_name:																								
+ET_module_ID	treatment_ID	date	leaf_number_as_haun_stg	growth_stage_Zadoks	leaf_area_index	PAR_interception_daily	tops_dry_weight	grain_dry_weight	grain_unit_dry_weight	tops_N	grain_N	grain_unit_N	root_depth	soil_water_whole_profile	drainage_daily	runoff_surface	N_inorganic_day	N_leached_day	N_mineralization_day	N2O_emissions_day	N_immobilization_day	N_denitrification_day	ground_heat_daily	latent_heat_daily	sensible_heat_daily	net_radiation_daily	soil_temp_surface_daily_avg	potential_evapotrans	evapotranspiration_daily	portential_soil_evaporation_daily	soil_evaporation_daily	potential_transpiration_daily	transpiration_daily	Evapotranspiration_reference_daily	standardized_reference_evapotranspiration_short_reference_daily	standardized_reference_evapotranspiration_tall_reference_daily	potential evapotranspiration_daily
+text	text	(YYYY-MM-DD)	leaf\mainstem	number	m²/m²	%	kg[DM]/ha	kg[DM]/ha	mg[DM]/grain	kg[N]/ha	kg[N]/ha	mg[N]/grain	m	cm3/cm3	mm/d	mm/d	kg[N]/ha/d	kg[N]/ha/d	kg[N]/ha/d	kg[N]/ha/d	kg[N]/ha/d	kg[N]/ha/d	w/m2	w/m2	w/m2	w/m2	mm/d	mm/d	mm/d	mm/d	mm/d	mm/d	mm/d	mm/d	mm/d	mm/d
+MODEL_ID	TREAT_ID	DATE	LNUM	GSTZD	LAID	LIPCD	CWAD	GWAD	GWGD	CNAD	GNAD	GNGD	RDPD	SWWPD	DRND	ROFD	NIAD	NLCD	NMND	N2OED	NIMD	NDND	GHFD	LHFD	HHFD	RND	EOAD	ETAD	EPSAD	ESAD	EPPAD	EPAD	ETO	ETOS	ETRS	ETP
