@@ -52,15 +52,22 @@ pixi run python evapotranspiration/evaluate_et.py --site bushland|avignon
 
 ## Model issues relevant to the ET study
 
-1. **Potential ET is hard-capped at 6.5 mm/d** (HERMES heritage). With a crop the cap is on
-   crop ET0 × crop Kc (`crop_water_uptake.odin:143`), before interception, transpiration and soil
-   evaporation are taken from it; without a crop on ET0 × Kc in soil moisture
-   (`soil_moisture.odin:993`, applied again there on the crop's remaining ET). That's the flat
-   ETa plateau late in the season at both sites, while the Bushland lysimeter shows 10-13 mm/d.
-   The reported `Pot_ET` (EOAD/ETP) is soil moisture's ET0 × Kc, which on crop days are the crop's
-   ET0 and Kc (`soil_moisture.odin:192`), i.e. exactly the value before the cap; it isn't capped
-   (max 14 mm/d). Without the cap, output and the potential ET the water balance works with would
-   be the same. Keep for "Orig", remove for "Imp"?
+1. **Potential ET is hard-capped at 6.5 mm/d** (`// from HERMES`, no reason given). With a crop
+   the cap is on crop ET0 × crop Kc (`crop_water_uptake.odin:143`), before interception,
+   transpiration and soil evaporation are taken from it; without a crop on ET0 × Kc in soil
+   moisture (`soil_moisture.odin:993`, applied again there on the crop's remaining ET). The
+   water balance uses the capped value consistently. Only the reported `Pot_ET` (EOAD/ETP) is not
+   capped: it is soil moisture's ET0 × Kc, on crop days the crop's ET0 and Kc
+   (`soil_moisture.odin:192`), i.e. exactly the value before the cap (max 14 mm/d). So it's a
+   reporting mismatch, not a water balance error.
+   - More than 6.5 mm/d is real at Bushland: the lysimeter measures up to 12.0-13.5 mm/d with
+     35-48 days > 6.5 mm in the fully irrigated seasons (partial irrigation: 0-35 days), and
+     MONICA's own FAO-56 ET0 reaches 10-14 mm/d (semi-arid, windy, dry air, advection over the
+     irrigated field). Avignon: max 3.1-7.9 mm/d, 0-6 days > 6.5. Presumably the cap comes from
+     HERMES' humid temperate origin, where grass ET0 rarely exceeds 6-7 mm/d and a cap only
+     catches outliers (a guess; ask the HERMES/MONICA authors).
+   - It causes the flat ETa plateau late in the season, i.e. most of Bushland's -0.6 mm/d bias
+     in the fully irrigated treatments. Keep for "Orig", remove for "Imp"?
 2. **`ET0` changes its surface resistance at emergence.** Since Odin's "G2" commit it is one
    FAO-56 Penman-Monteith function (`et0.odin`, `fao56_et0`) for both; the two calls differ only
    in the stomatal resistance:
@@ -81,6 +88,30 @@ pixi run python evapotranspiration/evaluate_et.py --site bushland|avignon
    transpiration). MONICA does compute the latter (`potential_transpiration` in
    `crop_water_uptake.odin`, after the cap and interception), which Odin could output via its path.
    ETOS/ETRS (ASCE standardized short/tall reference) are NA: MONICA computes neither.
+
+4. **Ponding water: crop and soil disagree about transpiration (a bug).** On days with water on
+   the surface (`soil_moisture.odin:997-1019`, the same in the C++):
+   - the water surface evaporates at capped potential × 1.1 / Kc, i.e. up to 1.1 × ET0,
+     past the cap (TXBL1992F 1991-10-03, bare soil: 9.9 mm). Every simulated day with
+     ETa > 6.5 mm is such a day;
+   - when that uses up the potential, soil moisture sets transpiration to 0 and takes no water
+     from the roots, but the crop module has already computed its own actual transpiration,
+     uses it for its water stress and reports it (`Act_Trans`, EPAD). So the crop transpires
+     water the soil never loses, and ESAD + EPAD != ETAD in the template. TXBL1992F 1992-04-10
+     (23 mm irrigation): Pot_ET 6.1, ETa 7.7 = surface evaporation 7.66, soil moisture
+     transpiration 0, crop transpiration 6.0;
+   - crop transpiration the soil didn't supply, per season: Bushland F 140-171 mm (about a
+     quarter of the crop's transpiration), P 15-66 mm, Avignon 5-16 mm.
+
+   Checked with Odin's path outputs `soil_moisture.evaporated_from_surface` and
+   `soil_moisture.actual_transpiration` against `Act_Trans`.
+5. **Infiltration depends on the layer thickness.** The daily infiltration is limited by the
+   free pore space of the top layer (`fm_Infiltration`), so with 5 cm layers about 15 mm/d.
+   Bushland's irrigations (17-31 mm) pond on most irrigation days, which triggers 4. TXBL1990F
+   with 5 vs 10 cm layers: 46 vs 22 ponding days, surface evaporation 200 vs 100 mm, crop
+   transpiration not supplied by the soil 171 vs 101 mm, season ETa 699 vs 682 mm (surface
+   evaporation replaces transpiration, so ETa hardly changes, but the split and the crop's water
+   stress do). In the lysimeter 20-30 mm of irrigation presumably infiltrate within hours.
 
 ## MONICA builds: Odin vs the AMEI branch
 
@@ -240,7 +271,11 @@ By relevance for Bushland and Avignon (2026-11-16):
    worse than the other Avignon years); Bushland rooting depth up to 3.9 m in a 2.1 m profile.
 5. **For the data providers** (no effect on the runs, RH is derived from ea / es_mean): Bushland,
    is RHUMD the mean or the minimum? Avignon, VPRSD is the deficit, not the vapor pressure.
-6. Template columns: fill EPPAD (potential transpiration) from Odin's path output? EPSAD,
+6. **Ponding** (model issues 4 and 5), changes to MONICA: tell the crop module when surface
+   evaporation takes over its transpiration (or let soil moisture take the crop's transpiration
+   anyway); base surface evaporation on the uncapped potential with an explicit cap; make the
+   infiltration limit independent of the layer thickness. Until then: 10 cm layers for Bushland?
+7. Template columns: fill EPPAD (potential transpiration) from Odin's path output? EPSAD,
    ETOS, ETRS stay NA.
 
 Less relevant for these two sites:
