@@ -98,12 +98,12 @@ Checked 2026-11-16 with all 10 treatments, same inputs:
   1.568 MJ m-2 from emergence to harvest). Master never had it as an output (it came with
   `intercropping_alessandro`/`amei`); the gap is old (crop-module local since at least 2020). Now
   the crop module keeps it and soil moisture takes it on crop days, as it does with ET0:
-  - Odin (`monica_odin`, uncommitted): `Crop_Et0.net_radiation` -> `Crop_To_Soil` ->
+  - Odin (`monica_odin` `5ab28005`): `Crop_Et0.net_radiation` -> `Crop_To_Soil` ->
     `soil_moisture.net_radiation`, legacy name `net_radiation` added to the output table; the same
     in the C++ copy in `src/` (output appended at the end of the id list). Odin tests pass,
     component check clean, `components.md` regenerated, Odin = `monica-cpp-src` byte for byte on
     all 10 treatments.
-  - AMEI branch (`monica_amei`, uncommitted): `CropModule::vc_NetRadiation`/`get_NetRadiation()`,
+  - AMEI branch (`monica_amei` `480692c9`): `CropModule::vc_NetRadiation`/`get_NetRadiation()`,
     taken over in `SoilMoisture::fm_Evapotranspiration`; output unit now "MJ m-2". Only RND
     changes (checked against a build without the fix), and it equals Odin's on every day.
   - `et_monica.py` converts it to the template's W/m2 (× 1e6/86400, daily mean).
