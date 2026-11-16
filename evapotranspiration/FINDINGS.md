@@ -52,20 +52,35 @@ pixi run python evapotranspiration/evaluate_et.py --site bushland|avignon
 
 ## Model issues relevant to the ET study
 
-1. **Potential ET is hard-capped at 6.5 mm/d** (`soilmoisture.cpp:897`,
-   `crop-module.cpp:3755`). That's the flat ETa plateau late in the season at both sites, while
-   the Bushland lysimeter shows 10-13 mm/d. The reported `Pot_ET` (EOAD/ETP) is *not* capped
-   (max 14 mm/d), so output and water balance disagree. Keep for "Orig", remove for "Imp"?
-2. **`ET0` changes meaning at emergence.** Without a crop it's the soil moisture module's FAO56-PM
-   grass reference (rs = 100/1.44 s/m; the AMEI branch uses the vapor pressure if given, master
-   and Odin only relative humidity, so there the measured vapor pressure reaches MONICA only
-   through the RH the site readers derive from it, ea / es_mean). With a crop
-   (`soilmoisture.cpp:866`) it's the crop module's ET0, with a stomatal resistance from CO2,
-   saturation deficit and photosynthesis, and only relative humidity. TXBL1990F: crop ET0 1105 mm
-   vs FAO56 module 1211 mm over the season (-9 %), up to 2.4 mm on single days (`checks.py et0`). If the study wants
-   the FAO56 reference for ETO: run each treatment a second time without a crop and take ET0 from
-   there (that's MONICA's own FAO56 module, same weather).
-3. `Pot_ET` is ET0 · Kc and goes into both EOAD and ETP. ETOS/ETRS (ASCE short/tall) are NA.
+1. **Potential ET is hard-capped at 6.5 mm/d** (HERMES heritage). With a crop the cap is on
+   crop ET0 × crop Kc (`crop_water_uptake.odin:143`), before interception, transpiration and soil
+   evaporation are taken from it; without a crop on ET0 × Kc in soil moisture
+   (`soil_moisture.odin:993`, applied again there on the crop's remaining ET). That's the flat
+   ETa plateau late in the season at both sites, while the Bushland lysimeter shows 10-13 mm/d.
+   The reported `Pot_ET` (EOAD/ETP) is soil moisture's ET0 × Kc, which on crop days are the crop's
+   ET0 and Kc (`soil_moisture.odin:192`), i.e. exactly the value before the cap; it isn't capped
+   (max 14 mm/d). Without the cap, output and the potential ET the water balance works with would
+   be the same. Keep for "Orig", remove for "Imp"?
+2. **`ET0` changes its surface resistance at emergence.** Since Odin's "G2" commit it is one
+   FAO-56 Penman-Monteith function (`et0.odin`, `fao56_et0`) for both; the two calls differ only
+   in the stomatal resistance:
+   - without a crop (soil moisture): the FAO default 100 s/m (surface resistance 100/1.44 =
+     70 s/m), i.e. the FAO-56 grass reference;
+   - with a crop (`crop_et0.odin`, `crop_stomata_resistance`): from CO2, the saturation deficit
+     and the crop's reference gross photosynthesis, so it depends on the crop's state.
+
+   Both take the humidity only as relative humidity (master and Odin; the AMEI branch's soil
+   moisture ET0 also used a given vapor pressure), so the measured vapor pressure reaches MONICA
+   through the RH the site readers derive from it, ea / es_mean. TXBL1990F: crop ET0 1105 mm vs
+   1211 mm with the FAO default resistance over the season (-9 %), up to 2.4 mm on single days
+   (`checks.py et0`). If the study wants the FAO-56 grass reference for ETO: run each treatment a
+   second time without a crop and take ET0 from there.
+3. **What goes into the template's ET columns.** It has two columns for potential ET, EOAD
+   ("potential_evapotrans") and ETP ("potential evapotranspiration_daily"); both get `Pot_ET`.
+   The potential parts are NA: EPSAD (potential soil evaporation) and EPPAD (potential
+   transpiration). MONICA does compute the latter (`potential_transpiration` in
+   `crop_water_uptake.odin`, after the cap and interception), which Odin could output via its path.
+   ETOS/ETRS (ASCE standardized short/tall reference) are NA: MONICA computes neither.
 
 ## MONICA builds: Odin vs the AMEI branch
 
@@ -211,14 +226,29 @@ late, LAI too high as well; ETa mostly fine in winter/spring, the 6.5 mm cap sho
 
 ## Open questions
 
-- Phenology/LAI: calibrate per cultivar (Bushland: TAM200, TAM107, Mesa; Avignon: four durum
-  cultivars) with the calibration flow, or is "Orig" meant uncalibrated?
-- 6.5 mm/d cap: part of "Orig", removed in "Imp"?
-- ETO column: crop module ET0 as now, or the FAO56 module via a crop-free run?
+By relevance for Bushland and Avignon (2026-11-16):
+
+1. **Phenology/LAI**, the largest error source: anthesis 1-4 weeks late, LAI 1.2-9x too high,
+   Bushland mostly not mature at harvest, so Kc and soil cover are wrong. Calibrate per cultivar
+   (Bushland: TAM200, TAM107, Mesa; Avignon: four durum cultivars) with the calibration flow, or
+   is "Orig" meant uncalibrated?
+2. **6.5 mm/d cap** (model issue 1): most of the late-season ETa underestimation at Bushland
+   (-0.6 mm/d in the fully irrigated treatments). Part of "Orig", removed in "Imp"?
+3. **ETO column** (model issue 2): the crop-dependent ET0 as now, or the FAO-56 grass reference
+   from a crop-free run?
+4. **Not looked into yet:** FRAV_2006's bias (-1.11 mm/d, 45 vs 96 mm on the measured days, far
+   worse than the other Avignon years); Bushland rooting depth up to 3.9 m in a 2.1 m profile.
+5. **For the data providers** (no effect on the runs, RH is derived from ea / es_mean): Bushland,
+   is RHUMD the mean or the minimum? Avignon, VPRSD is the deficit, not the vapor pressure.
+6. Template columns: fill EPPAD (potential transpiration) from Odin's path output? EPSAD,
+   ETOS, ETRS stay NA.
+
+Less relevant for these two sites:
+
 - Avignon: EXPTRNO or EXP_TRT_NAME as treatment id? Use residues/tillage?
-- Bushland: is RHUMD the mean or the minimum? (For the data providers.)
-- Fix the capnp soil moisture / climate gaps in `monica` (master) and `monica_odin` as well?
-- `Monica_AMEI_potential_Evapotranspiration` isn't integrated yet; "Imp" runs would select it via
-  `EvapotranspirationModel` in sim.json.
 - Odin's outputs round ET to 0.1 mm/d: good enough, or switch to unrounded path outputs (Odin
   only)?
+- `Monica_AMEI_potential_Evapotranspiration` isn't integrated yet; "Imp" runs would select it via
+  `EvapotranspirationModel` in sim.json.
+- Fix the capnp soil moisture / climate gaps in `monica` (master) and `monica_odin` as well?
+  (Flows and Maricopa only.)
