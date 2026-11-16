@@ -33,8 +33,9 @@ libsodium = ">=1.0.22,<2"
 amei_exercises = { path = ".", editable = true }
 #zalfmas-capnp-schemas = { path = "../mas_capnproto_schemas", editable = true }
 zalfmas-common = ">=0.1.49, <0.2"
-zalfmas-fbp = { path = "../mas_python_fbp", editable = true }
-#zalfmas-fbp = ">=0.2.40, <0.3"
+#zalfmas-fbp = { path = "../mas_python_fbp", editable = true }
+# >= 0.2.43: "derived params" in the calibration CSVs (maricopa_wheat_face/calibratethese_*.csv)
+zalfmas-fbp = ">=0.2.43, <0.3"
 
 [tool.pixi.environments]
 dev = ["dev"]
