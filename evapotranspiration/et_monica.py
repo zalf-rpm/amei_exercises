@@ -27,6 +27,21 @@ logger = logging.getLogger("et_monica")
 HERE = Path(__file__).resolve().parent
 TEMPLATES = HERE / "3_Templates/Evaluation"
 LAYER_THICKNESS_M = 0.05
+# the Odin port (zalf-rpm/monica, branch simplify_copilot): `pixi run build monica-run` in odin/
+DEFAULT_MONICA_RUN = Path.home() / "GitHub/monica_odin/odin/build/monica-run"
+
+
+def monica_build(monica_run: Path) -> str:
+    """'<repo> <branch>@<commit>' of the checkout the binary was built in, for the result headers."""
+    repo = next((p for p in monica_run.resolve().parents if (p / ".git").exists()), None)
+    if repo is None:
+        return monica_run.name
+
+    def git(*a: str) -> str:
+        return subprocess.run(["git", "-C", str(repo), *a], capture_output=True, text=True).stdout.strip()
+
+    return f"{repo.name} {git('branch', '--show-current')}@{git('rev-parse', '--short', 'HEAD')}"
+
 
 # ---------------------------------------------------------------------------------------------
 # what a site reader delivers
@@ -153,6 +168,8 @@ def daily_outputs(no_of_layers: int) -> dict[str, Any]:
         "GHFD": None,
         "LHFD": None,
         "HHFD": None,
+        # the net radiation of the day's ET0 (the crop's once it has emerged) [MJ m-2 d-1]; in W/m2
+        # via DAILY_FACTORS
         "RND": "net_radiation",
         "EOAD": "Pot_ET",
         "ETAD": "Act_ET",
@@ -166,6 +183,9 @@ def daily_outputs(no_of_layers: int) -> dict[str, Any]:
         "ETP": "Pot_ET",
     }
 
+
+# MONICA's unit -> the template's
+DAILY_FACTORS = {"RND": 1e6 / 86400}  # MJ m-2 d-1 -> W m-2 (daily mean)
 
 # not in the template, but useful to look at and to check a run with
 EXTRA_DAILY: dict[str, Any] = {"Stage": "Stage", "Kc": "Kc", "Precip": "Precip", "Tavg": "Tavg"}
@@ -377,6 +397,10 @@ def sim_json(base: dict[str, Any], s: Setup, opts: Options) -> dict[str, Any]:
         "path-to-output": "./",
         "WaterDeficitResponseOn": opts.water_stress,
         "NitrogenResponseOn": opts.nitrogen_stress,
+        # the C++ master and the Odin port take the layering from the simulation parameters (default
+        # 20 x 0.1 m), the AMEI branch from the site parameters: set both
+        "NumberOfLayers": s.no_of_layers,
+        "LayerThickness": [LAYER_THICKNESS_M, "m"],
     }
     daily = ["Date|DATE"] + [
         out_spec(k, v) for k, v in (daily_outputs(s.no_of_layers) | EXTRA_DAILY).items() if v is not None
@@ -486,6 +510,10 @@ def number(v: Any) -> float | None:
 def collect(run_dir: Path) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     """Daily rows (template codes) and the summary of one run."""
     daily, *event_sections = read_sections(run_dir / "monica_out.csv")
+    for r in daily:
+        for code, factor in DAILY_FACTORS.items():
+            if (x := number(r.get(code))) is not None:
+                r[code] = round(x * factor, 2)
     summary: dict[str, Any] = {}
     for (_event, outs), rows in zip(EVENTS.items(), event_sections, strict=True):
         if rows:

@@ -24,11 +24,13 @@ import sys
 from pathlib import Path
 
 from et_monica import (
+    DEFAULT_MONICA_RUN,
     HERE,
     TEMPLATES,
     Options,
     collect,
     fmt,
+    monica_build,
     prepare,
     result_names,
     run_monica,
@@ -45,7 +47,7 @@ def main() -> int:
     ap.add_argument("--site", choices=SITES, required=True)
     ap.add_argument("--xlsx", type=Path, help="default: the site's workbook in evapotranspiration/")
     ap.add_argument("--treatments", nargs="*", help="only these")
-    ap.add_argument("--monica-run", type=Path, default=Path.home() / "GitHub/monica_amei/build/monica-run")
+    ap.add_argument("--monica-run", type=Path, default=DEFAULT_MONICA_RUN, help="default: the Odin port")
     ap.add_argument("--params", type=Path, default=HERE / "phase_1/params")
     ap.add_argument("--cultivar", help="include path relative to --params; default: the site's")
     ap.add_argument("--module-code", default="MOFAPM")
@@ -82,7 +84,7 @@ def main() -> int:
     _, (_, _, daily_codes) = template_header(TEMPLATES / "AMEI_ET_template_Daily.csv")
     _, (_, _, summary_codes) = template_header(TEMPLATES / "AMEI_ET_template_summary.csv")
     summary_name, daily_name = result_names(args.kind, args.module_code, site.NAME)
-    model_line = f"Model:\tMONICA ({args.module_code}, {args.monica_run.parent.parent.name})"
+    model_line = f"Model:\tMONICA ({args.module_code}, {monica_build(args.monica_run)})"
 
     summaries, failed = [], []
     for s in setups:

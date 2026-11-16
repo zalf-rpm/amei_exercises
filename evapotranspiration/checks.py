@@ -27,7 +27,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from et_monica import HERE, Options, prepare, read_sections, run_monica, sat_vapor_pressure
+from et_monica import DEFAULT_MONICA_RUN, HERE, Options, prepare, read_sections, run_monica, sat_vapor_pressure
 
 WORKBOOKS = {
     "Bushland": (HERE / "AMEI_Bushland_v4_2026-01-24(no_soil_T).xlsx", 2),
@@ -125,7 +125,7 @@ def main() -> int:
     ap.add_argument("check", nargs="?", choices=("humidity", "et0", "all"), default="all")
     ap.add_argument("--site", default="bushland", choices=("bushland", "avignon"), help="for et0")
     ap.add_argument("--treatment", default="TXBL1990F", help="for et0")
-    ap.add_argument("--monica-run", type=Path, default=Path.home() / "GitHub/monica_amei/build/monica-run")
+    ap.add_argument("--monica-run", type=Path, default=DEFAULT_MONICA_RUN, help="default: the Odin port")
     ap.add_argument("--params", type=Path, default=HERE / "phase_1/params")
     args = ap.parse_args()
     if args.check in ("humidity", "all"):
