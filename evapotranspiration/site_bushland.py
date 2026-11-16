@@ -20,6 +20,7 @@ from et_monica import (
     Observations,
     Setup,
     nan_to_none,
+    sat_vapor_pressure,
     to_date,
 )
 
@@ -73,8 +74,17 @@ def treatment_id_resolver(treatments: dict[str, dict[str, Any]]):
 
 
 def weather(sheets: dict[str, pd.DataFrame], dataset: str) -> pd.DataFrame:
+    """MONICA's weather from the Bushland sheet.
+
+    - VPRSD is the vapor pressure [kPa] (it equals ea(TDEW) exactly, see checks.py).
+    - RHUMD is labelled "relative_humidity_mean", but it pairs with RHMXD (the maximum) and fits the
+      minimum slightly better (checks.py); in Avignon the same code is defined as the minimum. So
+      it isn't used: the mean RH MONICA wants is derived as ea / es_mean, as for Avignon (and as
+      Maricopa's RHAVD was computed).
+    """
     w = sheets["Weather_daily"]
     w = w[w["WST_DATASET"] == dataset]
+    es = (sat_vapor_pressure(w["TMAX"]) + sat_vapor_pressure(w["TMIN"])) / 2
     return pd.DataFrame(
         {
             "tmin": w["TMIN"].to_numpy(),
@@ -83,8 +93,8 @@ def weather(sheets: dict[str, pd.DataFrame], dataset: str) -> pd.DataFrame:
             "precip": w["RAIN"].to_numpy(),
             "globrad": w["SRAD"].to_numpy(),  # MJ m-2 d-1
             "wind": (w["WIND"] / 86.4).to_numpy(),  # km d-1 -> m s-1
-            "relhumid": w["RHUMD"].to_numpy(),  # mean daily RH here (in Avignon it's the minimum)
-            "vaporpress": w["VPRSD"].to_numpy(),  # kPa; checked: equals ea(TDEW)
+            "relhumid": (100 * w["VPRSD"] / es).clip(upper=100).to_numpy(),
+            "vaporpress": w["VPRSD"].to_numpy(),  # kPa
         },
         index=pd.to_datetime(w["W_DATE"]).dt.date,
     )[WEATHER_COLUMNS]

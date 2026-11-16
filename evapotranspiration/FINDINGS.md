@@ -12,6 +12,8 @@ pixi run python evapotranspiration/evaluate_et.py --site bushland|avignon
   live there.
 - `et_monica.py`: `Setup` -> MONICA inputs, `monica-run` (C++ AMEI branch by default), output
   parsing, AMEI templates.
+- `checks.py`: reproduces the checks behind the data and ET0 statements below
+  (`checks.py humidity`, `checks.py et0`).
 - `out_<site>/runs/<id>/`: everything MONICA got and returned, per treatment (not in git;
   `cd` there and `monica-run sim.json` repeats a run). `out_<site>/results/`: the template files
   for submission. `out_<site>/evaluation.{png,csv}`: comparison with the measured ET.
@@ -38,7 +40,8 @@ pixi run python evapotranspiration/evaluate_et.py --site bushland|avignon
   - Vapor pressure is now converted from the schema's hPa to the kPa MONICA's ET0 uses.
   - Earlier I said the flow would feed vapor pressure ×10 into ET0. That was wrong: it never
     arrived at all. The ×10 effect (ET0 ≈ 0 without a crop) only shows if someone writes hPa into
-    a climate CSV, where MONICA takes `vaporpress` as kPa without conversion.
+    a climate CSV, where MONICA takes `vaporpress` as kPa without conversion (`checks.py et0`:
+    39.2 -> 0.1 mm before emergence for TXBL1990F).
   - `monica` (master) and `monica_odin` presumably have the same gap, not checked.
   - Only compiled and checked for no change on the CSV path; the capnp path itself has not been
     run since. `result/bin` (what the flows use) needs a `nix build` to pick it up.
@@ -52,19 +55,36 @@ pixi run python evapotranspiration/evaluate_et.py --site bushland|avignon
 2. **`ET0` changes meaning at emergence.** Without a crop it's the soil moisture module's FAO56-PM
    grass reference (rs = 100/1.44 s/m, uses vapor pressure if given). With a crop
    (`soilmoisture.cpp:866`) it's the crop module's ET0, with a stomatal resistance from CO2,
-   saturation deficit and photosynthesis, and only relative humidity. TXBL1990F: crop ET0 1149 mm
-   vs FAO56 module 1211 mm over the season, up to ~0.9 mm/d on single days. If the study wants
+   saturation deficit and photosynthesis, and only relative humidity. TXBL1990F: crop ET0 1105 mm
+   vs FAO56 module 1211 mm over the season (-9 %), up to 2.4 mm on single days (`checks.py et0`). If the study wants
    the FAO56 reference for ETO: run each treatment a second time without a crop and take ET0 from
    there (that's MONICA's own FAO56 module, same weather).
 3. `Pot_ET` is ET0 · Kc and goes into both EOAD and ETP. ETOS/ETRS (ASCE short/tall) are NA.
 
 ## Data issues worth reporting to the data providers
 
+All from `checks.py humidity`, which tests each column against the dew point and, independently,
+against the other humidity columns.
+
 - **Avignon `VPRSD` is the vapor pressure *deficit*, not the vapor pressure** the Definitions
-  sheet says (kPa, "Vapor pressure, average daily"): correlation 0.98 with es - ea(TDEW), ~0 on
-  days with 90-100 % RH, mean 0.76 kPa vs ea(TDEW) 1.18 kPa. Bushland's `VPRSD` is fine
-  (correlation 1.000 with ea(TDEW)). Any model taking Avignon's VPRSD as ea gets a wrong ET0.
-- Avignon `RHUMD` is the daily *minimum* RH (Bushland: the mean).
+  sheet says (kPa, "Vapor pressure, average daily"):
+  - on the 19 days saturated all day (RHMXD = 100, RHUMD >= 95) it averages 0.027 kPa, where a
+    vapor pressure must be about es = 1.09 kPa;
+  - ea from Avignon's own RH min/max (FAO56 eq. 17) is 1.11 kPa on average, close to ea(TDEW)
+    1.18, not to VPRSD 0.76: two independent measurements agree with each other, not with VPRSD;
+  - VPRSD vs es - ea(TDEW): correlation 0.984, MAE 0.10 kPa.
+
+  Bushland's and Maricopa's `VPRSD` equal ea(TDEW) exactly. Similar averages across the files
+  (0.58 / 0.76 / 0.75 kPa) are a coincidence of the climates. Any model taking Avignon's VPRSD as
+  ea gets a wrong ET0.
+- **`RHUMD` means different things.** Avignon defines it as the daily *minimum*, and the data
+  agree (vs ea/es(Tmax): MAE 6.8 %, corr 0.91). Bushland's header calls it
+  "relative_humidity_mean" (no entry in its Definitions tab), but it pairs with `RHMXD` (max),
+  goes down to 10 % on 167 days, and fits the minimum slightly better than the mean (corr 0.71 vs
+  0.66; ea from it as min/max vs as mean: corr 0.77 vs 0.63). Neither fits well: Bushland's RH
+  columns don't match its dew point under either reading (MAE ~12 %), so RH and TDEW may come
+  from different sensors. Maricopa uses `RHAVD` for the mean, which is exactly ea(TDEW)/es_mean.
+  Ask the Bushland providers what RHUMD is.
 - Bushland treatment ids differ between sheets: TXBL1990F (Treatments, Plots, Planting,
   Fertilizer) vs TXBL1989F (Irrigation, Obs, ET_Daily) for the same season.
 - Avignon: the soil profile's `SOIL_ID` is "calcaric fluvisol", Metadata refers to "FRAV".
@@ -75,7 +95,9 @@ pixi run python evapotranspiration/evaluate_et.py --site bushland|avignon
 
 - Ids of the Treatments sheet; the other sheets' ids matched by prefix/suffix and sowing or
   harvest year.
-- Weather as given (`RHUMD` mean RH, `VPRSD` kPa, wind at 2 m); one `RAIN` column, though the
+- Weather as given (`VPRSD` = ea in kPa, wind at 2 m), except the mean RH: derived as
+  ea / es_mean, since `RHUMD` is ambiguous (see above). That lowered ET0 by ~4 % (TXBL1990F
+  1149 -> 1105 mm), as expected if RHUMD is closer to the minimum. One `RAIN` column, though the
   comments describe `RAIN_PART`/`RAIN_FULL`.
 - `SLPHW` missing below 160 cm: taken from the horizon above. 42 layers = 2.1 m of the 2.4 m.
 - Initial moisture above FC in 1992 (deep layers) and 1993 (5-70 cm): set to FC.
@@ -118,12 +140,12 @@ Bushland (lysimeter, 24 h):
 
 | | ETa obs / sim (mm) | bias mm/d | anthesis obs / sim | LAI max obs / sim |
 |---|---|---|---|---|
-| TXBL1990F | 825 / 698 | -0.54 | 05-16 / 06-05 | 3.6 / 11.6 |
-| TXBL1990P | 444 / 433 | -0.05 | 05-15 / 06-01 | 2.4 / 10.5 |
-| TXBL1992F | 930 / 801 | -0.48 | 05-09 / 05-25 | 7.1 / 12.7 |
-| TXBL1992P | 719 / 749 | 0.12 | - / 05-24 | 5.9 / 12.7 |
-| TXBL1993F | 907 / 766 | -0.57 | 05-18 / 06-02 | 4.1 / 12.9 |
-| TXBL1993P | 799 / 747 | -0.21 | 05-18 / 06-02 | 4.0 / 12.9 |
+| TXBL1990F | 825 / 685 | -0.60 | 05-16 / 06-05 | 3.6 / 11.6 |
+| TXBL1990P | 444 / 432 | -0.05 | 05-15 / 06-01 | 2.4 / 10.7 |
+| TXBL1992F | 930 / 765 | -0.61 | 05-09 / 05-25 | 7.1 / 12.5 |
+| TXBL1992P | 719 / 741 | 0.08 | - / 05-25 | 5.9 / 12.7 |
+| TXBL1993F | 907 / 770 | -0.56 | 05-18 / 06-02 | 4.1 / 12.9 |
+| TXBL1993P | 799 / 751 | -0.19 | 05-18 / 06-02 | 4.0 / 12.9 |
 
 Avignon (eddy covariance, 24 h days only):
 
@@ -146,6 +168,7 @@ late, LAI too high as well; ETa mostly fine in winter/spring, the 6.5 mm cap sho
 - 6.5 mm/d cap: part of "Orig", removed in "Imp"?
 - ETO column: crop module ET0 as now, or the FAO56 module via a crop-free run?
 - Avignon: EXPTRNO or EXP_TRT_NAME as treatment id? Use residues/tillage?
+- Bushland: is RHUMD the mean or the minimum? (For the data providers.)
 - Fix the capnp soil moisture / climate gaps in `monica` (master) and `monica_odin` as well?
 - `Monica_AMEI_potential_Evapotranspiration` isn't integrated yet; "Imp" runs would select it via
   `EvapotranspirationModel` in sim.json.
