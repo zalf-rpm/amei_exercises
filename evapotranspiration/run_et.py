@@ -13,12 +13,17 @@ The template files go to <out>/results/.
 
     pixi run python evapotranspiration/run_et.py --site bushland [--treatments TXBL1990F ...]
     pixi run python evapotranspiration/run_et.py --site avignon
+
+--soil-moisture puts parameters on top of general/soil-moisture.json, e.g. Odin's
+MaxPotentialEvapotranspiration=15, PondEvaporationByCoverage=true, InfiltrationByDepth=true,
+InfiltrationDepth=0.1 (values as JSON).
 """
 
 from __future__ import annotations
 
 import argparse
 import importlib
+import json
 import logging
 import sys
 from pathlib import Path
@@ -57,6 +62,13 @@ def main() -> int:
     ap.add_argument("--no-water-stress", action="store_true", help="WaterDeficitResponseOn = false")
     ap.add_argument("--nitrogen-stress", action="store_true", help="NitrogenResponseOn = true")
     ap.add_argument("--vp-factor", type=float, default=1.0, help="vapor pressure (kPa) is multiplied by this")
+    ap.add_argument(
+        "--soil-moisture",
+        nargs="*",
+        default=[],
+        metavar="KEY=VALUE",
+        help="soil moisture parameters on top of general/soil-moisture.json (VALUE as JSON)",
+    )
     ap.add_argument("--prepare-only", action="store_true", help="write the MONICA inputs, don't run")
     args = ap.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(levelname)-7s %(message)s")
@@ -73,6 +85,14 @@ def main() -> int:
     if args.cultivar:
         for s in setups:
             s.cultivar = args.cultivar
+    try:
+        soil_moisture = {k: json.loads(v) for k, v in (kv.split("=", 1) for kv in args.soil_moisture)}
+    except ValueError as e:
+        logger.error("--soil-moisture: %s", e)  # noqa: TRY400 - the message is the useful part
+        return 1
+    if soil_moisture:
+        for s in setups:
+            s.site_params["SoilMoistureParameters"] = s.site_params.get("SoilMoistureParameters", {}) | soil_moisture
 
     opts = Options(
         params=args.params,

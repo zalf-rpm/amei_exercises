@@ -192,7 +192,11 @@ def daily_outputs(no_of_layers: int) -> dict[str, Any]:
         "ETAD": "Act_ET",
         "EPSAD": None,
         "ESAD": "Act_Ev",
-        "EPPAD": None,
+        # the crop's potential transpiration, the same step that gives EPAD: crop ET0 x Kc, capped
+        # at MaxPotentialEvapotranspiration, minus the evaporation from interception, times the
+        # soil coverage; before the water and oxygen stress, so EPAD <= EPPAD. 0 before emergence
+        # and after maturity, like EPAD. Odin path output, rounded like Act_Trans.
+        "EPPAD": {"path": "current_crop_module.potential_transpiration", "round": 1},
         "EPAD": "Act_Trans",
         "ETO": "ET0",
         "ETOS": None,
@@ -205,7 +209,17 @@ def daily_outputs(no_of_layers: int) -> dict[str, Any]:
 DAILY_FACTORS = {"RND": 1e6 / 86400}  # MJ m-2 d-1 -> W m-2 (daily mean)
 
 # not in the template, but useful to look at and to check a run with
-EXTRA_DAILY: dict[str, Any] = {"Stage": "Stage", "Kc": "Kc", "Precip": "Precip", "Tavg": "Tavg"}
+EXTRA_DAILY: dict[str, Any] = {
+    "Stage": "Stage",
+    "Kc": "Kc",
+    "Precip": "Precip",
+    "Tavg": "Tavg",
+    # standing water: what evaporated from it, and the transpiration soil moisture took from the
+    # layers (differs from EPAD on ponding days, FINDINGS model issue 4)
+    "SurfEvap": {"path": "soil_moisture.evaporated_from_surface", "round": 2},
+    "SMTrans": {"path": "soil_moisture.actual_transpiration", "round": 2},
+    "Infilt": "Infilt",
+}
 
 # at-event values: dates and the biomass/N at anthesis and maturity
 EVENTS: dict[str, list[tuple[str, Any]]] = {
@@ -235,6 +249,7 @@ SEASON: dict[str, tuple[str, str]] = {
     "EOCM": ("EOAD", "sum"),
     "ETCM": ("ETAD", "sum"),
     "ESCM": ("ESAD", "sum"),
+    "EPPCM": ("EPPAD", "sum"),
     "EPCM": ("EPAD", "sum"),
     "ETO": ("ETO", "sum"),
     "ETP": ("ETP", "sum"),
@@ -244,7 +259,12 @@ DIGITS = 4  # what goes into the result files
 
 
 def out_spec(alias: str, spec: Any) -> Any:
-    """'LAI', 'LAID' -> 'LAI|LAID'; ['Mois', [1, 42, 'AVG']], 'SWWPD' -> ['Mois|SWWPD', [1, 42, 'AVG']]."""
+    """'LAI', 'LAID' -> 'LAI|LAID'; ['Mois', [1, 42, 'AVG']], 'SWWPD' -> ['Mois|SWWPD', [1, 42, 'AVG']].
+
+    A path column ({"path": ...}, Odin only) gets the alias as its name.
+    """
+    if isinstance(spec, dict):
+        return {**spec, "name": alias}
     if isinstance(spec, str):
         return f"{spec}|{alias}"
     return [f"{spec[0]}|{alias}", *spec[1:]]

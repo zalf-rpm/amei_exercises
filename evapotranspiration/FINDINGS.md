@@ -84,10 +84,18 @@ pixi run python evapotranspiration/evaluate_et.py --site bushland|avignon
    second time without a crop and take ET0 from there.
 3. **What goes into the template's ET columns.** It has two columns for potential ET, EOAD
    ("potential_evapotrans") and ETP ("potential evapotranspiration_daily"); both get `Pot_ET`.
-   The potential parts are NA: EPSAD (potential soil evaporation) and EPPAD (potential
-   transpiration). MONICA does compute the latter (`potential_transpiration` in
-   `crop_water_uptake.odin`, after the cap and interception), which Odin could output via its path.
-   ETOS/ETRS (ASCE standardized short/tall reference) are NA: MONICA computes neither.
+   EPPAD (potential transpiration) and its season sum EPPCM come from Odin's path output
+   `current_crop_module.potential_transpiration` (2026-11-17), the crop's own value from the same
+   step that gives EPAD (`Act_Trans`): crop ET0 × Kc, capped (issue 1), minus the evaporation from
+   interception, times the soil coverage, before water and oxygen stress; 0 before emergence and
+   after maturity, rounded to 0.1 mm like EPAD. So EPAD <= EPPAD (checked on all runs), and
+   EPAD/EPPAD is the crop's transpiration deficit. Not comparable with EOAD/ETP, which are
+   uncapped (issue 1): on hot days EPPAD stays at 6.5 mm while EOAD goes up to 14. Season sums,
+   EPPCM vs EPCM: Bushland F 587-631 vs the same (no water stress), P 513 vs 344 (1990), 605 vs 597
+   (1992); Avignon 369-413 vs 362-413.
+   Still NA: EPSAD (potential soil evaporation; MONICA has no single value for it, the potential
+   is reduced per layer) and ETOS/ETRS (ASCE standardized short/tall reference; MONICA computes
+   neither).
 
 4. **Ponding water: crop and soil disagree about transpiration (a bug).** On days with water on
    the surface (`soil_moisture.odin:997-1019`, the same in the C++):
@@ -112,6 +120,48 @@ pixi run python evapotranspiration/evaluate_et.py --site bushland|avignon
    transpiration not supplied by the soil 171 vs 101 mm, season ETa 699 vs 682 mm (surface
    evaporation replaces transpiration, so ETa hardly changes, but the split and the crop's water
    stress do). In the lysimeter 20-30 mm of irrigation presumably infiltrate within hours.
+
+   **Switches in Odin (2026-11-17), soil moisture parameters, both off by default (= the C++,
+   byte-identical):**
+   - `PondEvaporationByCoverage` (issue 4): the standing water takes the soil's place, not the
+     crop's. It evaporates with the share of the potential that reaches the ground, (1 - soil
+     coverage) × potential × 1.1 / Kc, capped; the soil evaporates only from what the water
+     leaves (a pond that dries up during the day), and soil moisture takes the crop's
+     transpiration from the layers as the crop computed it. Why the C++ does otherwise: probably
+     a HERMES leftover, the replacement is the soil evaporation formula with coverage instead of
+     1 - coverage, unchanged since MONICA's first commit (2013); the only sound idea in it is
+     that pond + crop must not exceed the potential, which the switch keeps. Only MONICA's own ET
+     (not with `Modules.Evapotranspiration`).
+   - `InfiltrationByDepth` + `InfiltrationDepth` (default 0.1 m, MONICA's original layer
+     thickness; issue 5): the day's infiltration is limited by the free pore space down to that
+     depth, the moisture deficit in the Ks term is the mean over it, and the water fills those
+     layers from the top (their upper boundary fluxes include it, for the solute transport).
+   - `run_et.py --soil-moisture PondEvaporationByCoverage=true InfiltrationByDepth=true` sets
+     them; the daily output has `SurfEvap` (evaporated from standing water), `SMTrans` (soil
+     moisture's transpiration) and `Infilt` as checks.
+
+   Effect (default cultivar, cap 6.5), season sums sowing to maturity/harvest:
+
+   | | ETa | standing water evap. | soil moisture transp. (crop: EPCM) | ET bias mm/d |
+   |---|---|---|---|---|
+   | TXBL1990F 10 cm, off | 682 | 100 | 488 (587) | -0.66 |
+   | TXBL1990F 10 cm, both (0.1 m) | 676 | 4 | 579 (587) | -0.69 |
+   | TXBL1990F 5 cm, off | 699 | 200 | 417 (587) | -0.60 |
+   | TXBL1990F 5 cm, both (0.1 m) | 669 | 4 | 580 (587) | -0.72 |
+   | TXBL1992F 5 / 10 cm, off | 781 / 739 | 207 / 59 | 453 / 546 (606) | -0.57 / -0.74 |
+   | TXBL1992F 5 / 10 cm, both | 734 / 735 | 4 / 1 | 601 / 599 (606) | -0.75 / -0.75 |
+
+   - With the pond switch, crop and soil agree (the remaining 6 mm in TXBL1992F is the harvest
+     day: the crop module still reports its transpiration, soil moisture treats the field as
+     bare already; an older quirk, unrelated). No more days with ETa > 6.5 mm.
+   - With both, 5 and 10 cm layers give nearly the same season ETa (-7…+10 mm, before 16-44
+     mm); the rest depends on the layer thickness elsewhere (evaporation depth, percolation).
+   - At 10 cm layers `InfiltrationByDepth` with 0.1 m changes nothing (one layer, as before).
+     0.2 m: a few mm less standing water (P seasons: none left), ETa -0…-5 mm, bias ±0.02.
+   - Avignon (5 cm): standing water evaporation 12-32 → 2-12 mm, ETa -5…-10 mm, bias
+     unchanged (±0.03).
+   - The ET bias doesn't improve: the split changes, the sum hardly. The F seasons' -0.7 mm/d
+     stay the cap's (issue 1).
 
 ## MONICA builds: Odin vs the AMEI branch
 
@@ -326,12 +376,10 @@ By relevance for Bushland and Avignon (2026-11-16):
    worse than the other Avignon years); Bushland rooting depth up to 3.9 m in a 2.1 m profile.
 5. **For the data providers** (no effect on the runs, RH is derived from ea / es_mean): Bushland,
    is RHUMD the mean or the minimum? Avignon, VPRSD is the deficit, not the vapor pressure.
-6. **Ponding** (model issues 4 and 5), changes to MONICA: tell the crop module when surface
-   evaporation takes over its transpiration (or let soil moisture take the crop's transpiration
-   anyway); base surface evaporation on the uncapped potential with an explicit cap; make the
-   infiltration limit independent of the layer thickness. Until then: 10 cm layers for Bushland?
-7. Template columns: fill EPPAD (potential transpiration) from Odin's path output? EPSAD,
-   ETOS, ETRS stay NA.
+6. **Ponding** (model issues 4 and 5): switches in Odin, off by default. Use them for "Imp"
+   (together with the cap)? `InfiltrationDepth` 0.1 or 0.2 m: hardly matters for ET here.
+7. ~~Template columns: fill EPPAD from Odin's path output?~~ Done (model issue 3). EPSAD, ETOS,
+   ETRS stay NA.
 
 Less relevant for these two sites:
 
