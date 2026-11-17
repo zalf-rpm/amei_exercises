@@ -1,0 +1,433 @@
+{
+  "CropParameters": [
+    "include-from-file",
+    "general/crop.json"
+  ],
+  "cropRotation": [
+    {
+      "worksteps": [
+        {
+          "date": "1993-12-07",
+          "type": "Sowing",
+          "crop": {
+            "cropParams": {
+              "species": [
+                "include-from-file",
+                "crops/species_wheat.json"
+              ],
+              "cultivar": [
+                "include-from-file",
+                "crops/cultivar_spring-wheat_with_1_calibrated_phenology.json"
+              ]
+            },
+            "residueParams": [
+              "include-from-file",
+              "crops/residue_wheat.json"
+            ]
+          }
+        },
+        {
+          "type": "MineralFertilization",
+          "date": "1993-12-07",
+          "amount": [
+            54.0,
+            "kg N"
+          ],
+          "partition": {
+            "id": "Monoammonium phosphate",
+            "name": "Monoammonium phosphate",
+            "Carbamid": 0.0,
+            "NH4": 1.0,
+            "NO3": 0.0
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1993-12-13",
+          "amount": [
+            13.0,
+            "mm"
+          ],
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1993-12-17",
+          "amount": [
+            17.0,
+            "mm"
+          ],
+          "depth": 0.23,
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1994-01-21",
+          "amount": [
+            30.0,
+            "mm"
+          ],
+          "depth": 0.23,
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "MineralFertilization",
+          "date": "1994-02-03",
+          "amount": [
+            92.0,
+            "kg N"
+          ],
+          "partition": {
+            "id": "Urea ammonium nitrate solution",
+            "name": "Urea ammonium nitrate solution",
+            "Carbamid": 0.5,
+            "NH4": 0.25,
+            "NO3": 0.25
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1994-02-03",
+          "amount": [
+            30.0,
+            "mm"
+          ],
+          "depth": 0.23,
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1994-02-23",
+          "amount": [
+            35.0,
+            "mm"
+          ],
+          "depth": 0.23,
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1994-03-03",
+          "amount": [
+            30.0,
+            "mm"
+          ],
+          "depth": 0.23,
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1994-03-15",
+          "amount": [
+            36.0,
+            "mm"
+          ],
+          "depth": 0.23,
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "MineralFertilization",
+          "date": "1994-03-16",
+          "amount": [
+            69.0,
+            "kg N"
+          ],
+          "partition": {
+            "id": "Urea ammonium nitrate solution",
+            "name": "Urea ammonium nitrate solution",
+            "Carbamid": 0.5,
+            "NH4": 0.25,
+            "NO3": 0.25
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1994-03-20",
+          "amount": [
+            25.0,
+            "mm"
+          ],
+          "depth": 0.23,
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1994-03-27",
+          "amount": [
+            30.0,
+            "mm"
+          ],
+          "depth": 0.23,
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1994-04-03",
+          "amount": [
+            30.0,
+            "mm"
+          ],
+          "depth": 0.23,
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1994-04-07",
+          "amount": [
+            50.0,
+            "mm"
+          ],
+          "depth": 0.23,
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "MineralFertilization",
+          "date": "1994-04-08",
+          "amount": [
+            46.0,
+            "kg N"
+          ],
+          "partition": {
+            "id": "Urea ammonium nitrate solution",
+            "name": "Urea ammonium nitrate solution",
+            "Carbamid": 0.5,
+            "NH4": 0.25,
+            "NO3": 0.25
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1994-04-13",
+          "amount": [
+            50.0,
+            "mm"
+          ],
+          "depth": 0.23,
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1994-04-18",
+          "amount": [
+            50.0,
+            "mm"
+          ],
+          "depth": 0.23,
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1994-04-24",
+          "amount": [
+            50.0,
+            "mm"
+          ],
+          "depth": 0.23,
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1994-04-29",
+          "amount": [
+            7.0,
+            "mm"
+          ],
+          "depth": 0.23,
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1994-05-03",
+          "amount": [
+            60.0,
+            "mm"
+          ],
+          "depth": 0.23,
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1994-05-09",
+          "amount": [
+            48.0,
+            "mm"
+          ],
+          "depth": 0.23,
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1994-05-15",
+          "amount": [
+            38.0,
+            "mm"
+          ],
+          "depth": 0.23,
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -35,6 +35,7 @@ from et_monica import (
     result_names,
     run_monica,
     template_header,
+    write_checksums,
     write_result,
 )
 
@@ -84,7 +85,8 @@ def main() -> int:
     _, (_, _, daily_codes) = template_header(TEMPLATES / "AMEI_ET_template_Daily.csv")
     _, (_, _, summary_codes) = template_header(TEMPLATES / "AMEI_ET_template_summary.csv")
     summary_name, daily_name = result_names(args.kind, args.module_code, site.NAME)
-    model_line = f"Model:\tMONICA ({args.module_code}, {monica_build(args.monica_run)})"
+    build = monica_build(args.monica_run)
+    model_line = f"Model:\tMONICA ({args.module_code}, {build})"
 
     summaries, failed = [], []
     for s in setups:
@@ -94,7 +96,7 @@ def main() -> int:
                 logger.info("%s: %s", s.id, note)
             if args.prepare_only:
                 continue
-            run_monica(args.monica_run, run_dir)
+            run_monica(args.monica_run, run_dir, build)
             daily, summary = collect(run_dir)
         except (ValueError, RuntimeError, OSError) as e:
             logger.error("%s: %s", s.id, e)  # noqa: TRY400 - the message is the useful part
@@ -113,6 +115,8 @@ def main() -> int:
             *(fmt(summary.get(k)) for k in ("ETO", "ETCM")),
         )
 
+    if not args.prepare_only:
+        write_checksums(out, ["runs/*/monica_out.csv"])
     if summaries:
         write_result(results_dir / summary_name, TEMPLATES / "AMEI_ET_template_summary.csv", model_line, summaries)
     if failed:

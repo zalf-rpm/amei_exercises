@@ -1,0 +1,447 @@
+{
+  "CropParameters": [
+    "include-from-file",
+    "general/crop.json"
+  ],
+  "cropRotation": [
+    {
+      "worksteps": [
+        {
+          "type": "MineralFertilization",
+          "date": "1989-09-21",
+          "amount": [
+            126.7,
+            "kg N"
+          ],
+          "partition": {
+            "id": "Anhydrous ammonia",
+            "name": "Anhydrous ammonia",
+            "Carbamid": 0.0,
+            "NH4": 1.0,
+            "NO3": 0.0
+          }
+        },
+        {
+          "date": "1989-10-11",
+          "type": "Sowing",
+          "crop": {
+            "cropParams": {
+              "species": [
+                "include-from-file",
+                "crops/species_wheat.json"
+              ],
+              "cultivar": [
+                "include-from-file",
+                "crops/cultivar_winter-wheat.json"
+              ]
+            },
+            "residueParams": [
+              "include-from-file",
+              "crops/residue_wheat.json"
+            ]
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1989-10-13",
+          "amount": [
+            10.21317999999999,
+            "mm"
+          ],
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1989-10-21",
+          "amount": [
+            18.53473600000001,
+            "mm"
+          ],
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1989-10-24",
+          "amount": [
+            9.140199999999993,
+            "mm"
+          ],
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1989-10-27",
+          "amount": [
+            19.57592400000001,
+            "mm"
+          ],
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1989-10-31",
+          "amount": [
+            16.12649199999998,
+            "mm"
+          ],
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1989-11-20",
+          "amount": [
+            17.278952,
+            "mm"
+          ],
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1989-11-22",
+          "amount": [
+            16.047012,
+            "mm"
+          ],
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1990-04-04",
+          "amount": [
+            38.14245199999999,
+            "mm"
+          ],
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1990-04-19",
+          "amount": [
+            15.40322399999999,
+            "mm"
+          ],
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1990-04-24",
+          "amount": [
+            23.25584800000004,
+            "mm"
+          ],
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1990-04-26",
+          "amount": [
+            27.452392,
+            "mm"
+          ],
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1990-05-07",
+          "amount": [
+            26.94372000000001,
+            "mm"
+          ],
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1990-05-09",
+          "amount": [
+            26.69733199999996,
+            "mm"
+          ],
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1990-05-15",
+          "amount": [
+            29.69372800000002,
+            "mm"
+          ],
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1990-05-16",
+          "amount": [
+            30.909772,
+            "mm"
+          ],
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1990-05-21",
+          "amount": [
+            29.669884,
+            "mm"
+          ],
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1990-05-22",
+          "amount": [
+            23.27969200000001,
+            "mm"
+          ],
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1990-05-25",
+          "amount": [
+            28.01670000000001,
+            "mm"
+          ],
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1990-05-30",
+          "amount": [
+            26.26813999999999,
+            "mm"
+          ],
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1990-06-01",
+          "amount": [
+            39.12800399999998,
+            "mm"
+          ],
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1990-06-05",
+          "amount": [
+            23.383016,
+            "mm"
+          ],
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1990-06-10",
+          "amount": [
+            37.77684400000001,
+            "mm"
+          ],
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "Harvest",
+          "date": "1990-06-25"
+        }
+      ]
+    }
+  ]
+}

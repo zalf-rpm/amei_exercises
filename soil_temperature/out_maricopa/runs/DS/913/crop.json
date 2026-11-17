@@ -1,0 +1,560 @@
+{
+  "CropParameters": [
+    "include-from-file",
+    "general/crop.json"
+  ],
+  "cropRotation": [
+    {
+      "worksteps": [
+        {
+          "date": "1996-12-15",
+          "type": "Sowing",
+          "crop": {
+            "cropParams": {
+              "species": [
+                "include-from-file",
+                "crops/species_wheat.json"
+              ],
+              "cultivar": [
+                "include-from-file",
+                "crops/cultivar_spring-wheat_with_1_calibrated_phenology.json"
+              ]
+            },
+            "residueParams": [
+              "include-from-file",
+              "crops/residue_wheat.json"
+            ]
+          }
+        },
+        {
+          "type": "MineralFertilization",
+          "date": "1996-12-23",
+          "amount": [
+            4.87,
+            "kg N"
+          ],
+          "partition": {
+            "id": "Nitrate from irrigation water (not a fertilizer product)",
+            "name": "Nitrate from irrigation water (not a fertilizer product)",
+            "Carbamid": 0.0,
+            "NH4": 0.0,
+            "NO3": 1.0
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1996-12-23",
+          "amount": [
+            35.0,
+            "mm"
+          ],
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1997-01-30",
+          "amount": [
+            25.0,
+            "mm"
+          ],
+          "depth": 0.23,
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "MineralFertilization",
+          "date": "1997-02-19",
+          "amount": [
+            0.42,
+            "kg N"
+          ],
+          "partition": {
+            "id": "Nitrate from irrigation water (not a fertilizer product)",
+            "name": "Nitrate from irrigation water (not a fertilizer product)",
+            "Carbamid": 0.0,
+            "NH4": 0.0,
+            "NO3": 1.0
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1997-02-19",
+          "amount": [
+            40.0,
+            "mm"
+          ],
+          "depth": 0.23,
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "MineralFertilization",
+          "date": "1997-03-05",
+          "amount": [
+            5.0,
+            "kg N"
+          ],
+          "partition": {
+            "id": "Ammonium nitrate",
+            "name": "Ammonium nitrate",
+            "Carbamid": 0.0,
+            "NH4": 0.0,
+            "NO3": 1.0
+          }
+        },
+        {
+          "type": "MineralFertilization",
+          "date": "1997-03-05",
+          "amount": [
+            1.56,
+            "kg N"
+          ],
+          "partition": {
+            "id": "Nitrate from irrigation water (not a fertilizer product)",
+            "name": "Nitrate from irrigation water (not a fertilizer product)",
+            "Carbamid": 0.0,
+            "NH4": 0.0,
+            "NO3": 1.0
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1997-03-05",
+          "amount": [
+            35.0,
+            "mm"
+          ],
+          "depth": 0.23,
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "MineralFertilization",
+          "date": "1997-03-13",
+          "amount": [
+            2.11,
+            "kg N"
+          ],
+          "partition": {
+            "id": "Nitrate from irrigation water (not a fertilizer product)",
+            "name": "Nitrate from irrigation water (not a fertilizer product)",
+            "Carbamid": 0.0,
+            "NH4": 0.0,
+            "NO3": 1.0
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1997-03-13",
+          "amount": [
+            40.0,
+            "mm"
+          ],
+          "depth": 0.23,
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "MineralFertilization",
+          "date": "1997-03-18",
+          "amount": [
+            0.26,
+            "kg N"
+          ],
+          "partition": {
+            "id": "Nitrate from irrigation water (not a fertilizer product)",
+            "name": "Nitrate from irrigation water (not a fertilizer product)",
+            "Carbamid": 0.0,
+            "NH4": 0.0,
+            "NO3": 1.0
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1997-03-18",
+          "amount": [
+            30.0,
+            "mm"
+          ],
+          "depth": 0.23,
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "MineralFertilization",
+          "date": "1997-03-27",
+          "amount": [
+            5.0,
+            "kg N"
+          ],
+          "partition": {
+            "id": "Ammonium nitrate",
+            "name": "Ammonium nitrate",
+            "Carbamid": 0.0,
+            "NH4": 0.0,
+            "NO3": 1.0
+          }
+        },
+        {
+          "type": "MineralFertilization",
+          "date": "1997-03-27",
+          "amount": [
+            2.36,
+            "kg N"
+          ],
+          "partition": {
+            "id": "Nitrate from irrigation water (not a fertilizer product)",
+            "name": "Nitrate from irrigation water (not a fertilizer product)",
+            "Carbamid": 0.0,
+            "NH4": 0.0,
+            "NO3": 1.0
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1997-03-27",
+          "amount": [
+            66.0,
+            "mm"
+          ],
+          "depth": 0.23,
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "MineralFertilization",
+          "date": "1997-04-02",
+          "amount": [
+            3.03,
+            "kg N"
+          ],
+          "partition": {
+            "id": "Nitrate from irrigation water (not a fertilizer product)",
+            "name": "Nitrate from irrigation water (not a fertilizer product)",
+            "Carbamid": 0.0,
+            "NH4": 0.0,
+            "NO3": 1.0
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1997-04-02",
+          "amount": [
+            42.0,
+            "mm"
+          ],
+          "depth": 0.23,
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "MineralFertilization",
+          "date": "1997-04-07",
+          "amount": [
+            1.59,
+            "kg N"
+          ],
+          "partition": {
+            "id": "Nitrate from irrigation water (not a fertilizer product)",
+            "name": "Nitrate from irrigation water (not a fertilizer product)",
+            "Carbamid": 0.0,
+            "NH4": 0.0,
+            "NO3": 1.0
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1997-04-07",
+          "amount": [
+            22.0,
+            "mm"
+          ],
+          "depth": 0.23,
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "MineralFertilization",
+          "date": "1997-04-12",
+          "amount": [
+            3.1,
+            "kg N"
+          ],
+          "partition": {
+            "id": "Nitrate from irrigation water (not a fertilizer product)",
+            "name": "Nitrate from irrigation water (not a fertilizer product)",
+            "Carbamid": 0.0,
+            "NH4": 0.0,
+            "NO3": 1.0
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1997-04-12",
+          "amount": [
+            43.0,
+            "mm"
+          ],
+          "depth": 0.23,
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "MineralFertilization",
+          "date": "1997-04-17",
+          "amount": [
+            3.06,
+            "kg N"
+          ],
+          "partition": {
+            "id": "Nitrate from irrigation water (not a fertilizer product)",
+            "name": "Nitrate from irrigation water (not a fertilizer product)",
+            "Carbamid": 0.0,
+            "NH4": 0.0,
+            "NO3": 1.0
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1997-04-17",
+          "amount": [
+            38.0,
+            "mm"
+          ],
+          "depth": 0.23,
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "MineralFertilization",
+          "date": "1997-04-22",
+          "amount": [
+            5.0,
+            "kg N"
+          ],
+          "partition": {
+            "id": "Ammonium nitrate",
+            "name": "Ammonium nitrate",
+            "Carbamid": 0.0,
+            "NH4": 0.0,
+            "NO3": 1.0
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1997-04-22",
+          "amount": [
+            44.0,
+            "mm"
+          ],
+          "depth": 0.23,
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "MineralFertilization",
+          "date": "1997-04-29",
+          "amount": [
+            4.59,
+            "kg N"
+          ],
+          "partition": {
+            "id": "Nitrate from irrigation water (not a fertilizer product)",
+            "name": "Nitrate from irrigation water (not a fertilizer product)",
+            "Carbamid": 0.0,
+            "NH4": 0.0,
+            "NO3": 1.0
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1997-04-29",
+          "amount": [
+            60.0,
+            "mm"
+          ],
+          "depth": 0.23,
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "MineralFertilization",
+          "date": "1997-05-03",
+          "amount": [
+            2.1,
+            "kg N"
+          ],
+          "partition": {
+            "id": "Nitrate from irrigation water (not a fertilizer product)",
+            "name": "Nitrate from irrigation water (not a fertilizer product)",
+            "Carbamid": 0.0,
+            "NH4": 0.0,
+            "NO3": 1.0
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1997-05-03",
+          "amount": [
+            30.0,
+            "mm"
+          ],
+          "depth": 0.23,
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "MineralFertilization",
+          "date": "1997-05-09",
+          "amount": [
+            0.22,
+            "kg N"
+          ],
+          "partition": {
+            "id": "Nitrate from irrigation water (not a fertilizer product)",
+            "name": "Nitrate from irrigation water (not a fertilizer product)",
+            "Carbamid": 0.0,
+            "NH4": 0.0,
+            "NO3": 1.0
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "1997-05-09",
+          "amount": [
+            3.0,
+            "mm"
+          ],
+          "depth": 0.23,
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "Harvest",
+          "date": "1997-05-28"
+        }
+      ]
+    }
+  ]
+}

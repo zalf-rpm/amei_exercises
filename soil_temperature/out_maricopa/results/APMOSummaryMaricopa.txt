@@ -1,0 +1,23 @@
+Maricopa Wheat FACE
+Model:	MONICA (ApsimCampbell, monica_odin simplify_copilot@1c1f3e76)
+Modeler_name:	Michael Berg-Mohnicke
+
+framework_ID	model_ID	treatment_ID	planting_date	emergence_date	anthesis_date	physiologic_maturity_dat	leaf_no_per_stem_matur	leaf_area_index_maximum	PAR_interception_over_season	tops_dry_weight_anthesis	tops_dry_weight_maturity	grain_dry_wt_at_mat	harvest_no_at_maturity	grain_unit_dry_wt_matur	tops_N_at_anthesis	tops_N_at_maturity	grain_N_at_maturity	grain_unit_N_matur	root_depth_maximum	avail_water_soil_profile_sow_mat	drainage_over_season	runoff_over_season	avail_N_inorganic_soil_profile_over_season	N_leached_during_season	N_mineralization_during_season	N2O_emissions__over_season	N_immobilization_cumul	N_denitrification_over_season	potential_evapotrans_over_season	evapotrans_over_season	potential_soil_evaporation_over_season	soil_evap_over_season	potential_transpiration_over_season	transpiration_over_season
+text	text	text	date	date	date	date	leaf\mainstem	m /m 	%	kg[DM]/ha	kg[DM]/ha	kg[DM]/ha	number/m2	mg[DM]/grain	kg[N]/ha	kg[N]/ha	kg[N]/ha	mg[N]/grain	m	mm	mm	mm	kg[N]/ha	kg[N]/ha	kg[N]/ha	kg[N]/ha	kg[N]/ha	kg[N]/ha	mm	mm	mm	mm	mm	mm
+FRAMEWORK_ID	MODEL_ID	TREAT_ID	PDATE	PLDAE	ADAT	MDAT	LnoSM	LAIX	LIPCCM	CWAA	CWAM	GWAM	HnoAM	GWGM	CNAA	CNAM	GNAM	GNGM	RDPM	WAVSSM	DRCM	ROCM	NIAVSSM	NLCM	NMNCM	N2OECM	NIMCM	NDNCM	EOCM	ETCM	EPSCM	ESCM	EPPCM	EPCM
+MO	AP	901	1992-12-15	1992-12-30	1993-04-24	1993-05-22	na	7.0936	na	17449.4	23545.5	8753.8	na	na	239.7	249.3	135.128	na	3.4	na	210.615	0	na	6.396	10.3168	0.7881	na	0.0809	480.6	483.5	na	40.6	na	382.8
+MO	AP	902	1992-12-15	1992-12-30	1993-04-24	1993-05-22	na	6.9291	na	17200.8	23211.5	8661.2	na	na	221.8	225	122.309	na	3.4	na	432.645	0	na	20.463	10.6652	0.7931	na	0.0796	480.2	481.1	na	43.1	na	379.7
+MO	AP	903	1992-12-15	1992-12-30	1993-04-21	1993-05-19	na	7.429	na	18498.5	25422.8	9832.8	na	na	212.9	220.4	122.957	na	3.4	na	127.076	0	na	3.062	10.1801	0.7359	na	0.0832	449.2	458.4	na	33.9	na	363.6
+MO	AP	904	1992-12-15	1992-12-30	1993-04-21	1993-05-19	na	7.4217	na	18553.3	25832.7	10232.1	na	na	242.3	248.2	140.858	na	3.4	na	336.294	0	na	18.213	6.4594	0.3503	na	0.1927	450.3	500.7	na	12	na	362.8
+MO	AP	905	1993-12-07	1993-12-21	1994-04-21	1994-05-23	na	8.2873	na	18091.3	25614.3	9579.1	na	na	308.5	327.7	178.404	na	3.5	na	0	0	na	0	14.3142	0.4477	na	0.0253	529.9	501	na	51.7	na	417.2
+MO	AP	906	1993-12-07	1993-12-21	1994-04-21	1994-05-26	na	8.1995	na	17805.9	25534.8	9745	na	na	198.6	214.6	118.576	na	3.4	na	130.722	0	na	35.175	12.3193	0.4457	na	0.0474	539.6	526.3	na	51.6	na	439.6
+MO	AP	907	1993-12-07	1993-12-21	1994-04-19	1994-05-20	na	8.7127	na	19113	25634.6	8842.8	na	na	224.4	235.3	120.688	na	3.6	na	0	0	na	0	14.7275	0.4362	na	0.0244	496.3	450.7	na	44.8	na	374
+MO	AP	908	1993-12-07	1993-12-21	1994-04-19	1994-05-23	na	8.8601	na	19590.3	28468.7	11350	na	na	244	259.7	148.042	na	3.4	na	78.2175	0	na	47.61	11.9248	0.4199	na	0.0534	511.2	505.8	na	46.4	na	426.3
+MO	AP	909	1995-12-15	1995-12-31	1996-04-18	1996-05-14	na	6.7823	na	15942.1	20801.4	7314.2	na	na	137.1	153.4	79.8343	na	3.4	na	78.4331	0	na	22.635	13.1454	0.0629	na	0.0359	496.4	473.3	na	54.9	na	392.1
+MO	AP	910	1995-12-15	1995-12-31	1996-04-18	na	na	7.2652	na	17402.6	na	na	na	na	334.9	na	na	na	3.4	na	114.007	0	na	16.05	18.8912	0.0641	na	0.0389	510.7	488.2	na	54.8	na	412.9
+MO	AP	911	1995-12-15	1995-12-31	1996-04-17	1996-05-13	na	7.4205	na	16749.9	22060.1	7592.2	na	na	132	148.6	76.0964	na	3.4	na	35.4121	0	na	12.894	13.0547	0.0628	na	0.037	468.9	454.7	na	45.5	na	381.9
+MO	AP	912	1995-12-15	1995-12-31	1996-04-18	na	na	8.2335	na	19460.4	na	na	na	na	328.3	na	na	na	3.4	na	50.5729	0	na	16.454	17.4051	0.0659	na	0.0404	490.3	478.8	na	47.4	na	410.4
+MO	AP	913	1996-12-15	1996-12-30	1997-04-18	1997-05-09	na	2.8657	na	6101.9	8377	3215.4	na	na	42.2	55.6	30.8446	na	3.4	na	101.323	0	na	3.852	9.6913	0.0307	na	0.0403	462.9	355.9	na	68.4	na	266.4
+MO	AP	914	1996-12-15	1996-12-30	1997-04-20	1997-05-16	na	6.2711	na	15255.8	20529.5	7658.4	na	na	180.6	223.5	121.435	na	3.4	na	83.8417	0	na	4.939	12.6773	0.408	na	0.0389	515.9	471.1	na	60	na	390.4
+MO	AP	915	1996-12-15	1996-12-30	1997-04-17	1997-05-07	na	3.4059	na	6796.3	8936.9	2986.2	na	na	44.3	55	27.5736	na	3.4	na	52.8752	0	na	2.999	9.8247	0.0379	na	0.0392	428	360.1	na	63.8	na	276.4
+MO	AP	916	1996-12-15	1996-12-30	1997-04-20	1997-05-16	na	6.7546	na	16455.4	22949.8	9097.2	na	na	179.2	221.8	125.904	na	3.4	na	83.6751	0	na	5.844	12.9667	0.5359	na	0.0399	493.7	462.4	na	56.3	na	384.4

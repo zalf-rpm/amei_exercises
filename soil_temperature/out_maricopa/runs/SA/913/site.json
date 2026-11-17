@@ -1,0 +1,2270 @@
+{
+  "SiteParameters": {
+    "Latitude": 33.0628,
+    "Slope": 0.0,
+    "HeightNN": [
+      361.0,
+      "m"
+    ],
+    "NDeposition": 30,
+    "NumberOfLayers": 42,
+    "LayerThickness": [
+      0.05,
+      "m"
+    ],
+    "SoilProfileParameters": [
+      {
+        "Thickness": [
+          0.05,
+          "m"
+        ],
+        "Sand": [
+          0.35,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.34,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.41,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1310.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.36,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.202,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.417,
+          "m3 m-3"
+        ],
+        "pH": 8.5,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilMoisturePercentFC": [
+          74.167,
+          "% [0-100]"
+        ],
+        "SoilNitrate": [
+          0.0022008,
+          "kg NO3-N m-3"
+        ],
+        "SoilAmmonium": [
+          0.00026199999999999997,
+          "kg NH4-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.05,
+          "m"
+        ],
+        "Sand": [
+          0.35,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.34,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.35,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1270.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.36,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.201,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.424,
+          "m3 m-3"
+        ],
+        "pH": 8.5,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilMoisturePercentFC": [
+          74.167,
+          "% [0-100]"
+        ],
+        "SoilNitrate": [
+          0.0021336,
+          "kg NO3-N m-3"
+        ],
+        "SoilAmmonium": [
+          0.000254,
+          "kg NH4-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.05,
+          "m"
+        ],
+        "Sand": [
+          0.35,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.34,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.35,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1270.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.36,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.201,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.424,
+          "m3 m-3"
+        ],
+        "pH": 8.5,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilMoisturePercentFC": [
+          74.167,
+          "% [0-100]"
+        ],
+        "SoilNitrate": [
+          0.0021335999999999994,
+          "kg NO3-N m-3"
+        ],
+        "SoilAmmonium": [
+          0.00025399999999999994,
+          "kg NH4-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.05,
+          "m"
+        ],
+        "Sand": [
+          0.35,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.34,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.27,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1270.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.36,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.199,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.424,
+          "m3 m-3"
+        ],
+        "pH": 8.5,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilMoisturePercentFC": [
+          74.167,
+          "% [0-100]"
+        ],
+        "SoilNitrate": [
+          0.0008763,
+          "kg NO3-N m-3"
+        ],
+        "SoilAmmonium": [
+          0.00017780000000000004,
+          "kg NH4-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.05,
+          "m"
+        ],
+        "Sand": [
+          0.35,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.34,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.27,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1270.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.36,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.199,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.424,
+          "m3 m-3"
+        ],
+        "pH": 8.5,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilMoisturePercentFC": [
+          74.167,
+          "% [0-100]"
+        ],
+        "SoilNitrate": [
+          0.0008763,
+          "kg NO3-N m-3"
+        ],
+        "SoilAmmonium": [
+          0.00017780000000000004,
+          "kg NH4-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.05,
+          "m"
+        ],
+        "Sand": [
+          0.35,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.34,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.27,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1270.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.36,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.199,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.424,
+          "m3 m-3"
+        ],
+        "pH": 8.5,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilMoisturePercentFC": [
+          74.167,
+          "% [0-100]"
+        ],
+        "SoilNitrate": [
+          0.0008763000000000001,
+          "kg NO3-N m-3"
+        ],
+        "SoilAmmonium": [
+          0.00017780000000000007,
+          "kg NH4-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.05,
+          "m"
+        ],
+        "Sand": [
+          0.35,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.34,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.24,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1300.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.32,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.198,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.419,
+          "m3 m-3"
+        ],
+        "pH": 8.6,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilMoisturePercentFC": [
+          87.188,
+          "% [0-100]"
+        ],
+        "SoilNitrate": [
+          0.000884,
+          "kg NO3-N m-3"
+        ],
+        "SoilAmmonium": [
+          0.000195,
+          "kg NH4-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.05,
+          "m"
+        ],
+        "Sand": [
+          0.35,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.34,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.24,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1300.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.32,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.198,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.419,
+          "m3 m-3"
+        ],
+        "pH": 8.6,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilMoisturePercentFC": [
+          87.188,
+          "% [0-100]"
+        ],
+        "SoilNitrate": [
+          0.000884,
+          "kg NO3-N m-3"
+        ],
+        "SoilAmmonium": [
+          0.000195,
+          "kg NH4-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.05,
+          "m"
+        ],
+        "Sand": [
+          0.35,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.34,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.24,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1300.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.32,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.198,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.419,
+          "m3 m-3"
+        ],
+        "pH": 8.6,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilMoisturePercentFC": [
+          87.188,
+          "% [0-100]"
+        ],
+        "SoilNitrate": [
+          0.000884,
+          "kg NO3-N m-3"
+        ],
+        "SoilAmmonium": [
+          0.000195,
+          "kg NH4-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.05,
+          "m"
+        ],
+        "Sand": [
+          0.35,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.34,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.24,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1300.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.32,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.198,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.419,
+          "m3 m-3"
+        ],
+        "pH": 8.6,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilMoisturePercentFC": [
+          87.188,
+          "% [0-100]"
+        ],
+        "SoilNitrate": [
+          0.000884,
+          "kg NO3-N m-3"
+        ],
+        "SoilAmmonium": [
+          0.000195,
+          "kg NH4-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.05,
+          "m"
+        ],
+        "Sand": [
+          0.35,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.34,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.16,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1470.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.3,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.198,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.387,
+          "m3 m-3"
+        ],
+        "pH": 8.6,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilMoisturePercentFC": [
+          91.0,
+          "% [0-100]"
+        ],
+        "SoilNitrate": [
+          0.0006908999999999998,
+          "kg NO3-N m-3"
+        ],
+        "SoilAmmonium": [
+          0.00016170000000000003,
+          "kg NH4-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.05,
+          "m"
+        ],
+        "Sand": [
+          0.35,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.34,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.16,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1470.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.3,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.198,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.387,
+          "m3 m-3"
+        ],
+        "pH": 8.6,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilMoisturePercentFC": [
+          91.0,
+          "% [0-100]"
+        ],
+        "SoilNitrate": [
+          0.0006908999999999995,
+          "kg NO3-N m-3"
+        ],
+        "SoilAmmonium": [
+          0.00016169999999999995,
+          "kg NH4-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.05,
+          "m"
+        ],
+        "Sand": [
+          0.35,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.34,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.16,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1470.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.29,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.198,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.387,
+          "m3 m-3"
+        ],
+        "pH": 8.6,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilMoisturePercentFC": [
+          92.069,
+          "% [0-100]"
+        ],
+        "SoilNitrate": [
+          0.0005145,
+          "kg NO3-N m-3"
+        ],
+        "SoilAmmonium": [
+          0.0001029,
+          "kg NH4-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.05,
+          "m"
+        ],
+        "Sand": [
+          0.35,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.34,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.16,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1470.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.29,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.198,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.387,
+          "m3 m-3"
+        ],
+        "pH": 8.6,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilMoisturePercentFC": [
+          92.069,
+          "% [0-100]"
+        ],
+        "SoilNitrate": [
+          0.0005145,
+          "kg NO3-N m-3"
+        ],
+        "SoilAmmonium": [
+          0.0001029,
+          "kg NH4-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.05,
+          "m"
+        ],
+        "Sand": [
+          0.45,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.3,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.13,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1570.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.27,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.186,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.359,
+          "m3 m-3"
+        ],
+        "pH": 8.6,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilMoisturePercentFC": [
+          69.63,
+          "% [0-100]"
+        ],
+        "SoilNitrate": [
+          0.00034540000000000005,
+          "kg NO3-N m-3"
+        ],
+        "SoilAmmonium": [
+          6.280000000000001e-05,
+          "kg NH4-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.05,
+          "m"
+        ],
+        "Sand": [
+          0.45,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.3,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.13,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1570.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.27,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.186,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.359,
+          "m3 m-3"
+        ],
+        "pH": 8.6,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilMoisturePercentFC": [
+          69.63,
+          "% [0-100]"
+        ],
+        "SoilNitrate": [
+          0.00034540000000000005,
+          "kg NO3-N m-3"
+        ],
+        "SoilAmmonium": [
+          6.280000000000001e-05,
+          "kg NH4-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.05,
+          "m"
+        ],
+        "Sand": [
+          0.45,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.3,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.13,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1570.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.27,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.186,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.359,
+          "m3 m-3"
+        ],
+        "pH": 8.6,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilMoisturePercentFC": [
+          69.63,
+          "% [0-100]"
+        ],
+        "SoilNitrate": [
+          0.00034540000000000005,
+          "kg NO3-N m-3"
+        ],
+        "SoilAmmonium": [
+          6.280000000000001e-05,
+          "kg NH4-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.05,
+          "m"
+        ],
+        "Sand": [
+          0.45,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.3,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.13,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1570.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.27,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.186,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.359,
+          "m3 m-3"
+        ],
+        "pH": 8.6,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilMoisturePercentFC": [
+          69.63,
+          "% [0-100]"
+        ],
+        "SoilNitrate": [
+          0.00034540000000000005,
+          "kg NO3-N m-3"
+        ],
+        "SoilAmmonium": [
+          6.280000000000001e-05,
+          "kg NH4-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.05,
+          "m"
+        ],
+        "Sand": [
+          0.55,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.25,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.1,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1570.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.25,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.159,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.347,
+          "m3 m-3"
+        ],
+        "pH": 8.6,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilMoisturePercentFC": [
+          70.4,
+          "% [0-100]"
+        ],
+        "SoilNitrate": [
+          0.00042390000000000006,
+          "kg NO3-N m-3"
+        ],
+        "SoilAmmonium": [
+          4.7100000000000006e-05,
+          "kg NH4-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.05,
+          "m"
+        ],
+        "Sand": [
+          0.55,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.25,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.1,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1570.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.25,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.159,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.347,
+          "m3 m-3"
+        ],
+        "pH": 8.6,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilMoisturePercentFC": [
+          70.4,
+          "% [0-100]"
+        ],
+        "SoilNitrate": [
+          0.00042390000000000006,
+          "kg NO3-N m-3"
+        ],
+        "SoilAmmonium": [
+          4.7100000000000006e-05,
+          "kg NH4-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.05,
+          "m"
+        ],
+        "Sand": [
+          0.55,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.25,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.1,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1570.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.25,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.159,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.347,
+          "m3 m-3"
+        ],
+        "pH": 8.6,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilMoisturePercentFC": [
+          70.4,
+          "% [0-100]"
+        ],
+        "SoilNitrate": [
+          0.00042390000000000006,
+          "kg NO3-N m-3"
+        ],
+        "SoilAmmonium": [
+          4.7100000000000006e-05,
+          "kg NH4-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.05,
+          "m"
+        ],
+        "Sand": [
+          0.55,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.25,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.1,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1570.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.25,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.159,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.347,
+          "m3 m-3"
+        ],
+        "pH": 8.6,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilMoisturePercentFC": [
+          70.4,
+          "% [0-100]"
+        ],
+        "SoilNitrate": [
+          0.0004239000000000002,
+          "kg NO3-N m-3"
+        ],
+        "SoilAmmonium": [
+          4.7100000000000006e-05,
+          "kg NH4-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.05,
+          "m"
+        ],
+        "Sand": [
+          0.55,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.25,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.1,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1570.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.25,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.159,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.347,
+          "m3 m-3"
+        ],
+        "pH": 8.6,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilMoisturePercentFC": [
+          74.0,
+          "% [0-100]"
+        ],
+        "SoilNitrate": [
+          0.0005024000000000001,
+          "kg NO3-N m-3"
+        ],
+        "SoilAmmonium": [
+          4.7100000000000006e-05,
+          "kg NH4-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.05,
+          "m"
+        ],
+        "Sand": [
+          0.55,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.25,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.1,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1570.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.25,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.159,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.347,
+          "m3 m-3"
+        ],
+        "pH": 8.6,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilMoisturePercentFC": [
+          74.0,
+          "% [0-100]"
+        ],
+        "SoilNitrate": [
+          0.0005024000000000001,
+          "kg NO3-N m-3"
+        ],
+        "SoilAmmonium": [
+          4.7100000000000006e-05,
+          "kg NH4-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.05,
+          "m"
+        ],
+        "Sand": [
+          0.55,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.25,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.1,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1570.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.25,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.159,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.347,
+          "m3 m-3"
+        ],
+        "pH": 8.6,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilMoisturePercentFC": [
+          78.0,
+          "% [0-100]"
+        ],
+        "SoilNitrate": [
+          0.0005024000000000001,
+          "kg NO3-N m-3"
+        ],
+        "SoilAmmonium": [
+          4.7100000000000006e-05,
+          "kg NH4-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.05,
+          "m"
+        ],
+        "Sand": [
+          0.55,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.25,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.1,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1570.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.25,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.159,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.347,
+          "m3 m-3"
+        ],
+        "pH": 8.6,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilMoisturePercentFC": [
+          78.0,
+          "% [0-100]"
+        ],
+        "SoilNitrate": [
+          0.0005024000000000001,
+          "kg NO3-N m-3"
+        ],
+        "SoilAmmonium": [
+          4.7100000000000006e-05,
+          "kg NH4-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.05,
+          "m"
+        ],
+        "Sand": [
+          0.6,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.2,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.0,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1570.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.25,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.136,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.336,
+          "m3 m-3"
+        ],
+        "pH": 8.6,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilMoisturePercentFC": [
+          78.8,
+          "% [0-100]"
+        ],
+        "SoilNitrate": [
+          0.0005024000000000001,
+          "kg NO3-N m-3"
+        ],
+        "SoilAmmonium": [
+          4.7100000000000006e-05,
+          "kg NH4-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.05,
+          "m"
+        ],
+        "Sand": [
+          0.6,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.2,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.0,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1570.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.25,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.136,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.336,
+          "m3 m-3"
+        ],
+        "pH": 8.6,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilMoisturePercentFC": [
+          78.8,
+          "% [0-100]"
+        ],
+        "SoilNitrate": [
+          0.0005024000000000001,
+          "kg NO3-N m-3"
+        ],
+        "SoilAmmonium": [
+          4.7100000000000006e-05,
+          "kg NH4-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.05,
+          "m"
+        ],
+        "Sand": [
+          0.6,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.2,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.0,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1570.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.25,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.136,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.336,
+          "m3 m-3"
+        ],
+        "pH": 8.6,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilMoisturePercentFC": [
+          78.8,
+          "% [0-100]"
+        ],
+        "SoilNitrate": [
+          0.0005024000000000001,
+          "kg NO3-N m-3"
+        ],
+        "SoilAmmonium": [
+          4.7100000000000006e-05,
+          "kg NH4-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.05,
+          "m"
+        ],
+        "Sand": [
+          0.6,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.2,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.0,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1570.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.25,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.136,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.336,
+          "m3 m-3"
+        ],
+        "pH": 8.6,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilMoisturePercentFC": [
+          78.8,
+          "% [0-100]"
+        ],
+        "SoilNitrate": [
+          0.0005024000000000001,
+          "kg NO3-N m-3"
+        ],
+        "SoilAmmonium": [
+          4.7100000000000006e-05,
+          "kg NH4-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.05,
+          "m"
+        ],
+        "Sand": [
+          0.6,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.2,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.0,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1570.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.25,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.136,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.336,
+          "m3 m-3"
+        ],
+        "pH": 8.6,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilMoisturePercentFC": [
+          72.0,
+          "% [0-100]"
+        ],
+        "SoilNitrate": [
+          0.0005024000000000001,
+          "kg NO3-N m-3"
+        ],
+        "SoilAmmonium": [
+          4.7100000000000006e-05,
+          "kg NH4-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.05,
+          "m"
+        ],
+        "Sand": [
+          0.6,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.2,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.0,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1570.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.25,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.136,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.336,
+          "m3 m-3"
+        ],
+        "pH": 8.6,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilMoisturePercentFC": [
+          72.0,
+          "% [0-100]"
+        ],
+        "SoilNitrate": [
+          0.0005024000000000001,
+          "kg NO3-N m-3"
+        ],
+        "SoilAmmonium": [
+          4.7100000000000006e-05,
+          "kg NH4-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.05,
+          "m"
+        ],
+        "Sand": [
+          0.6,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.2,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.0,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1570.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.25,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.136,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.336,
+          "m3 m-3"
+        ],
+        "pH": 8.6,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilMoisturePercentFC": [
+          72.0,
+          "% [0-100]"
+        ],
+        "SoilNitrate": [
+          0.0005024000000000001,
+          "kg NO3-N m-3"
+        ],
+        "SoilAmmonium": [
+          4.7100000000000006e-05,
+          "kg NH4-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.05,
+          "m"
+        ],
+        "Sand": [
+          0.6,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.2,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.0,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1570.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.25,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.136,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.336,
+          "m3 m-3"
+        ],
+        "pH": 8.6,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilMoisturePercentFC": [
+          72.0,
+          "% [0-100]"
+        ],
+        "SoilNitrate": [
+          0.0005024000000000001,
+          "kg NO3-N m-3"
+        ],
+        "SoilAmmonium": [
+          4.7100000000000006e-05,
+          "kg NH4-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.05,
+          "m"
+        ],
+        "Sand": [
+          0.65,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.18,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.0,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1570.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.25,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.128,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.331,
+          "m3 m-3"
+        ],
+        "pH": 8.6,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilMoisturePercentFC": [
+          70.0,
+          "% [0-100]"
+        ],
+        "SoilNitrate": [
+          0.0005024000000000001,
+          "kg NO3-N m-3"
+        ],
+        "SoilAmmonium": [
+          4.7100000000000006e-05,
+          "kg NH4-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.05,
+          "m"
+        ],
+        "Sand": [
+          0.65,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.18,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.0,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1570.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.25,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.128,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.331,
+          "m3 m-3"
+        ],
+        "pH": 8.6,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilMoisturePercentFC": [
+          70.0,
+          "% [0-100]"
+        ],
+        "SoilNitrate": [
+          0.0005024000000000001,
+          "kg NO3-N m-3"
+        ],
+        "SoilAmmonium": [
+          4.7100000000000006e-05,
+          "kg NH4-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.05,
+          "m"
+        ],
+        "Sand": [
+          0.65,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.18,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.0,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1570.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.25,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.128,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.331,
+          "m3 m-3"
+        ],
+        "pH": 8.6,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilMoisturePercentFC": [
+          70.0,
+          "% [0-100]"
+        ],
+        "SoilNitrate": [
+          0.0005024000000000001,
+          "kg NO3-N m-3"
+        ],
+        "SoilAmmonium": [
+          4.7100000000000006e-05,
+          "kg NH4-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.05,
+          "m"
+        ],
+        "Sand": [
+          0.65,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.18,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.0,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1570.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.25,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.128,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.331,
+          "m3 m-3"
+        ],
+        "pH": 8.6,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilMoisturePercentFC": [
+          70.0,
+          "% [0-100]"
+        ],
+        "SoilNitrate": [
+          0.0005024000000000001,
+          "kg NO3-N m-3"
+        ],
+        "SoilAmmonium": [
+          4.7100000000000006e-05,
+          "kg NH4-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.05,
+          "m"
+        ],
+        "Sand": [
+          0.65,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.18,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.0,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1570.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.25,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.128,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.331,
+          "m3 m-3"
+        ],
+        "pH": 8.6,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilMoisturePercentFC": [
+          73.2,
+          "% [0-100]"
+        ],
+        "SoilNitrate": [
+          0.0005024000000000001,
+          "kg NO3-N m-3"
+        ],
+        "SoilAmmonium": [
+          4.7100000000000006e-05,
+          "kg NH4-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.05,
+          "m"
+        ],
+        "Sand": [
+          0.65,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.18,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.0,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1570.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.25,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.128,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.331,
+          "m3 m-3"
+        ],
+        "pH": 8.6,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilMoisturePercentFC": [
+          73.2,
+          "% [0-100]"
+        ],
+        "SoilNitrate": [
+          0.0005024000000000001,
+          "kg NO3-N m-3"
+        ],
+        "SoilAmmonium": [
+          4.7100000000000006e-05,
+          "kg NH4-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.05,
+          "m"
+        ],
+        "Sand": [
+          0.65,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.18,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.0,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1570.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.25,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.128,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.331,
+          "m3 m-3"
+        ],
+        "pH": 8.6,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilMoisturePercentFC": [
+          73.2,
+          "% [0-100]"
+        ],
+        "SoilNitrate": [
+          0.0005024000000000001,
+          "kg NO3-N m-3"
+        ],
+        "SoilAmmonium": [
+          4.7100000000000006e-05,
+          "kg NH4-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.05,
+          "m"
+        ],
+        "Sand": [
+          0.65,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.18,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.0,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1570.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.25,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.128,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.331,
+          "m3 m-3"
+        ],
+        "pH": 8.6,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilMoisturePercentFC": [
+          73.2,
+          "% [0-100]"
+        ],
+        "SoilNitrate": [
+          0.0005024000000000001,
+          "kg NO3-N m-3"
+        ],
+        "SoilAmmonium": [
+          4.7100000000000006e-05,
+          "kg NH4-N m-3"
+        ]
+      }
+    ]
+  },
+  "SoilTemperatureParameters": {
+    "BaseTemperature": 21.0,
+    "InitialSurfaceTemperature": 10,
+    "DensityAir": [
+      1.25,
+      "kg/m3"
+    ],
+    "SpecificHeatCapacityAir": [
+      1005,
+      "J/(kg*K)",
+      "at 300 K"
+    ],
+    "DensityHumus": [
+      1300,
+      "kg/m3"
+    ],
+    "SpecificHeatCapacityHumus": [
+      1920,
+      "J/(kg*K)"
+    ],
+    "DensityWater": [
+      1000,
+      "kg/m3"
+    ],
+    "SpecificHeatCapacityWater": [
+      4192,
+      "J/(kg*K)"
+    ],
+    "QuartzRawDensity": [
+      2650,
+      "kg/m3"
+    ],
+    "SpecificHeatCapacityQuartz": [
+      750,
+      "J/(kg*K)"
+    ],
+    "NTau": 0.65,
+    "SoilAlbedo": 0.7,
+    "SoilMoisture": 0.25,
+    "type": "SoilTemperatureModuleParameters"
+  },
+  "EnvironmentParameters": {
+    "Albedo": 0.2,
+    "rcp": "rcp85",
+    "AtmosphericCO2": 0,
+    "0 means MONICA will calculate CO2 automatically, else use this value for whole simulation, unless more exact data are available": "",
+    "AtmosphericCO2s": {},
+    "year -> CO2-value pairs for yearly CO2 values": "",
+    "LeachingDepth": 1.6,
+    "MaxGroundwaterDepth": 18,
+    "MinGroundwaterDepth": 20,
+    "MinGroundwaterDepthMonth": 3,
+    "WindSpeedHeight": 2.0,
+    "timeStep": 1,
+    "type": "UserEnvironmentParameters"
+  },
+  "SoilOrganicParameters": [
+    "include-from-file",
+    "general/soil-organic.json"
+  ],
+  "SoilTransportParameters": [
+    "include-from-file",
+    "general/soil-transport.json"
+  ],
+  "SoilMoistureParameters": [
+    "include-from-file",
+    "general/soil-moisture.json"
+  ]
+}

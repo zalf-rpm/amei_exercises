@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import copy
 import csv
+import hashlib
 import json
 import logging
 import math
@@ -32,7 +33,9 @@ DEFAULT_MONICA_RUN = Path.home() / "GitHub/monica_odin/odin/build/monica-run"
 
 
 def monica_build(monica_run: Path) -> str:
-    """'<repo> <branch>@<commit>' of the checkout the binary was built in, for the result headers."""
+    """'<repo> <branch>@<commit>' of the checkout the binary was built in, for the result headers and
+    monica_build.txt; '+dirty' if tracked files differ from that commit (the binary may too).
+    """
     repo = next((p for p in monica_run.resolve().parents if (p / ".git").exists()), None)
     if repo is None:
         return monica_run.name
@@ -40,7 +43,8 @@ def monica_build(monica_run: Path) -> str:
     def git(*a: str) -> str:
         return subprocess.run(["git", "-C", str(repo), *a], capture_output=True, text=True).stdout.strip()
 
-    return f"{repo.name} {git('branch', '--show-current')}@{git('rev-parse', '--short', 'HEAD')}"
+    dirty = "+dirty" if git("status", "--porcelain", "--untracked-files=no") else ""
+    return f"{repo.name} {git('branch', '--show-current')}@{git('rev-parse', '--short', 'HEAD')}{dirty}"
 
 
 # ---------------------------------------------------------------------------------------------
@@ -76,6 +80,7 @@ class Fertilization:
     nh4: float  # fraction of the N
     no3: float
     name: str
+    urea: float = 0.0  # fraction of the N
 
 
 @dataclass
@@ -106,11 +111,22 @@ class Setup:
     slope: float = 0.0  # m m-1
     wind_height: float = 2.0
     co2: float | None = None  # None: MONICA's own CO2 by year
+    co2_daily: pd.Series | None = None  # [ppm], date index; a co2 column in climate.csv, overrides co2
+    # annual average air temperature and amplitude of the monthly averages [°C] for the soil
+    # temperature modules; None: MONICA calculates them from the climate data (wrong for a season)
+    tav: float | None = None
+    tamp: float | None = None
+    # site.json section (e.g. "SoilTemperatureParameters") -> parameters to put on top of its include
+    site_params: dict[str, dict[str, Any]] = field(default_factory=dict)
     albedo: float | None = None
     initial_moisture: list[tuple[float, float, float]] = field(default_factory=list)  # (top cm, bottom cm, m3 m-3)
     initial_n_total_kg_ha: float | None = None  # spread evenly, if the horizons have no N
+    # (top cm, bottom cm, NO3-N kg/ha, NH4-N kg/ha) as measured, None = not measured; overrides the horizons' N
+    initial_n: list[tuple[float, float, float | None, float | None]] = field(default_factory=list)
     fertilizations: list[Fertilization] = field(default_factory=list)
-    irrigations: list[tuple[date, float]] = field(default_factory=list)  # (date, mm)
+    # (date, mm) or (date, mm, depth m): below the surface (buried drip lines) into the layer at that
+    # depth (Odin MONICA and the AMEI branch since 2026-11-17)
+    irrigations: list[tuple[date, float] | tuple[date, float, float]] = field(default_factory=list)
     obs: Observations = field(default_factory=lambda: Observations(pd.Series(dtype=float)))
     notes: list[str] = field(default_factory=list)
 
@@ -244,6 +260,8 @@ class Options:
     water_stress: bool = True
     nitrogen_stress: bool = False
     vp_factor: float = 1.0  # VPRSD is multiplied by this; 10 reproduces hPa
+    modules: dict[str, Any] | None = None  # sim.json's "Modules" (Odin), e.g. the soil temperature model
+    events: list[Any] | None = None  # sim.json's output events; None: the ET study's (daily_outputs, EVENTS)
 
 
 def write_climate(path: Path, s: Setup, vp_factor: float) -> None:
@@ -257,13 +275,21 @@ def write_climate(path: Path, s: Setup, vp_factor: float) -> None:
     if gaps:
         msg = f"{s.id}: missing weather values {gaps}"
         raise ValueError(msg)
+    co2 = None
+    if s.co2_daily is not None:
+        co2 = s.co2_daily.reindex(w.index)
+        if co2.isna().any():
+            msg = f"{s.id}: no CO2 for {int(co2.isna().sum())} day(s)"
+            raise ValueError(msg)
     with path.open("w", newline="") as f:
         out = csv.writer(f, delimiter=";")
-        out.writerow(["iso-date", *WEATHER_COLUMNS])
-        out.writerow(["", *WEATHER_UNITS])
+        out.writerow(["iso-date", *WEATHER_COLUMNS, *(["co2"] if co2 is not None else [])])
+        out.writerow(["", *WEATHER_UNITS, *(["ppm"] if co2 is not None else [])])
         for day, r in w.iterrows():
             vals = [round(float(r[c]), 6) for c in WEATHER_COLUMNS]
             vals[-1] = round(vals[-1] * vp_factor, 6)
+            if co2 is not None:
+                vals.append(round(float(co2[day]), 6))
             out.writerow([str(day), *vals])
 
 
@@ -285,6 +311,10 @@ def soil_layers(s: Setup) -> tuple[list[dict[str, Any]], list[str]]:
     """
     profile_depth = s.no_of_layers * LAYER_THICKNESS_M
     horizons_have_n = any(h.nitrate_kg_ha is not None or h.ammonium_kg_ha is not None for h in s.horizons)
+    # measured N as concentrations [kg N m-3] of the measured layers, for depth_weighted
+    no3_conc = [(t, b, None if no3 is None else no3 / 10000.0 / ((b - t) / 100)) for t, b, no3, _ in s.initial_n]
+    nh4_conc = [(t, b, None if nh4 is None else nh4 / 10000.0 / ((b - t) / 100)) for t, b, _, nh4 in s.initial_n]
+    no_n = []
     even_nitrate = (
         s.initial_n_total_kg_ha / 10000.0 / profile_depth
         if s.initial_n_total_kg_ha is not None and not horizons_have_n
@@ -325,7 +355,16 @@ def soil_layers(s: Setup) -> tuple[list[dict[str, Any]], list[str]]:
                 percent_fc = 100.0  # MONICA accepts at most 100 % of FC
             layer["SoilMoisturePercentFC"] = [round(percent_fc, 3), "% [0-100]"]
         horizon_m = (h.bottom_cm - h.top_cm) / 100
-        if h.nitrate_kg_ha is not None:
+        if s.initial_n:
+            no3 = depth_weighted(no3_conc, top_cm, bottom_cm)
+            nh4 = depth_weighted(nh4_conc, top_cm, bottom_cm)
+            if no3 is not None:
+                layer["SoilNitrate"] = [no3, "kg NO3-N m-3"]
+            if nh4 is not None:
+                layer["SoilAmmonium"] = [nh4, "kg NH4-N m-3"]
+            if no3 is None or nh4 is None:
+                no_n.append(i + 1)
+        elif h.nitrate_kg_ha is not None:
             layer["SoilNitrate"] = [h.nitrate_kg_ha / 10000.0 / horizon_m, "kg NO3-N m-3"]
         elif even_nitrate is not None:
             layer["SoilNitrate"] = [even_nitrate, "kg NO3-N m-3"]
@@ -336,6 +375,8 @@ def soil_layers(s: Setup) -> tuple[list[dict[str, Any]], list[str]]:
         notes.append(f"initial moisture above field capacity, set to FC, in layer(s) {', '.join(above_fc)}")
     if not s.initial_moisture:
         notes.append("no initial moisture given, MONICA's default used")
+    if no_n:
+        notes.append(f"no initial NO3/NH4 measured for layer(s) {no_n[0]}-{no_n[-1]}, MONICA's default used")
     return layers, notes
 
 
@@ -361,15 +402,16 @@ def worksteps(s: Setup, sowing_template: dict[str, Any]) -> list[dict[str, Any]]
                 "type": "MineralFertilization",
                 "date": str(f.date),
                 "amount": [f.kg_n, "kg N"],
-                "partition": {"id": f.name, "name": f.name, "Carbamid": 0.0, "NH4": f.nh4, "NO3": f.no3},
+                "partition": {"id": f.name, "name": f.name, "Carbamid": f.urea, "NH4": f.nh4, "NO3": f.no3},
             }
         )
-    for day, mm in s.irrigations:
+    for day, mm, *depth in s.irrigations:
         steps.append(
             {
                 "type": "Irrigation",
                 "date": str(day),
                 "amount": [mm, "mm"],
+                **({"depth": depth[0]} if depth and depth[0] > 0 else {}),
                 "parameters": {"nitrateConcentration": [0.0, "mg dm-3"], "sulfateConcentration": [0.0, "mg dm-3"]},
             }
         )
@@ -379,6 +421,14 @@ def worksteps(s: Setup, sowing_template: dict[str, Any]) -> list[dict[str, Any]]
             "%s: %s on %s is outside the simulation %s..%s, dropped", s.id, st["type"], st["date"], s.start, s.end
         )
     return sorted((st for st in steps if st not in outside), key=lambda st: st["date"])
+
+
+def output_events(daily: dict[str, Any]) -> list[Any]:
+    """A "daily" section with the given outputs (code -> spec, None = skipped) and the EVENTS sections."""
+    events: list[Any] = ["daily", ["Date|DATE"] + [out_spec(k, v) for k, v in daily.items() if v is not None]]
+    for event, outs in EVENTS.items():
+        events += [event, [out_spec(code, spec) for code, spec in outs]]
+    return events
 
 
 def sim_json(base: dict[str, Any], s: Setup, opts: Options) -> dict[str, Any]:
@@ -392,6 +442,9 @@ def sim_json(base: dict[str, Any], s: Setup, opts: Options) -> dict[str, Any]:
             "lineNoOfHeaderLine": 1,
             "csv-separator": ";",
             "header-to-acd-names": {},
+            # the Odin MONICA since 2026-11-17, ignored by the others
+            **({"tav": s.tav} if s.tav is not None else {}),
+            **({"tamp": s.tamp} if s.tamp is not None else {}),
         },
         "include-file-base-path": f"{opts.params.resolve()}/",
         "path-to-output": "./",
@@ -402,12 +455,9 @@ def sim_json(base: dict[str, Any], s: Setup, opts: Options) -> dict[str, Any]:
         "NumberOfLayers": s.no_of_layers,
         "LayerThickness": [LAYER_THICKNESS_M, "m"],
     }
-    daily = ["Date|DATE"] + [
-        out_spec(k, v) for k, v in (daily_outputs(s.no_of_layers) | EXTRA_DAILY).items() if v is not None
-    ]
-    events: list[Any] = ["daily", daily]
-    for event, outs in EVENTS.items():
-        events += [event, [out_spec(code, spec) for code, spec in outs]]
+    if opts.modules is not None:
+        sim["Modules"] = opts.modules
+    events = opts.events if opts.events is not None else output_events(daily_outputs(s.no_of_layers) | EXTRA_DAILY)
     sim["output"] = {
         "write-file?": False,  # monica-run prints the sections to stdout
         "csv-options": {"include-header-row": True, "include-units-row": False, "csv-separator": ","},
@@ -431,12 +481,13 @@ def site_json(base: dict[str, Any], s: Setup, layers: list[dict[str, Any]], para
         env["AtmosphericCO2"] = s.co2
     if s.albedo is not None:
         env["Albedo"] = s.albedo
-    # An object here replaces the include of general/environment.json entirely - the parameters not
-    # in it fall back to MONICA's built-in defaults. So the include is resolved and ours put on top.
-    env_base = site.get("EnvironmentParameters")
-    if isinstance(env_base, list) and env_base[:1] == ["include-from-file"]:
-        env_base = json.loads((params / env_base[1]).read_text())
-    site["EnvironmentParameters"] = (env_base or {}) | env
+    # An object here replaces the include of e.g. general/environment.json entirely - the parameters
+    # not in it fall back to MONICA's built-in defaults. So the include is resolved and ours put on top.
+    for section, values in ({"EnvironmentParameters": env} | s.site_params).items():
+        section_base = site.get(section)
+        if isinstance(section_base, list) and section_base[:1] == ["include-from-file"]:
+            section_base = json.loads((params / section_base[1]).read_text())
+        site[section] = (section_base or {}) | values
     return site
 
 
@@ -464,13 +515,33 @@ def prepare(s: Setup, run_dir: Path, opts: Options) -> list[str]:
     return s.notes + notes
 
 
-def run_monica(monica_run: Path, run_dir: Path) -> None:
+def run_monica(monica_run: Path, run_dir: Path, build: str | None = None) -> None:
+    """monica_out.csv and monica.log into run_dir, and monica_build.txt (`monica_build`) if given."""
+    if build is not None:
+        (run_dir / "monica_build.txt").write_text(build + "\n")
     res = subprocess.run([str(monica_run), "sim.json"], cwd=run_dir, capture_output=True, text=True, check=False)
     (run_dir / "monica_out.csv").write_text(res.stdout)
     (run_dir / "monica.log").write_text(res.stderr)
     if res.returncode != 0 or not res.stdout.startswith('"'):
         msg = f"monica-run failed in {run_dir} (exit {res.returncode}), see monica.log:\n{res.stderr[-600:]}"
         raise RuntimeError(msg)
+
+
+CHECKSUMS = "checksums.txt"
+
+
+def write_checksums(out: Path, patterns: Iterable[str]) -> Path:
+    """sha256 of the outputs below `out` that git ignores (too big to track), in sha256sum's format.
+
+    After a rerun, `git diff <out>/checksums.txt` shows which of them changed; `sha256sum -c
+    checksums.txt` in `out` checks the files on disk.
+    """
+    files = sorted({f for pattern in patterns for f in out.glob(pattern) if f.is_file()})
+    path = out / CHECKSUMS
+    path.write_text(
+        "".join(f"{hashlib.sha256(f.read_bytes()).hexdigest()}  {f.relative_to(out).as_posix()}\n" for f in files)
+    )
+    return path
 
 
 # ---------------------------------------------------------------------------------------------
@@ -531,10 +602,10 @@ def collect(run_dir: Path) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     return daily, summary
 
 
-def template_header(path: Path) -> tuple[list[str], list[list[str]]]:
+def template_header(path: Path, encoding: str = "utf-8") -> tuple[list[str], list[list[str]]]:
     """The lines before the column header, and the name/unit/code rows, of an AMEI template."""
-    rows = [line.split("\t") for line in path.read_text(encoding="utf-8").splitlines()]
-    code_row = next(i for i, r in enumerate(rows) if r and r[0] == "MODEL_ID")
+    rows = [line.split("\t") for line in path.read_text(encoding=encoding).splitlines()]
+    code_row = next(i for i, r in enumerate(rows) if r and r[0] in ("MODEL_ID", "FRAMEWORK_ID"))
     names, units, codes = (r[:] for r in rows[code_row - 2 : code_row + 1])
     while names and len(names) > len(codes) and "soil_temp_surface_daily_avg" in names:
         # the daily template names a column (TSSAV) that has neither a unit nor a code
@@ -543,25 +614,43 @@ def template_header(path: Path) -> tuple[list[str], list[list[str]]]:
     return preamble, [names, units, codes]
 
 
-def fmt(v: Any) -> str:
+def fmt(v: Any, na: str = "NA") -> str:
     if v is None or v == "":
-        return "NA"
+        return na
     x = number(v)
     if x is None:
         return str(v)
     return f"{round(x, DIGITS):g}"
 
 
-def write_result(path: Path, template: Path, model_line: str, rows: list[list[Any]]) -> None:
-    preamble, header = template_header(template)
-    preamble = [model_line if line.startswith("Model:") else line for line in preamble]
-    with path.open("w", newline="") as f:
+def write_result(
+    path: Path,
+    template: Path,
+    model_line: str,
+    rows: list[list[Any]],
+    *,
+    na: str = "NA",
+    encoding: str = "utf-8",
+    preamble_lines: dict[str, str] | None = None,
+    title: str | None = None,
+    min_preamble_lines: int = 0,
+) -> None:
+    """The template's header with the "Model:" line (and any of preamble_lines, by their start)
+    replaced, then the rows. title replaces the first line; empty lines are added to the preamble up
+    to min_preamble_lines (the AMEI soil temperature checklist wants the data from line 8)."""
+    preamble, header = template_header(template, encoding)
+    replace = {"Model:": model_line} | (preamble_lines or {})
+    preamble = [next((v for k, v in replace.items() if line.startswith(k)), line) for line in preamble]
+    if title is not None and preamble:
+        preamble[0] = title
+    preamble += [""] * (min_preamble_lines - len(preamble))
+    with path.open("w", newline="", encoding=encoding) as f:
         for line in preamble:
             f.write(line.rstrip("\t") + "\n")
         for r in header:
             f.write("\t".join(r) + "\n")
         for r in rows:
-            f.write("\t".join(fmt(v) for v in r) + "\n")
+            f.write("\t".join(fmt(v, na) for v in r) + "\n")
 
 
 def result_names(kind: str, module_code: str, site_name: str) -> tuple[str, str]:

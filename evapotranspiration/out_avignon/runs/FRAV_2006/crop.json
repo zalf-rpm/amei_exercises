@@ -1,0 +1,86 @@
+{
+  "CropParameters": [
+    "include-from-file",
+    "general/crop.json"
+  ],
+  "cropRotation": [
+    {
+      "worksteps": [
+        {
+          "date": "2005-10-27",
+          "type": "Sowing",
+          "crop": {
+            "cropParams": {
+              "species": [
+                "include-from-file",
+                "crops/species_wheat.json"
+              ],
+              "cultivar": [
+                "include-from-file",
+                "crops/cultivar_winter-wheat.json"
+              ]
+            },
+            "residueParams": [
+              "include-from-file",
+              "crops/residue_wheat.json"
+            ]
+          }
+        },
+        {
+          "type": "MineralFertilization",
+          "date": "2006-02-27",
+          "amount": [
+            66.0,
+            "kg N"
+          ],
+          "partition": {
+            "id": "Ammonium nitrate",
+            "name": "Ammonium nitrate",
+            "Carbamid": 0.0,
+            "NH4": 0.5,
+            "NO3": 0.5
+          }
+        },
+        {
+          "type": "MineralFertilization",
+          "date": "2006-04-14",
+          "amount": [
+            66.0,
+            "kg N"
+          ],
+          "partition": {
+            "id": "Ammonium nitrate",
+            "name": "Ammonium nitrate",
+            "Carbamid": 0.0,
+            "NH4": 0.5,
+            "NO3": 0.5
+          }
+        },
+        {
+          "type": "Irrigation",
+          "date": "2006-05-18",
+          "amount": [
+            20.0,
+            "mm"
+          ],
+          "parameters": {
+            "nitrateConcentration": [
+              0.0,
+              "mg dm-3"
+            ],
+            "sulfateConcentration": [
+              0.0,
+              "mg dm-3"
+            ]
+          }
+        },
+        {
+          "type": "AutomaticHarvest",
+          "date": "2006-07-15",
+          "harvest-time": "maturity",
+          "latest-date": "2006-07-15"
+        }
+      ]
+    }
+  ]
+}
