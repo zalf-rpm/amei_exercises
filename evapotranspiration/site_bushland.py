@@ -18,7 +18,10 @@ logger = logging.getLogger("site_bushland")
 
 NAME = "Bushland"
 XLSX = HERE / "AMEI_Bushland_v4_2026-01-24(no_soil_T).xlsx"
-NO_OF_LAYERS = 42  # 2.1 m of the 2.4 m profile
+# 10 cm layers: with 5 cm the infiltration limit (it scales with the layer thickness) let the
+# irrigation water pond, which then evaporated at 1.1 x ET0 (FINDINGS.md, model issues 4 and 5)
+LAYER_THICKNESS_M = 0.1
+NO_OF_LAYERS = 21  # 2.1 m of the 2.4 m profile
 CULTIVAR = "crops/cultivar_winter-wheat.json"
 
 
@@ -109,6 +112,7 @@ def load(xlsx: Path = XLSX) -> list[Setup]:
                 ],
                 cultivar=CULTIVAR,
                 no_of_layers=NO_OF_LAYERS,
+                layer_thickness_m=LAYER_THICKNESS_M,
                 obs=Observations(
                     et=pd.Series(et["ETAD"].astype(float).to_numpy(), index=pd.to_datetime(et["DATE"]).dt.date)
                     if len(et)

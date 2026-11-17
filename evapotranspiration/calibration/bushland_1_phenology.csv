@@ -1,0 +1,12 @@
+name,position in array,low,high,step,optguess,minbound,maxbound,derived params
+StageTemperatureSum,0,80,220,,148,,,
+tsum_veg,,0.5,1.5,,1,,,
+StageTemperatureSum,1,,,,,,,cultivar['StageTemperatureSum'][0][1] * tsum_veg
+StageTemperatureSum,2,,,,,,,cultivar['StageTemperatureSum'][0][2] * tsum_veg
+StageTemperatureSum,3,,,,,,,cultivar['StageTemperatureSum'][0][3] * tsum_veg
+StageTemperatureSum,4,200,700,,420,,,
+VernalisationRequirement,1,10,60,,50,,,
+dl_req,,12,24,,20,,,
+DaylengthRequirement,1,,,,,,,dl_req
+DaylengthRequirement,2,,,,,,,dl_req
+DaylengthRequirement,3,,,,,,,dl_req

@@ -1,13 +1,13 @@
 AMEI ET summary results
-Model:	MONICA (MOFAPM, monica_odin simplify_copilot@e4258a06)
+Model:	MONICA (MOFAPM, monica_odin simplify_copilot@d343fb82)
 Modeler_name:
 
 ET_module_ID	treatment_ID	planting_date	emergence_date	anthesis_date	physiologic_maturity_dat	leaf_no_per_stem_matur	leaf_area_index_maximum	PAR_interception_over_season	tops_dry_weight_anthesis	tops_dry_weight_maturity	grain_dry_wt_at_mat	harvest_no_at_maturity	grain_unit_dry_wt_matur	tops_N_at_anthesis	tops_N_at_maturity	grain_N_at_maturity	grain_unit_N_matur	root_depth_maximum	avail_water_soil_profile_sow_mat	drainage_over_season	runoff_over_season	avail_N_inorganic_soil_profile_over_season	N_leached_during_season	N_mineralization_during_season	N2O_emissions__over_season	N_immobilization_cumul	N_denitrification_over_season	potential_evapotrans_over_season	evapotrans_over_season	potential_soil_evaporation_over_season	soil_evap_over_season	potential_transpiration_over_season	transpiration_over_season	Evapotranspiration_reference_over_season	standardized_reference_evapotranspiration_short_reference_over_season	standardized_reference_evapotranspiration_tall_reference_over_season	potential evapotranspiration_over_season
 text	text	date	date	date	date	leaf\mainstem	m /m 	%	kg[DM]/ha	kg[DM]/ha	kg[DM]/ha	number/m2	mg[DM]/grain	kg[N]/ha	kg[N]/ha	kg[N]/ha	mg[N]/grain	m	mm	mm	mm	kg[N]/ha	kg[N]/ha	kg[N]/ha	kg[N]/ha	kg[N]/ha	kg[N]/ha	mm	mm	mm	mm	mm	mm	mm	mm	mm	mm
 MODEL_ID	TREAT_ID	PDATE	PLDAE	ADAT	MDAT	LnoSM	LAIX	LIPCCM	CWAA	CWAM	GWAM	HnoAM	GWGM	CNAA	CNAM	GNAM	GNGM	RDPM	WAVSSM	DRCM	ROCM	NIAVSSM	NLCM	NMNCM	N2OECM	NIMCM	NDNCM	EOCM	ETCM	EPSCM	ESCM	EPPCM	EPCM	ETO	ETOS	ETRS	ETP
-MOFAPM	TXBL1990F	1989-10-11	1989-10-21	1990-06-05	NA	NA	11.5856	NA	17521.8	NA	NA	NA	NA	104.6	NA	NA	NA	3.9	NA	0	0	NA	0	26.7425	0.6672	NA	0.0751	865	698.5	NA	61.6	NA	587.1	1105.1	NA	NA	865
-MOFAPM	TXBL1990P	1989-10-11	1989-10-21	1990-06-01	1990-06-14	NA	10.6908	NA	14047.8	13698.9	542.7	NA	NA	60.6	61.7	4.7033	NA	4	NA	0	0	NA	0	33.3869	0.4175	NA	0.0031	737.2	436.1	NA	55.5	NA	333.9	988.7	NA	NA	737.2
-MOFAPM	TXBL1992F	1991-09-26	1991-10-04	1992-05-25	NA	NA	12.7569	NA	17986.7	NA	NA	NA	NA	93.5	NA	NA	NA	3.9	NA	86.5016	0	NA	3.551	27.8563	0.5513	NA	0.1065	799.9	780.5	NA	63.2	NA	607.4	1058.5	NA	NA	799.9
-MOFAPM	TXBL1992P	1991-09-26	1991-10-04	1992-05-25	NA	NA	12.7569	NA	17986.7	NA	NA	NA	NA	95.1	NA	NA	NA	3.9	NA	52.3008	0	NA	2.13	45.2001	0.6574	NA	0.0121	799.9	766.4	NA	62.6	NA	606.9	1058.5	NA	NA	799.9
-MOFAPM	TXBL1993F	1992-09-29	1992-10-05	1993-06-02	NA	NA	12.8536	NA	17156	NA	NA	NA	NA	89	NA	NA	NA	3.9	NA	10.7194	0	NA	0.662	25.1242	0.4761	NA	0.0672	887.9	773.2	NA	65.1	NA	631.3	1149.6	NA	NA	887.9
-MOFAPM	TXBL1993P	1992-09-29	1992-10-05	1993-06-02	NA	NA	12.8536	NA	17156	NA	NA	NA	NA	49	NA	NA	NA	3.9	NA	11.4779	0	NA	0.608	41.8221	0.3542	NA	0.0134	887.9	750.9	NA	63.7	NA	631.3	1149.6	NA	NA	887.9
+MOFAPM	TXBL1990F	1989-10-11	1989-10-21	1990-06-05	NA	NA	11.5607	NA	17468.7	NA	NA	NA	NA	101.2	NA	NA	NA	2	NA	0	0	NA	0	29.6376	0.6107	NA	0.0202	865.1	682.2	NA	74.4	NA	586.5	1105.1	NA	NA	865.1
+MOFAPM	TXBL1990P	1989-10-11	1989-10-21	1990-06-02	1990-06-14	NA	10.7314	NA	14202	13869	577.4	NA	NA	61.5	63.3	5.0623	NA	2	NA	0	0	NA	0	32.3636	0.3988	NA	0.0002	740.3	433.7	NA	68.2	NA	343.9	988.7	NA	NA	740.3
+MOFAPM	TXBL1992F	1991-09-26	1991-10-04	1992-05-25	NA	NA	13.2248	NA	17818.4	NA	NA	NA	NA	87.5	NA	NA	NA	2	NA	146.925	0	NA	5.991	29.6918	0.547	NA	0.0183	794.9	739.2	NA	76.5	NA	605.5	1058.5	NA	NA	794.9
+MOFAPM	TXBL1992P	1991-09-26	1991-10-04	1992-05-25	NA	NA	13.2245	NA	17801.3	NA	NA	NA	NA	94.6	NA	NA	NA	2	NA	91.6568	0	NA	3.59	42.4244	0.66	NA	0.0064	794.9	727.9	NA	76.5	NA	597.1	1058.5	NA	NA	794.9
+MOFAPM	TXBL1993F	1992-09-29	1992-10-06	1993-06-01	NA	NA	12.217	NA	17187.4	NA	NA	NA	NA	92.1	NA	NA	NA	2	NA	52.4114	0	NA	2.174	29.7606	0.4813	NA	0.0049	893.3	752.4	NA	79.7	NA	630.9	1149.9	NA	NA	893.3
+MOFAPM	TXBL1993P	1992-09-29	1992-10-06	1993-06-01	NA	NA	12.217	NA	17187.4	NA	NA	NA	NA	55.6	NA	NA	NA	2	NA	25.327	0	NA	1.084	41.82	0.3944	NA	0.0012	893.3	755.2	NA	79	NA	630.9	1149.9	NA	NA	893.3

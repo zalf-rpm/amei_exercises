@@ -193,7 +193,8 @@ against the other humidity columns.
   ea / es_mean, since `RHUMD` is ambiguous (see above). That lowered ET0 by ~4 % (TXBL1990F
   1149 -> 1105 mm), as expected if RHUMD is closer to the minimum. One `RAIN` column, though the
   comments describe `RAIN_PART`/`RAIN_FULL`.
-- `SLPHW` missing below 160 cm: taken from the horizon above. 42 layers = 2.1 m of the 2.4 m.
+- `SLPHW` missing below 160 cm: taken from the horizon above. Since 2026-11-17 **21 layers of
+  10 cm** = 2.1 m of the 2.4 m (before 42 x 5 cm), see "10 cm layers" below.
 - Initial moisture above FC in 1992 (deep layers) and 1993 (5-70 cm): set to FC.
 - Initial N: only `ICIN` = 25 kg N/ha, spread evenly over 2.1 m. Nitrogen response is off.
 - Anhydrous ammonia as 100 % NH4. Harvest on the given dates.
@@ -254,6 +255,60 @@ Bushland: anthesis 2-3 weeks late, maturity mostly not reached before harvest, L
 root depth up to 3.9 m (profile is 2.1 m). ETa underestimated mainly late in the season (6.5 mm
 cap, and the crop keeps transpiring while the real one senesces). Avignon: anthesis 1-4 weeks
 late, LAI too high as well; ETa mostly fine in winter/spring, the 6.5 mm cap shows from May.
+
+## 10 cm layers (Bushland, 2026-11-17)
+
+With 5 cm layers the infiltration limit (it scales with the layer thickness, model issue 5) let
+the irrigation water pond, which then evaporated at up to 1.1 x ET0, past the 6.5 mm cap (model
+issue 4). Bushland now uses 21 x 10 cm (`Setup.layer_thickness_m`, default still 5 cm; Avignon
+and the soil temperature study unchanged). Same Odin build (`d343fb82`), default cultivar; the
+build alone changed nothing against the table above.
+
+| | ETa sim 5 / 10 cm (mm) | days with ETa > 6.5 mm, 5 / 10 cm | soil evaporation 5 / 10 cm (mm) |
+|---|---|---|---|
+| TXBL1990F | 684 / 670 | 9 / 3 | 62 / 74 |
+| TXBL1990P | 431 / 432 | 0 / 0 | 61 / 75 |
+| TXBL1992F | 776 / 732 | 10 / 2 | 63 / 77 |
+| TXBL1992P | 742 / 702 | 5 / 0 | 63 / 77 |
+| TXBL1993F | 770 / 749 | 11 / 2 | 77 / 92 |
+| TXBL1993P | 750 / 755 | 1 / 0 | 75 / 92 |
+
+The ponding is mostly gone; the water now evaporates from the soil instead. The bias of the fully
+irrigated treatments gets a little worse (-0.64 to -0.74 mm/d): what's left is the cap.
+
+## Calibration (`calibrate.py`, 2026-11-17)
+
+Step by step, each step starting from the previous one's cultivar: 1. phenology, 2. LAI and
+biomass (F treatments), 3. yield, 4. water (Kc, rooting, drought response on the P treatments),
+then leave-one-season-out. The parameters per step in a CSV like the Maricopa flows'
+`calibratethese_*.csv` (`calibration/<site>_<n>_<step>.csv`, free variables and derived rows
+supported); SCE-UA (spotpy); a MONICA run takes 0.05 s, a step a few minutes. The runs last
+until maturity (at the latest until the weather has a gap after harvest), a date not reached
+counts as 30 days after the last simulated day.
+
+**Step 1, phenology, Bushland** (`calibration/bushland_1_phenology.csv`; one winter wheat for all
+three cultivars: TAM200/TAM107/Mesa have one season each, so per cultivar there would be one F/P
+pair with the same dates): emergence, anthesis, maturity of all 6 treatments (17 dates). 5
+parameters: `StageTemperatureSum[0]` (emergence), a factor on `[1..3]` (anthesis), `[4]`
+(maturity), `VernalisationRequirement[1]`, one `DaylengthRequirement` for stages 2-4. RMSE 15.2
+-> 2.9 d, ~1000 evaluations, 1.5 min:
+
+| | emergence | anthesis | maturity |
+|---|---|---|---|
+| default, sim - obs (d) | -3..1 | 14..20 | 7..36 |
+| calibrated, sim - obs (d) | -3..1 | -2..5 | -5..5 |
+
+Calibrated: TSUM 154 / 279 / 373 / 177 / 401 (default 148 / 284 / 380 / 180 / 420),
+vernalisation 11 d (50), daylength requirement 18.3 h (20). The vernalisation went to the lower
+bound (10); with the bound at 0 it ends at 13 d with the same RMSE and 181 °C d for emergence:
+**the dates don't determine the parameters** (vernalisation, daylength and the temperature sums
+trade off). The daily Zadoks stages (9-13 per treatment) could pin them down better; MONICA's
+stages map to Zadoks only at the stage boundaries.
+
+With that cultivar (`crops/cultivar_winter-wheat_bushland_1_phenology.json`, 10 cm): all
+treatments reach maturity, LAI max 6.2-7.9 (obs 2.4-7.1, before 10.7-13.2), ET RMSE 1.35-1.96
+mm/d, bias of the F treatments -0.61..-0.67 mm/d (the cap). Yield off: F +13..+46 %, P -57 % (1990)
+to +88 % (1992). Steps 2-4.
 
 ## Open questions
 

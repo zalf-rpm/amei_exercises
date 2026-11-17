@@ -23,3 +23,6 @@ maricopa_wheat_face/load-balance-test-out/
 evapotranspiration/out_*/runs/*/monica_out.csv
 soil_temperature/out_*/runs/*/*/monica_out.csv
 soil_temperature/out_*/results/*Layers*.txt
+
+# calibrate.py: the MONICA run folders of the evaluations
+evapotranspiration/calibration/*/work/

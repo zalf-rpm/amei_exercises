@@ -27,7 +27,7 @@ logger = logging.getLogger("et_monica")
 
 HERE = Path(__file__).resolve().parent
 TEMPLATES = HERE / "3_Templates/Evaluation"
-LAYER_THICKNESS_M = 0.05
+LAYER_THICKNESS_M = 0.05  # the default; Setup.layer_thickness_m
 # the Odin port (zalf-rpm/monica, branch simplify_copilot): `pixi run build monica-run` in odin/
 DEFAULT_MONICA_RUN = Path.home() / "GitHub/monica_odin/odin/build/monica-run"
 
@@ -106,6 +106,7 @@ class Setup:
     sowing: date
     cultivar: str  # include path, relative to the params dir
     no_of_layers: int
+    layer_thickness_m: float = LAYER_THICKNESS_M
     harvest: date | None = None
     latest_harvest: date | None = None  # harvest at maturity, at the latest on this date
     slope: float = 0.0  # m m-1
@@ -305,11 +306,12 @@ def depth_weighted(intervals: Iterable[tuple[float, float, float]], top: float, 
 
 
 def soil_layers(s: Setup) -> tuple[list[dict[str, Any]], list[str]]:
-    """The profile as MONICA layers of LAYER_THICKNESS_M with the initial moisture and N.
+    """The profile as MONICA layers of s.layer_thickness_m with the initial moisture and N.
 
     A layer below the last horizon gets the last horizon's properties.
     """
-    profile_depth = s.no_of_layers * LAYER_THICKNESS_M
+    dz = s.layer_thickness_m
+    profile_depth = s.no_of_layers * dz
     horizons_have_n = any(h.nitrate_kg_ha is not None or h.ammonium_kg_ha is not None for h in s.horizons)
     # measured N as concentrations [kg N m-3] of the measured layers, for depth_weighted
     no3_conc = [(t, b, None if no3 is None else no3 / 10000.0 / ((b - t) / 100)) for t, b, no3, _ in s.initial_n]
@@ -328,11 +330,11 @@ def soil_layers(s: Setup) -> tuple[list[dict[str, Any]], list[str]]:
 
     layers, above_fc = [], []
     for i in range(s.no_of_layers):
-        top_cm, bottom_cm = i * LAYER_THICKNESS_M * 100, (i + 1) * LAYER_THICKNESS_M * 100
+        top_cm, bottom_cm = i * dz * 100, (i + 1) * dz * 100
         mid = (top_cm + bottom_cm) / 2
         h = next((h for h in s.horizons if h.top_cm <= mid < h.bottom_cm), s.horizons[-1])
         layer: dict[str, Any] = {
-            "Thickness": [LAYER_THICKNESS_M, "m"],
+            "Thickness": [dz, "m"],
             "Sand": [h.sand / 100, "kg kg-1"],
             "Clay": [h.clay / 100, "kg kg-1"],
             "SoilOrganicCarbon": [h.soc, "mass%"],
@@ -453,7 +455,7 @@ def sim_json(base: dict[str, Any], s: Setup, opts: Options) -> dict[str, Any]:
         # the C++ master and the Odin port take the layering from the simulation parameters (default
         # 20 x 0.1 m), the AMEI branch from the site parameters: set both
         "NumberOfLayers": s.no_of_layers,
-        "LayerThickness": [LAYER_THICKNESS_M, "m"],
+        "LayerThickness": [s.layer_thickness_m, "m"],
     }
     if opts.modules is not None:
         sim["Modules"] = opts.modules
@@ -474,7 +476,7 @@ def site_json(base: dict[str, Any], s: Setup, layers: list[dict[str, Any]], para
     sp["HeightNN"] = [s.elevation, "m"]
     sp["Slope"] = s.slope
     sp["NumberOfLayers"] = s.no_of_layers
-    sp["LayerThickness"] = [LAYER_THICKNESS_M, "m"]
+    sp["LayerThickness"] = [s.layer_thickness_m, "m"]
     sp["SoilProfileParameters"] = layers
     env: dict[str, Any] = {"WindSpeedHeight": s.wind_height}
     if s.co2 is not None:

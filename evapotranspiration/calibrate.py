@@ -1,0 +1,399 @@
+"""Calibrate MONICA cultivar parameters against a site's observations, one step at a time.
+
+    pixi run python evapotranspiration/calibrate.py --site bushland --step phenology \\
+        --params-csv evapotranspiration/calibration/bushland_1_phenology.csv [--reps 3000]
+
+The steps (see STEPS): phenology (emergence, anthesis, maturity dates). Later steps (LAI and
+biomass, yield, water) start from the cultivar a previous step wrote (--cultivar).
+
+The parameters come from a CSV in the format of the Maricopa flows' calibratethese_*.csv:
+
+    name,position in array,low,high,step,optguess,minbound,maxbound,derived params
+
+- a cultivar parameter with a position ("1", or "0_1" for an array of arrays) and low/high: that
+  element is calibrated
+- a name that isn't a cultivar parameter, without a position, with low/high: a free variable,
+  only used in the expressions of derived rows
+- a row with "derived params": the element is set to that Python expression of the free variables,
+  the calibrated elements (`<name>_<position>`) and `cultivar` (the original cultivar, as in the
+  JSON file: `cultivar['StageTemperatureSum'][0][1]`)
+
+optguess is the start value (default: the middle of low..high).
+
+Every MONICA run of the calibration lasts until maturity (AutomaticHarvest), at the latest
+EXTEND_DAYS after the observed harvest or where the weather has a gap; with the fixed harvest a late
+crop would never reach maturity, and the error would be unknown. A date the model doesn't reach
+counts as MISSING_PENALTY_DAYS after the last simulated day.
+
+Writes to <out> (default evapotranspiration/calibration/<site>_<step>/):
+- cultivar.json: the cultivar with the best values, ready as the next step's --cultivar
+- best.csv: the best values of the calibrated rows; report.csv: obs/default/calibrated per treatment
+- spotpy.csv: every evaluation (spotpy's database)
+"""
+
+from __future__ import annotations
+
+import argparse
+import copy
+import csv
+import importlib
+import json
+import logging
+import math
+import os
+import sys
+from collections.abc import Callable
+from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass, field
+from datetime import date, timedelta
+from pathlib import Path
+from typing import Any
+
+import pandas as pd
+import spotpy
+from et_monica import DEFAULT_MONICA_RUN, HERE, Options, Setup, collect, dump, prepare, run_monica
+
+logger = logging.getLogger("calibrate")
+
+SITES = ("bushland", "avignon")
+EXTEND_DAYS = 60  # the runs last at most this long after the observed harvest
+MISSING_PENALTY_DAYS = 30  # a date not reached: this many days after the last simulated day
+
+
+# ---------------------------------------------------------------------------------------------
+# the parameters
+# ---------------------------------------------------------------------------------------------
+
+
+@dataclass
+class Row:
+    name: str
+    position: tuple[int, ...] | None
+    low: float | None
+    high: float | None
+    optguess: float | None
+    derived: str | None
+
+    @property
+    def key(self) -> str:
+        """spotpy's parameter name and the name in expressions."""
+        return self.name if self.position is None else f"{self.name}_{'_'.join(map(str, self.position))}"
+
+
+def read_rows(path: Path) -> list[Row]:
+    def num(v: str) -> float | None:
+        return float(v) if v.strip() else None
+
+    rows = []
+    with path.open(newline="") as f:
+        for r in csv.DictReader(f):
+            pos = r["position in array"].strip()
+            rows.append(
+                Row(
+                    name=r["name"].strip(),
+                    position=tuple(int(i) for i in pos.split("_")) if pos else None,
+                    low=num(r["low"]),
+                    high=num(r["high"]),
+                    optguess=num(r.get("optguess", "")),
+                    derived=r.get("derived params", "").strip() or None,
+                )
+            )
+    keys = [r.key for r in rows]
+    if dups := sorted({k for k in keys if keys.count(k) > 1}):
+        msg = f"{path}: rows given twice: {dups}"
+        raise ValueError(msg)
+    return rows
+
+
+def values_of(cultivar: dict[str, Any], name: str) -> list[Any]:
+    """The array of a cultivar parameter: [[...], "unit"] -> [...], [...] -> [...]."""
+    v = cultivar[name]
+    if isinstance(v, list) and len(v) == 2 and isinstance(v[0], list) and isinstance(v[1], str):
+        return v[0]
+    if isinstance(v, list):
+        return v
+    msg = f"cultivar parameter {name} is no array: {v!r}"
+    raise ValueError(msg)
+
+
+def set_value(cultivar: dict[str, Any], row: Row, value: float) -> None:
+    if row.position is None:
+        v = cultivar[row.name]
+        if isinstance(v, list) and len(v) == 2 and isinstance(v[1], str):
+            v[0] = value
+        else:
+            cultivar[row.name] = value
+        return
+    a = values_of(cultivar, row.name)
+    for i in row.position[:-1]:
+        a = a[i]
+    a[row.position[-1]] = value
+
+
+def apply(cultivar: dict[str, Any], rows: list[Row], x: dict[str, float]) -> dict[str, Any]:
+    """The cultivar with the calibrated values x (key -> value) and the derived ones."""
+    c = copy.deepcopy(cultivar)
+    ns: dict[str, Any] = {"cultivar": cultivar, "math": math, **x}
+    for r in rows:
+        if r.derived is not None:
+            value = eval(r.derived, {"__builtins__": {}}, ns)  # noqa: S307 - our own CSV
+            ns[r.key] = value
+        elif r.key in x:
+            value = x[r.key]
+        else:
+            continue
+        if r.name in cultivar:
+            set_value(c, r, value)
+    return c
+
+
+# ---------------------------------------------------------------------------------------------
+# the steps: residuals per treatment
+# ---------------------------------------------------------------------------------------------
+
+
+def day(v: Any) -> date | None:
+    return pd.Timestamp(v).date() if v not in (None, "") and not pd.isna(v) else None
+
+
+def phenology(s: Setup, daily: list[dict[str, Any]], summary: dict[str, Any]) -> dict[str, float]:
+    """Days simulated - observed for emergence, anthesis and maturity."""
+    last = day(daily[-1]["DATE"]) if daily else s.end
+    res = {}
+    for code, obs in (("PLDAE", s.obs.emergence), ("ADAT", s.obs.anthesis), ("MDAT", s.obs.maturity)):
+        if obs is None:
+            continue
+        sim = day(summary.get(code)) or last + timedelta(days=MISSING_PENALTY_DAYS)
+        res[code] = float((sim - obs).days)
+    return res
+
+
+@dataclass
+class Step:
+    residuals: Callable[[Setup, list[dict[str, Any]], dict[str, Any]], dict[str, float]]
+    unit: str
+
+
+STEPS = {"phenology": Step(phenology, "d")}
+
+
+# ---------------------------------------------------------------------------------------------
+# running MONICA
+# ---------------------------------------------------------------------------------------------
+
+
+@dataclass
+class Calibration:
+    setups: list[Setup]
+    run_dirs: dict[str, Path]
+    crop_json: dict[str, dict[str, Any]]  # per treatment, the cultivar include replaced per evaluation
+    cultivar: dict[str, Any]
+    rows: list[Row]
+    step: Step
+    monica_run: Path
+    jobs: int
+    evaluations: int = 0
+    labels: list[str] = field(default_factory=list)  # "<treatment> <code>", the order of residuals()
+
+    def run(self, cultivar: dict[str, Any]) -> dict[str, tuple[list[dict[str, Any]], dict[str, Any]] | None]:
+        def one(s: Setup) -> tuple[list[dict[str, Any]], dict[str, Any]] | None:
+            crop = copy.deepcopy(self.crop_json[s.id])
+            for ws in crop["cropRotation"][0]["worksteps"]:
+                if ws["type"] == "Sowing":
+                    ws["crop"]["cropParams"]["cultivar"] = cultivar
+            (self.run_dirs[s.id] / "crop.json").write_text(dump(crop))
+            try:
+                run_monica(self.monica_run, self.run_dirs[s.id])
+            except RuntimeError as e:
+                logger.warning("%s: %s", s.id, str(e).splitlines()[0])
+                return None
+            return collect(self.run_dirs[s.id])
+
+        with ThreadPoolExecutor(max_workers=self.jobs) as pool:
+            return dict(zip([s.id for s in self.setups], pool.map(one, self.setups), strict=True))
+
+    def residuals_of(self, cultivar: dict[str, Any]) -> dict[str, dict[str, float]]:
+        out = {}
+        results = self.run(cultivar)
+        for s in self.setups:
+            res = results[s.id]
+            if res is None:  # a failed run counts as every date missed
+                out[s.id] = {c: float(MISSING_PENALTY_DAYS * 10) for c in self.step.residuals(s, [], {})}
+            else:
+                out[s.id] = self.step.residuals(s, *res)
+        return out
+
+    def residuals(self, x: dict[str, float]) -> list[float]:
+        self.evaluations += 1
+        per = self.residuals_of(apply(self.cultivar, self.rows, x))
+        flat = {f"{tid} {code}": v for tid, r in per.items() for code, v in r.items()}
+        if not self.labels:
+            self.labels = list(flat)
+        return [flat.get(k, float(MISSING_PENALTY_DAYS * 10)) for k in self.labels]
+
+
+class SpotSetup:
+    """spotpy's interface: simulation() returns the residuals, the evaluation is 0."""
+
+    def __init__(self, cal: Calibration, free: list[Row]):
+        self.cal = cal
+        self.free = free
+        self.params = [
+            spotpy.parameter.Uniform(
+                name=r.key,
+                low=r.low,
+                high=r.high,
+                optguess=r.optguess if r.optguess is not None else (r.low + r.high) / 2,
+            )
+            for r in free
+        ]
+        self.n = len(cal.residuals({r.key: p.optguess for r, p in zip(free, self.params, strict=True)}))
+
+    def parameters(self):
+        return spotpy.parameter.generate(self.params)
+
+    def simulation(self, vector):
+        return self.cal.residuals({r.key: float(v) for r, v in zip(self.free, vector, strict=True)})
+
+    def evaluation(self):
+        return [0.0] * self.n
+
+    def objectivefunction(self, simulation, evaluation, params=None):
+        return spotpy.objectivefunctions.rmse(evaluation, simulation)
+
+
+def rmse(values: list[float]) -> float:
+    return math.sqrt(sum(v * v for v in values) / len(values)) if values else float("nan")
+
+
+# ---------------------------------------------------------------------------------------------
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--site", choices=SITES, required=True)
+    ap.add_argument("--step", choices=list(STEPS), required=True)
+    ap.add_argument("--params-csv", type=Path, required=True, help="the parameters to calibrate")
+    ap.add_argument("--xlsx", type=Path, help="default: the site's workbook in evapotranspiration/")
+    ap.add_argument("--treatments", nargs="*", help="only these")
+    ap.add_argument("--params", type=Path, default=HERE / "phase_1/params")
+    ap.add_argument(
+        "--cultivar",
+        help="the cultivar to start from: a JSON file, or an include path relative to --params; default: the site's",
+    )
+    ap.add_argument("--monica-run", type=Path, default=DEFAULT_MONICA_RUN, help="default: the Odin port")
+    ap.add_argument("--reps", type=int, default=3000, help="maximum number of evaluations (SCE-UA)")
+    ap.add_argument("--seed", type=int, default=1)
+    ap.add_argument("--jobs", type=int, default=os.cpu_count(), help="MONICA runs in parallel")
+    ap.add_argument("--out", type=Path, help="default: evapotranspiration/calibration/<site>_<step>")
+    args = ap.parse_args()
+    logging.basicConfig(level=logging.INFO, format="%(levelname)-7s %(message)s")
+
+    site = importlib.import_module(f"site_{args.site}")
+    out: Path = args.out or HERE / "calibration" / f"{args.site}_{args.step}"
+    rows = read_rows(args.params_csv)
+    free = [r for r in rows if r.derived is None and r.low is not None and r.high is not None]
+
+    setups = site.load(args.xlsx or site.XLSX)
+    if args.treatments:
+        setups = [s for s in setups if s.id in args.treatments]
+    cultivar_path = Path(args.cultivar) if args.cultivar and Path(args.cultivar).is_file() else None
+    cultivar_include = None if cultivar_path else (args.cultivar or setups[0].cultivar)
+    cultivar = json.loads((cultivar_path or args.params / cultivar_include).read_text())
+    if unknown := [r.key for r in rows if r.position is not None and r.name not in cultivar]:
+        logger.error("not in the cultivar: %s", unknown)
+        return 1
+
+    run_dirs, crop_json = {}, {}
+    for s in setups:
+        # as long as the weather goes on without a gap
+        weather_days, limit = set(s.weather.index), (s.harvest or s.end) + timedelta(days=EXTEND_DAYS)
+        while s.end < limit and s.end + timedelta(days=1) in weather_days:
+            s.end += timedelta(days=1)
+        s.latest_harvest, s.harvest = s.end, None
+        if cultivar_include is not None:
+            s.cultivar = cultivar_include
+        run_dirs[s.id] = out / "work" / s.id
+        prepare(s, run_dirs[s.id], Options(params=args.params, water_stress=True, nitrogen_stress=False))
+        crop_json[s.id] = json.loads((run_dirs[s.id] / "crop.json").read_text())
+
+    step = STEPS[args.step]
+    cal = Calibration(setups, run_dirs, crop_json, cultivar, rows, step, args.monica_run, args.jobs)
+    default_res = cal.residuals_of(cultivar)
+    flat = [v for r in default_res.values() for v in r.values()]
+    logger.info(
+        "%d treatments, %d residuals; default cultivar: RMSE %.1f %s", len(setups), len(flat), rmse(flat), step.unit
+    )
+    logger.info("calibrating %s", ", ".join(f"{r.key} [{r.low:g}, {r.high:g}]" for r in free))
+
+    spot = SpotSetup(cal, free)
+    sampler = spotpy.algorithms.sceua(
+        spot, dbname=str(out / "spotpy"), dbformat="csv", random_state=args.seed, save_sim=False
+    )
+    sampler.sample(args.reps, ngs=max(2, len(free)), kstop=5, peps=0.01, pcento=0.005)
+    results = sampler.getdata()
+    best = spotpy.analyser.get_best_parameterset(results, maximize=False)[0]
+    x = {name.removeprefix("par"): float(v) for name, v in zip(best.dtype.names, best, strict=True)}
+
+    best_cultivar = apply(cultivar, rows, x)
+    (out / "cultivar.json").write_text(dump(best_cultivar))
+    best_res = cal.residuals_of(best_cultivar)
+
+    with (out / "best.csv").open("w", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["name", "position in array", "default", "calibrated", "low", "high", "derived params"])
+        for r in rows:
+            if r.name not in cultivar:
+                w.writerow(
+                    [
+                        r.name,
+                        "",
+                        "",
+                        x.get(r.key, ""),
+                        "" if r.low is None else r.low,
+                        "" if r.high is None else r.high,
+                        r.derived or "",
+                    ]
+                )
+                continue
+            a = values_of(cultivar, r.name) if r.position else None
+            b = values_of(best_cultivar, r.name) if r.position else None
+            for i in r.position or ():
+                a, b = a[i], b[i]
+            w.writerow(
+                [
+                    r.name,
+                    "_".join(map(str, r.position or ())),
+                    a,
+                    b,
+                    "" if r.low is None else r.low,
+                    "" if r.high is None else r.high,
+                    r.derived or "",
+                ]
+            )
+
+    report = []
+    for s in setups:
+        for code in default_res[s.id]:
+            report.append(
+                {
+                    "treatment": s.id,
+                    "variable": code,
+                    "default": default_res[s.id][code],
+                    "calibrated": best_res[s.id][code],
+                }
+            )
+    df = pd.DataFrame(report)
+    df.to_csv(out / "report.csv", index=False)
+    print(f"\nsim - obs [{step.unit}], {cal.evaluations} evaluations")  # noqa: T201
+    print(df.pivot(index="treatment", columns="variable", values=["default", "calibrated"]).to_string())  # noqa: T201
+    rmse_default = rmse([v for r in default_res.values() for v in r.values()])
+    rmse_best = rmse([v for r in best_res.values() for v in r.values()])
+    print(f"\nRMSE: default {rmse_default:.1f}, calibrated {rmse_best:.1f} {step.unit}")  # noqa: T201
+    print("\n" + (out / "best.csv").read_text())  # noqa: T201
+    print(f"wrote {out}/cultivar.json, best.csv, report.csv, spotpy.csv")  # noqa: T201
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
