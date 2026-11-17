@@ -107,6 +107,11 @@
         "Pot_ET|EOAD",
         "Act_ET|ETAD",
         "Act_Ev|ESAD",
+        {
+          "path": "current_crop_module.potential_transpiration",
+          "round": 1,
+          "name": "EPPAD"
+        },
         "Act_Trans|EPAD",
         "Stage|Stage",
         "Precip|Precip",

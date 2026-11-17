@@ -115,7 +115,18 @@
         "Stage|Stage",
         "Kc|Kc",
         "Precip|Precip",
-        "Tavg|Tavg"
+        "Tavg|Tavg",
+        {
+          "path": "soil_moisture.evaporated_from_surface",
+          "round": 2,
+          "name": "SurfEvap"
+        },
+        {
+          "path": "soil_moisture.actual_transpiration",
+          "round": 2,
+          "name": "SMTrans"
+        },
+        "Infilt|Infilt"
       ],
       "Sowing",
       [
