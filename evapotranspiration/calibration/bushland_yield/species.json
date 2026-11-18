@@ -6,7 +6,7 @@
     true,
     true
   ],
-  "AssimilateReallocation": 0.24582273,
+  "AssimilateReallocation": 0.4064032,
   "BaseTemperature": [
     0,
     1,
@@ -42,7 +42,7 @@
   "MaxCropDiameter": 0.005,
   "MaxNUptakeParam": 3.145,
   "MinimumNConcentration": 0.005,
-  "MinimumTemperatureForAssimilation": 4.0812783,
+  "MinimumTemperatureForAssimilation": 0,
   "OptimumTemperatureForAssimilation": 27,
   "MaximumTemperatureForAssimilation": 35,
   "MinimumTemperatureRootGrowth": 0,

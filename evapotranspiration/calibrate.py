@@ -29,7 +29,8 @@ crop would never reach maturity, and the error would be unknown. A date the mode
 counts as MISSING_PENALTY_DAYS after the last simulated day.
 
 Writes to <out> (default evapotranspiration/calibration/<site>_<step>/):
-- cultivar.json, species.json: with the best values, ready as the next step's --cultivar/--species
+- cultivar.json (species.json, if species parameters were calibrated): with the best values, ready
+  as the next step's --cultivar/--species
 - best.csv: the best values of the calibrated rows; report.csv: obs/default/calibrated per treatment
 - spotpy.csv: every evaluation (spotpy's database)
 """
@@ -427,7 +428,8 @@ def main() -> int:
     best_params = apply(params, rows, x)
     best_cultivar, best_species = split(best_params)
     (out / "cultivar.json").write_text(dump(best_cultivar))
-    (out / "species.json").write_text(dump(best_species))
+    if any(r.name.startswith(SPECIES) for r in rows):
+        (out / "species.json").write_text(dump(best_species))
     best_res = cal.residuals_of(best_params)
 
     with (out / "best.csv").open("w", newline="") as f:
@@ -490,7 +492,7 @@ def main() -> int:
     rmse_best = rmse([v for r in best_res.values() for v in r.values()])
     print(f"\nRMSE: default {rmse_default:.1f}, calibrated {rmse_best:.1f} {step.unit}")  # noqa: T201
     print("\n" + (out / "best.csv").read_text())  # noqa: T201
-    print(f"wrote {out}/cultivar.json, species.json, best.csv, report.csv, spotpy.csv")  # noqa: T201
+    print(f"wrote {out}/cultivar.json (species.json), best.csv, report.csv, spotpy.csv")  # noqa: T201
     return 0
 
 

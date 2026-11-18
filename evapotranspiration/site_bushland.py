@@ -24,7 +24,8 @@ XLSX = HERE / "AMEI_Bushland_v4_2026-01-24(no_soil_T).xlsx"
 # irrigation water pond, which then evaporated at 1.1 x ET0 (FINDINGS.md, model issues 4 and 5)
 LAYER_THICKNESS_M = 0.1
 NO_OF_LAYERS = 24  # the whole 2.4 m profile
-CULTIVAR = "crops/cultivar_winter-wheat.json"
+# calibrated (FINDINGS.md, "Calibration"): phenology (step 1), LAI and biomass (step 2); species: crop.json's
+CULTIVAR = "crops/cultivar_winter-wheat_bushland_2_growth.json"
 # the treatments differ in their fertilization (1990, 1993: F about twice P), so with N response
 NITROGEN_STRESS = True
 # Odin's fixes for standing water (FINDINGS.md, model issues 4 and 5), in "Orig" and "Imp" alike: they

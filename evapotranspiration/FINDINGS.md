@@ -411,13 +411,13 @@ How reliable is `ICIN` = 25 kg/ha?
 
 - Step 2 again (N off; senescence bound widened to 0.4): two seeds agree, nearly the same as with N
   on: MaxAssimilationRate 38, MinimumTemperatureForAssimilation 4.1 °C, SLA ×0.73, leaf senescence
-  0.019 (stage 4) and 0.18 (from anthesis). RMSE 3.8 -> 0.7. In
-  `crops/cultivar_winter-wheat_bushland_2_growth.json` + `crops/species_wheat_bushland_2_growth.json`.
+  0.019 (stage 4) and 0.18 (from anthesis). RMSE 3.8 -> 0.7. **Replaced** (see the soil moisture
+  check below): MinimumTemperatureForAssimilation also lowers the crop ET0 in winter.
 - Step 3 (yield, `calibration/bushland_3_yield.csv`, AssimilateReallocation): not needed, the F yields
   are within ±0.5 t/ha with the step 2 parameters (RMSE 0.50 -> 0.47 t/ha with 0.25 instead of 0.3);
   the default stays.
 
-With the step 2 parameters, N response on (the setup for the runs):
+With those step 2 parameters (MinimumTemperatureForAssimilation 4.1 °C), N response on:
 
 | | ET bias mm/d | LAI max obs / sim | yield obs / sim (N off) |
 |---|---|---|---|
@@ -430,6 +430,45 @@ With the step 2 parameters, N response on (the setup for the runs):
 
 Open: the N-limited F yields of 1992/1993 (see above), the missing water stress of 1992P, the cap
 (the F treatments' ET bias, "Imp").
+
+**Soil moisture check (2026-11-18, lysimeter and field data, step 2 parameters, N on).** MONICA's
+profile (0-180 cm) is 40-90 mm too wet in spring in the P treatments, mostly at 70-130 cm, which is
+why they show no water stress (1992P: 4.9 t/ha vs 3.2 observed). Two causes:
+- The soil data's field capacity at 80-140 cm (0.35) is never reached: max measured 0.31-0.34
+  (lysimeter), 0.31-0.32 (field); MONICA drains only down to 0.35. Lowering it to 0.32 (and LL to
+  0.18) removes ~20 mm, 1992P 4.9 -> 4.7 t/ha. A question for the data providers rather than a
+  calibration.
+- **Winter ET is far too low** (the bigger part): Nov-Feb lysimeter ET 123-198 mm, MONICA 57-89 mm,
+  the water stays in the profile (1990P: measured profile flat over winter, simulated +80 mm). On
+  cold days MONICA's crop ET0 is ~0: its stomatal resistance comes from the crop's photosynthesis
+  (model issue 2), which stops below MinimumTemperatureForAssimilation. The step 2 value (4.1 °C,
+  default 0) makes that worse: winter ET0 -57…-62 mm, ETa -23…-30 mm. With the default (0 °C) winter
+  ETa is still 86-119 mm, so most of it is MONICA's (crop) ET0 itself: a Phase 1 (ET0/ETp) finding,
+  not a calibration one.
+- Step 2 without MinimumTemperatureForAssimilation (so the calibration doesn't change ET0):
+  MaxAssimilationRate 33, SLA ×0.65, leaf senescence 0.009/0.21, RMSE 0.9 (instead of 0.7). Runs (N
+  on): F ET bias -0.73…-0.80 (instead of -0.86…-0.92), yields F 4.3/4.4/4.4, P 1.0/4.3/3.1 t/ha (obs
+  F 4.5/5.8/6.4, P 1.9/3.2/5.0); the spring profile still 50-80 mm too wet.
+
+**Final (2026-11-18): step 2 without MinimumTemperatureForAssimilation**, so the calibration doesn't
+change MONICA's ET0 (`calibration/bushland_2_growth.csv`, two seeds agree): MaxAssimilationRate 33,
+SLA ×0.65, leaf senescence 0.009 (stage 4) and 0.21 (from anthesis), RMSE 3.8 -> 0.9; the default
+species. `crops/cultivar_winter-wheat_bushland_2_growth.json` is the Bushland default (`CULTIVAR`),
+out_bushland ("Orig") rerun with it. Step 3 checked again: RMSE 0.6 -> 0.5 t/ha with reallocation
+0.41, only by trading 1993 against 1990/1992; the default stays.
+
+| | ET bias mm/d | RMSE mm/d | LAI max obs / sim | yield obs / sim |
+|---|---|---|---|---|
+| TXBL1990F | -0.75 | 1.82 | 3.6 / 3.8 | 4475 / 4308 |
+| TXBL1990P | 0.02 | 1.38 | 2.4 / 3.4 | 1898 / 977 |
+| TXBL1992F | -0.80 | 1.64 | 7.1 / 4.5 | 5847 / 4371 |
+| TXBL1992P | -0.15 | 1.61 | 5.9 / 4.5 | 3197 / 4303 |
+| TXBL1993F | -0.73 | 1.68 | 4.1 / 4.1 | 6422 / 4377 |
+| TXBL1993P | -0.50 | 1.36 | 4.0 / 3.8 | 5031 / 3094 |
+
+Phenology: emergence -3…+2 d, anthesis -5…+4 d, maturity -2…+12 d (TXBL1992P). Open, none of them
+for the calibration: N (F yields 1992/1993, data providers), FC at 80-140 cm (data providers),
+winter ET and the cap (MONICA's ET0/ETp, "Imp").
 
 ## Open questions
 
