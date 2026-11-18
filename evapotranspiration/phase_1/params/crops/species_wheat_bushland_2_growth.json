@@ -42,7 +42,7 @@
   "MaxCropDiameter": 0.005,
   "MaxNUptakeParam": 3.145,
   "MinimumNConcentration": 0.005,
-  "MinimumTemperatureForAssimilation": 4.0905247,
+  "MinimumTemperatureForAssimilation": 4.0812783,
   "OptimumTemperatureForAssimilation": 27,
   "MaximumTemperatureForAssimilation": 35,
   "MinimumTemperatureRootGrowth": 0,

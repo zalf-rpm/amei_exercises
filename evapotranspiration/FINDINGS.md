@@ -390,12 +390,46 @@ from anthesis (0.05, at the bound). RMSE (1 LAI ~ 3 t/ha) 3.4 -> 0.8; LAI max 3.
 Leaf partitioning traded off with SLA, it stays at the default.
 
 **Open: nitrogen.** From March on the F treatments are strongly N-limited (N stress factor
-0.4-0.55), the crop takes up ~113 kg N of ~170 kg supplied (25 initial, 104-112 fertilizer, ~33 net
-mineralisation), and late biomass stays 4-6 t/ha below the observed (1992F, 1993F). No N
-observations to check against. And water: the P treatments show no water stress in MONICA (1992P
+0.4-0.55), and late biomass stays 4-6 t/ha below the observed (1992F, 1993F). Season N balance
+(1992F, step 2 parameters): ~32 kg mineral N at the start + 112 fertilizer + 33 net mineralisation;
+crop uptake 130 (113 above ground), leaching 5, NH3 2, **75 kg left in the soil at the end** (1990F
+59, 1993F 62). The N isn't missing, it is too dilute: the injected fertilizer (92 kg in 10-20 cm in
+October) is moved down to 40-120 cm by January, the crop has taken up 78 kg N by then (1.7 t/ha,
+~4.5 % N), and from March on the remaining 60-65 kg lie at 1-5 kg per 10 cm over 2 m. With N
+response off (same parameters) the late biomass gap closes for 1993F (June -0.7 instead of -3.6
+t/ha) and halves for 1992F (-3.1 instead of -6.1); F yields 5.3 / 6.8 / 6.4 t/ha (obs 4.5 / 5.8 /
+6.4). No N observations to check against (neither crop N nor soil nitrate). And water: the P treatments show no water stress in MONICA (1992P
 transpiration reduced ≤ 5 %), while their observed LAI collapses in April. ET with the step 2
 parameters: F bias -0.85…-0.92 mm/d (lower LAI, same cap). Yield: F 4.8-4.9 t/ha (obs 4.5-6.4), P
 1.4 / 5.1 / 3.3 (obs 1.9 / 3.2 / 5.0).
+
+**Decision (2026-11-18): steps 2-3 with N response off** (`calibrate.py --no-nitrogen-stress`), on the
+F treatments, taken as not N-limited, as the experiment presumably intended; the runs keep N
+response on (the fertilization differences between F and P matter). So the crop parameters don't
+absorb MONICA's N uncertainty. Question for the data providers: crop N or soil nitrate measured?
+How reliable is `ICIN` = 25 kg/ha?
+
+- Step 2 again (N off; senescence bound widened to 0.4): two seeds agree, nearly the same as with N
+  on: MaxAssimilationRate 38, MinimumTemperatureForAssimilation 4.1 °C, SLA ×0.73, leaf senescence
+  0.019 (stage 4) and 0.18 (from anthesis). RMSE 3.8 -> 0.7. In
+  `crops/cultivar_winter-wheat_bushland_2_growth.json` + `crops/species_wheat_bushland_2_growth.json`.
+- Step 3 (yield, `calibration/bushland_3_yield.csv`, AssimilateReallocation): not needed, the F yields
+  are within ±0.5 t/ha with the step 2 parameters (RMSE 0.50 -> 0.47 t/ha with 0.25 instead of 0.3);
+  the default stays.
+
+With the step 2 parameters, N response on (the setup for the runs):
+
+| | ET bias mm/d | LAI max obs / sim | yield obs / sim (N off) |
+|---|---|---|---|
+| TXBL1990F | -0.88 | 3.6 / 3.8 | 4475 / 4694 (5013) |
+| TXBL1990P | 0.03 | 2.4 / 3.6 | 1898 / 1519 (1749) |
+| TXBL1992F | -0.92 | 7.1 / 4.9 | 5847 / 4635 (6350) |
+| TXBL1992P | -0.24 | 5.9 / 5.0 | 3197 / 4926 (6187) |
+| TXBL1993F | -0.86 | 4.1 / 4.4 | 6422 / 4609 (5972) |
+| TXBL1993P | -0.60 | 4.0 / 4.0 | 5031 / 3247 (5972) |
+
+Open: the N-limited F yields of 1992/1993 (see above), the missing water stress of 1992P, the cap
+(the F treatments' ET bias, "Imp").
 
 ## Open questions
 

@@ -4,7 +4,8 @@
         --params-csv evapotranspiration/calibration/bushland_1_phenology.csv [--reps 3000]
 
 The steps (see STEPS): phenology (emergence, ear emergence, anthesis, maturity dates); growth
-(daily LAI and above ground biomass, LAI in units of LAI_SCALE, biomass of BIOMASS_SCALE). Later steps (LAI and
+(daily LAI and above ground biomass, LAI in units of LAI_SCALE, biomass of BIOMASS_SCALE); yield
+(grain yield at maturity). Later steps (LAI and
 biomass, yield, water) start from the cultivar a previous step wrote (--cultivar).
 
 The parameters come from a CSV in the format of the Maricopa flows' calibratethese_*.csv:
@@ -222,13 +223,23 @@ def growth(s: Setup, daily: list[dict[str, Any]], summary: dict[str, Any]) -> di
     return res
 
 
+def grain_yield(s: Setup, daily: list[dict[str, Any]], summary: dict[str, Any]) -> dict[str, float]:
+    """Grain yield at maturity (GWAM; the last day's GWAD if not reached) - observed (HWAM) [t/ha]."""
+    if s.obs.grain_yield is None:
+        return {}
+    sim = number(summary.get("GWAM"))
+    if sim is None:
+        sim = number(daily[-1].get("GWAD")) if daily else 0.0
+    return {"HWAM": ((sim or 0.0) - s.obs.grain_yield) / 1000}
+
+
 @dataclass
 class Step:
     residuals: Callable[[Setup, list[dict[str, Any]], dict[str, Any]], dict[str, float]]
     unit: str
 
 
-STEPS = {"phenology": Step(phenology, "d"), "growth": Step(growth, "LAI, 3 t/ha")}
+STEPS = {"phenology": Step(phenology, "d"), "growth": Step(growth, "LAI, 3 t/ha"), "yield": Step(grain_yield, "t/ha")}
 
 
 # ---------------------------------------------------------------------------------------------
@@ -339,6 +350,11 @@ def main() -> int:
         "--species",
         help="the species to start from: a JSON file, or an include path relative to --params; default: crop.json's",
     )
+    ap.add_argument(
+        "--nitrogen-stress",
+        action=argparse.BooleanOptionalAction,
+        help="NitrogenResponseOn; default: the site's (NITROGEN_STRESS)",
+    )
     ap.add_argument("--monica-run", type=Path, default=DEFAULT_MONICA_RUN, help="default: the Odin port")
     ap.add_argument("--reps", type=int, default=3000, help="maximum number of evaluations (SCE-UA)")
     ap.add_argument("--seed", type=int, default=1)
@@ -370,6 +386,8 @@ def main() -> int:
         logger.error("not in the cultivar/species: %s", unknown)
         return 1
 
+    nitrogen_stress = getattr(site, "NITROGEN_STRESS", False) if args.nitrogen_stress is None else args.nitrogen_stress
+    logger.info("NitrogenResponseOn: %s", nitrogen_stress)
     run_dirs, crop_json = {}, {}
     for s in setups:
         # as long as the weather goes on without a gap
@@ -383,7 +401,7 @@ def main() -> int:
         prepare(
             s,
             run_dirs[s.id],
-            Options(params=args.params, water_stress=True, nitrogen_stress=getattr(site, "NITROGEN_STRESS", False)),
+            Options(params=args.params, water_stress=True, nitrogen_stress=nitrogen_stress),
         )
         crop_json[s.id] = json.loads((run_dirs[s.id] / "crop.json").read_text())
 
