@@ -96,6 +96,7 @@ class Observations:
     grain_yield: float | None = None  # kg/ha
     lai: pd.Series | None = None  # daily observations [m2 m-2], date index
     biomass: pd.Series | None = None  # above ground [kg DM ha-1], date index
+    green_leaf: pd.Series | None = None  # green leaf weight (WLVG) [kg DM ha-1], date index
 
 
 @dataclass
@@ -155,6 +156,12 @@ def nan_to_none(v: Any) -> Any:
 def to_date(v: Any) -> date | None:
     v = nan_to_none(v)
     return None if v is None else pd.Timestamp(v).date()
+
+
+def daily_obs(daily: list[dict[str, Any]], code: str) -> pd.Series:
+    """The observed daily values of `code` (ICASA rows with DATE), date index, without the missing ones."""
+    obs = {to_date(r["DATE"]): float(r[code]) for r in daily if nan_to_none(r.get(code)) is not None}
+    return pd.Series(obs, dtype=float).sort_index()
 
 
 # ---------------------------------------------------------------------------------------------
@@ -225,6 +232,8 @@ EXTRA_DAILY: dict[str, Any] = {
     "SurfEvap": {"path": "soil_moisture.evaporated_from_surface", "round": 2},
     "SMTrans": {"path": "soil_moisture.actual_transpiration", "round": 2},
     "Infilt": "Infilt",
+    # the green leaves (WLVG in ICASA; OrgBiom includes the dead ones)
+    "WLVG": ["OrgGreenBiom", "Leaf"],
 }
 
 # at-event values: dates and the biomass/N at anthesis and maturity

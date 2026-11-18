@@ -13,7 +13,7 @@ from pathlib import Path
 from typing import Any
 
 import pandas as pd
-from et_monica import HERE, Fertilization, Observations, Setup, nan_to_none, to_date
+from et_monica import HERE, Fertilization, Observations, Setup, daily_obs, nan_to_none, to_date
 from icasa import horizons, read_sheets, treatment_id_resolver, weather
 
 logger = logging.getLogger("site_bushland")
@@ -40,12 +40,6 @@ def zadoks_date(daily: list[dict[str, Any]], stage: float) -> date | None:
         if z0 < stage <= z1:
             return d0 + timedelta(days=round((d1 - d0).days * (stage - z0) / (z1 - z0)))
     return None
-
-
-def daily_obs(daily: list[dict[str, Any]], code: str) -> pd.Series:
-    """The observed daily values of `code`, date index, without the missing ones."""
-    obs = {to_date(r["DATE"]): float(r[code]) for r in daily if nan_to_none(r.get(code)) is not None}
-    return pd.Series(obs, dtype=float).sort_index()
 
 
 def load(xlsx: Path = XLSX) -> list[Setup]:

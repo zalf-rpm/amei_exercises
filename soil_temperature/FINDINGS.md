@@ -50,8 +50,10 @@ MO and iMO give identical results (all 16 treatments), as in the old flow's setu
   shares of FENO3/FENH4/FEUREA, including the N in the irrigation water.
 - Irrigations (`Irrigation_events`) into the layer at IRADP (buried drip lines at 23 cm: layer 5,
   20-25 cm; the few at 0 cm at the surface). Sowing PDATE, harvest HADAT.
-- Cultivar `crops/cultivar_spring-wheat_with_1_calibrated_phenology.json` of
-  `maricopa_wheat_face/params` (1st calibration step of the flows; LAI step not applied).
+- Cultivar `crops/cultivar_spring-wheat_maricopa_3_yield.json` and species
+  `crops/species_wheat_maricopa_2_growth.json` of `maricopa_wheat_face/params` (since 2026-11-18, see
+  "Maricopa calibration"; before: the flows' `cultivar_spring-wheat_with_1_calibrated_phenology.json`).
+- Odin's standing water fixes (`SOIL_MOISTURE` in site_maricopa.py), since 2026-11-18.
 - Water and N stress on (low and high N treatments).
 
 ## Outputs
@@ -168,6 +170,63 @@ Data questions (for Thiago Berton Ferreira):
 Model state: the default cultivar is far off: LAI max 11-13 (observed 2.4-7.1), maturity 2-4 weeks
 late, not reached by ENDAT in TXBL1990F and both 1993 treatments (no maturity values). Calibration
 pending, as for the ET study.
+
+## Maricopa calibration (`evapotranspiration/calibrate.py --site maricopa`, 2026-11-18)
+
+Independent of the Maricopa flows (their parameters and cultivars not used), the same way as Bushland
+(evapotranspiration/FINDINGS.md, "Calibration"): from `cultivar_spring-wheat_default.json`, not
+against ET, no crop parameters that change MONICA's crop ET0, two seeds per step. Setup: this
+study's (42 × 5 cm, N response on, FACE CO2, buried drip) plus the ponding/infiltration fixes
+(`SOIL_MOISTURE` in site_maricopa.py, also for the soil temperature runs, rerun with the calibrated cultivar on 2026-11-18).
+Results in `evapotranspiration/calibration/maricopa_*`, parameters in
+`maricopa_wheat_face/params/crops/{cultivar_spring-wheat,species_wheat}_maricopa_*.json`.
+
+- **Step 1, phenology** (all 16 treatments, emergence, ear emergence = start of stage 4, anthesis,
+  maturity; 64 dates): emergence 186 °C d (80), stages 2-3 ×0.82, stage 4 49 °C d (180; ear
+  emergence to anthesis is only 1-10 days here), maturity 434 °C d. RMSE 15.7 -> 4.2 d, seeds agree.
+  The daylength requirement free gives the same RMSE (15.3 h, stages 2-3 ×1.2), so it stays.
+  Left: a year effect, 1993 anthesis +7…+9 d, 1997 -3…-5 d.
+- **Step 2, growth** (the controls Wet-High N-Ambient: 902, 906, 910, 914; daily LAI, above ground
+  biomass and green leaves `WLVG`, which here are consistent with LAI and `SLAD`, unlike Bushland's):
+  MaxAssimilationRate 31 (52), SLA 0.0024 stages 1-2 and 0.0020 stages 3-4 (0.0020-0.0016; measured
+  0.0017-0.0028), leaf share 0.36 in stage 2 (0.2) and 0.17 in stage 3 (0.2), leaf senescence 0.07
+  from anthesis, species InitialOrganBiomass ×0.55 (53 -> 29 kg/ha). RMSE (1 LAI ~ 3 t/ha ~ 1 t/ha
+  green leaves) 0.9 -> 0.7. Seeds agree on MaxAssimilationRate and the stage 2 leaf share; SLA of
+  stages 3-4 and the stage 3 leaf share trade off. Why InitialOrganBiomass: the crop had 2-4× the
+  measured biomass until February at the same N uptake (1997, measured crop N), so its N
+  concentration was diluted (1.3-2 % vs 2.6-3.8 %) and it was N-stressed in Feb/March.
+- **Step 3, yield** (the controls): the simulated harvest index was ~0.57 (measured ~0.45). The ear's
+  share of the assimilates in stage 4 (ear emergence to anthesis) 0.68 (0.97, rest to the stem);
+  RMSE 2.1 -> 1.0 t/ha. AssimilateReallocation instead went to its bound (0) with the same fit, the
+  grain share after anthesis stayed at 1; both keep their defaults.
+
+All 16 treatments, final parameters (`cultivar_spring-wheat_maricopa_3_yield.json` +
+`species_wheat_maricopa_2_growth.json`), and the flow's for comparison (phase 1 cultivar
+`cultivar_spring-wheat_with_1_calibrated_phenology.json`, phase 2 = its best.csv applied to it), the
+same setup for all:
+
+| | anthesis RMSE d | maturity RMSE d | LAI RMSE | biomass RMSE t/ha | yield RMSE t/ha (controls) |
+|---|---|---|---|---|---|
+| flow phase 1 | 21.7 | 10.0 (2 not reached) | 2.46 | 3.67 | 2.11 (1.80) |
+| flow phase 2 | 21.7 | 10.6 (2 not reached) | 2.20 | 2.47 | 3.29 (2.76) |
+| calibrate.py step 2 | 4.8 | 4.6 | 1.23 | 1.77 | 2.85 (2.06) |
+| calibrate.py step 3 | 4.6 | 4.3 | 1.24 | 1.76 | 1.47 (0.98) |
+
+The flow's phenology is 2-4 weeks late in this setup (as noticed before, "Phenology of the
+flow-calibrated cultivar"); it was calibrated in the flow's setup, so its phenology is no fair
+comparison here. The flow's phase 2 also calibrates the StageKcFactors (potential ET): for the ET
+study that would be calibrating against ET.
+
+What the treatments that weren't calibrated show (ratios of final biomass / yield):
+- **Water**: Dry/Wet measured 0.77-0.82 / 0.80-0.86, MONICA 0.99-1.01: no water stress in the dry
+  treatments, as in Bushland's P treatments.
+- **N**: Low/High N measured 0.75-0.98, MONICA 1996 0.89-0.96 (too weak), 1997 0.36-0.43 (far too
+  strong: crop N 53-56 vs 124-136 kg/ha measured; the 1997 low-N soil supplies too little N in
+  MONICA - residues aren't simulated, initial N?).
+- **CO2**: FACE/Ambient measured 0.94-1.20, MONICA 1.13-1.27: a bit too strong.
+- Crop N with high N (1997): 232-234 vs 191-223 kg/ha measured.
+- Setup: the 1994 harvest (1994-06-01) is after the simulation's end (ENDAT 1994-05-31), so it's
+  dropped (the season ends without harvest).
 
 ## Open questions
 

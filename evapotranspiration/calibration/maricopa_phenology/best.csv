@@ -1,0 +1,7 @@
+name,position in array,default,calibrated,low,high,derived params
+StageTemperatureSum,0,80,193.03993,40.0,200.0,
+tsum_veg,,,0.8184969,0.5,1.5,
+StageTemperatureSum,1,284,232.45311959999998,,,cultivar['StageTemperatureSum'][0][1] * tsum_veg
+StageTemperatureSum,2,280,229.17913199999998,,,cultivar['StageTemperatureSum'][0][2] * tsum_veg
+StageTemperatureSum,3,180,49.16095,20.0,400.0,
+StageTemperatureSum,4,435,433.52573,200.0,700.0,

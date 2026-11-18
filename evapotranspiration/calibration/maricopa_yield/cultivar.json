@@ -1,0 +1,216 @@
+{
+  "AssimilatePartitioningCoeff": [
+    [
+      0.5,
+      0.5,
+      0,
+      0
+    ],
+    [
+      0.2,
+      0.35743326,
+      0.44256674000000007,
+      0
+    ],
+    [
+      0.13,
+      0.17462768,
+      0.6953723199999999,
+      0
+    ],
+    [
+      0,
+      0,
+      0.31672789999999995,
+      0.6832721
+    ],
+    [
+      0,
+      0,
+      0,
+      1
+    ],
+    [
+      0,
+      0,
+      0,
+      0.8
+    ]
+  ],
+  "BaseDaylength": [
+    [
+      0,
+      0,
+      7,
+      7,
+      0,
+      0
+    ],
+    "h"
+  ],
+  "BeginSensitivePhaseHeatStress": [
+    780,
+    "\u00b0C d"
+  ],
+  "CriticalTemperatureHeatStress": [
+    31,
+    "\u00b0C"
+  ],
+  "CropHeightP1": 6,
+  "CropHeightP2": 0.5,
+  "CropSpecificMaxRootingDepth": 1.2999999523162842,
+  "CultivarName": "spring wheat",
+  "DaylengthRequirement": [
+    [
+      0,
+      20,
+      20,
+      20,
+      0,
+      0
+    ],
+    "h"
+  ],
+  "Description": "",
+  "DroughtStressThreshold": [
+    1,
+    0.9,
+    1,
+    1,
+    0.9,
+    0.8
+  ],
+  "EndSensitivePhaseHeatStress": [
+    900,
+    "\u00b0C d"
+  ],
+  "FrostDehardening": 0,
+  "FrostHardening": 0,
+  "HeatSumIrrigationEnd": 1676,
+  "HeatSumIrrigationStart": 461,
+  "LT50cultivar": 0,
+  "LatestHarvestDoy": -1,
+  "LowTemperatureExposure": 0,
+  "MaxAssimilationRate": 30.589327,
+  "MaxCropHeight": [
+    0.8299999833106995,
+    "m"
+  ],
+  "OptimumTemperature": [
+    [
+      30,
+      30,
+      30,
+      30,
+      30,
+      30
+    ],
+    "\u00b0C"
+  ],
+  "OrganIdsForCutting": [],
+  "OrganIdsForPrimaryYield": [
+    {
+      "organId": 4,
+      "type": "YieldComponent",
+      "yieldDryMatter": 0.86,
+      "yieldPercentage": 0.85
+    }
+  ],
+  "OrganIdsForSecondaryYield": [
+    {
+      "organId": 2,
+      "type": "YieldComponent",
+      "yieldDryMatter": 0.86,
+      "yieldPercentage": 0.85
+    },
+    {
+      "organId": 3,
+      "type": "YieldComponent",
+      "yieldDryMatter": 0.86,
+      "yieldPercentage": 0.9
+    }
+  ],
+  "OrganSenescenceRate": [
+    [
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0.0006892294,
+      0,
+      0
+    ],
+    [
+      0,
+      0.069333814,
+      0,
+      0
+    ],
+    [
+      0,
+      0.069333814,
+      0,
+      0
+    ]
+  ],
+  "Perennial": false,
+  "ResidueNRatio": 0.5,
+  "RespiratoryStress": 0,
+  "SpecificLeafArea": [
+    [
+      0.0024211332,
+      0.0024211332,
+      0.0020497444,
+      0.0020497444,
+      0.0015,
+      0.0015
+    ],
+    "ha kg-1"
+  ],
+  "StageKcFactor": [
+    [
+      0.6,
+      0.7,
+      1.1,
+      1.1,
+      0.8,
+      0.25
+    ],
+    "1;0"
+  ],
+  "StageTemperatureSum": [
+    [
+      193.03993,
+      232.45311959999998,
+      229.17913199999998,
+      49.16095,
+      433.52573,
+      25
+    ],
+    "\u00b0C d"
+  ],
+  "VernalisationRequirement": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "type": "CultivarParameters"
+}

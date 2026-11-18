@@ -26,6 +26,7 @@ from et_monica import (  # noqa: E402
     Observations,
     Options,
     Setup,
+    daily_obs,
     daily_outputs,
     monica_build,
     nan_to_none,
@@ -42,6 +43,7 @@ from et_monica import (  # noqa: E402
 from icasa import horizons, read_sheets, treatment_id_resolver, weather  # noqa: E402
 
 __all__ = [
+    "daily_obs",
     "DEFAULT_MONICA_RUN",
     "HERE",
     "WEATHER_COLUMNS",

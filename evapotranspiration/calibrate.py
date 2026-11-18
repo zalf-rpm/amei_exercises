@@ -59,7 +59,7 @@ from et_monica import DEFAULT_MONICA_RUN, HERE, Options, Setup, collect, dump, n
 
 logger = logging.getLogger("calibrate")
 
-SITES = ("bushland", "avignon")
+SITES = ("bushland", "avignon", "maricopa")  # site_<name>.py here or in ../soil_temperature
 EXTEND_DAYS = 60  # the runs last at most this long after the observed harvest
 MISSING_PENALTY_DAYS = 30  # a date not reached: this many days after the last simulated day
 
@@ -208,15 +208,20 @@ def phenology(s: Setup, daily: list[dict[str, Any]], summary: dict[str, Any]) ->
 # the residuals' units: 1 LAI unit weighs as much as 3 t/ha biomass (about their ranges' ratio)
 LAI_SCALE = 1.0
 BIOMASS_SCALE = 3000.0  # kg DM ha-1
+GREEN_LEAF_SCALE = 1000.0  # kg DM ha-1, where the site has them (Observations.green_leaf)
 
 
 def growth(s: Setup, daily: list[dict[str, Any]], summary: dict[str, Any]) -> dict[str, float]:
-    """(simulated - observed) / scale of the daily LAI and above ground biomass, keys LAID@<date>, CWAD@<date>."""
+    """(simulated - observed) / scale of the daily LAI, above ground biomass and green leaves, keys <code>@<date>."""
     sim = {day(r["DATE"]): r for r in daily}
     # the runs harvest at maturity: an observation after it is compared with the crop at maturity
     maturity = day(summary.get("MDAT"))
     res = {}
-    for code, obs, scale in (("LAID", s.obs.lai, LAI_SCALE), ("CWAD", s.obs.biomass, BIOMASS_SCALE)):
+    for code, obs, scale in (
+        ("LAID", s.obs.lai, LAI_SCALE),
+        ("CWAD", s.obs.biomass, BIOMASS_SCALE),
+        ("WLVG", s.obs.green_leaf, GREEN_LEAF_SCALE),
+    ):
         for d, v in (obs if obs is not None else {}).items():
             at = maturity if maturity is not None and d > maturity else d
             if (r := sim.get(at)) is not None and (x := number(r.get(code))) is not None:
@@ -342,7 +347,7 @@ def main() -> int:
     ap.add_argument("--params-csv", type=Path, required=True, help="the parameters to calibrate")
     ap.add_argument("--xlsx", type=Path, help="default: the site's workbook in evapotranspiration/")
     ap.add_argument("--treatments", nargs="*", help="only these")
-    ap.add_argument("--params", type=Path, default=HERE / "phase_1/params")
+    ap.add_argument("--params", type=Path, help="default: the site's PARAMS, else evapotranspiration/phase_1/params")
     ap.add_argument(
         "--cultivar",
         help="the cultivar to start from: a JSON file, or an include path relative to --params; default: the site's",
@@ -364,7 +369,9 @@ def main() -> int:
     args = ap.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(levelname)-7s %(message)s")
 
+    sys.path.append(str(HERE.parent / "soil_temperature"))  # site_maricopa.py
     site = importlib.import_module(f"site_{args.site}")
+    params_dir: Path = args.params or getattr(site, "PARAMS", HERE / "phase_1/params")
     out: Path = args.out or HERE / "calibration" / f"{args.site}_{args.step}"
     rows = read_rows(args.params_csv)
     free = [r for r in rows if r.derived is None and r.low is not None and r.high is not None]
@@ -374,14 +381,14 @@ def main() -> int:
         setups = [s for s in setups if s.id in args.treatments]
     cultivar_path = Path(args.cultivar) if args.cultivar and Path(args.cultivar).is_file() else None
     cultivar_include = None if cultivar_path else (args.cultivar or setups[0].cultivar)
-    cultivar = json.loads((cultivar_path or args.params / cultivar_include).read_text())
+    cultivar = json.loads((cultivar_path or params_dir / cultivar_include).read_text())
     species_path = Path(args.species) if args.species and Path(args.species).is_file() else None
     species_include = args.species or next(
         ws["crop"]["cropParams"]["species"][1]
         for ws in json.loads((HERE / "crop.json").read_text())["cropRotation"][0]["worksteps"]
         if ws["type"] == "Sowing"
     )
-    species = json.loads((species_path or args.params / species_include).read_text())
+    species = json.loads((species_path or params_dir / species_include).read_text())
     params = combine(cultivar, species)
     if unknown := [r.key for r in rows if r.position is not None and r.name not in params]:
         logger.error("not in the cultivar/species: %s", unknown)
@@ -395,6 +402,10 @@ def main() -> int:
         weather_days, limit = set(s.weather.index), (s.harvest or s.end) + timedelta(days=EXTEND_DAYS)
         while s.end < limit and s.end + timedelta(days=1) in weather_days:
             s.end += timedelta(days=1)
+        if s.co2_daily is not None and len(s.co2_daily) and s.co2_daily.index[-1] < s.end:
+            # the daily CO2 (e.g. FACE) ends with the season: its last value for the extra days
+            extra = pd.date_range(s.co2_daily.index[-1] + timedelta(days=1), s.end).date
+            s.co2_daily = pd.concat([s.co2_daily, pd.Series(s.co2_daily.iloc[-1], index=extra)])
         s.latest_harvest, s.harvest = s.end, None
         if cultivar_include is not None:
             s.cultivar = cultivar_include
@@ -402,7 +413,7 @@ def main() -> int:
         prepare(
             s,
             run_dirs[s.id],
-            Options(params=args.params, water_stress=True, nitrogen_stress=nitrogen_stress),
+            Options(params=params_dir, water_stress=True, nitrogen_stress=nitrogen_stress),
         )
         crop_json[s.id] = json.loads((run_dirs[s.id] / "crop.json").read_text())
 

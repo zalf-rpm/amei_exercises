@@ -17,6 +17,7 @@ from st_monica import (
     Fertilization,
     Observations,
     Setup,
+    daily_obs,
     horizons,
     nan_to_none,
     read_sheets,
@@ -35,11 +36,16 @@ TEMPLATES = {
     "daily": DATA_DIR / "AMIE_template_MarcicopaWheatFACE_daily_output.txt",
     "layers": DATA_DIR / "AMIE_template_MarcicopaWheatFACE_layers_output.txt",
 }
-# the parameters of the Maricopa calibration flows; the phenology is calibrated (1st step), LAI not
+# the parameters of evapotranspiration/calibrate.py --site maricopa (phenology, growth, yield; FINDINGS.md);
+# the calibration flow's cultivar was crops/cultivar_spring-wheat_with_1_calibrated_phenology.json
 PARAMS = HERE.parent / "maricopa_wheat_face/params"
-CULTIVAR = "crops/cultivar_spring-wheat_with_1_calibrated_phenology.json"
+CULTIVAR = "crops/cultivar_spring-wheat_maricopa_3_yield.json"
+SPECIES = "crops/species_wheat_maricopa_2_growth.json"
 NO_OF_LAYERS = 42  # 2.1 m in 5 cm layers, as the protocol asks
 NITROGEN_STRESS = True  # low and high N treatments
+# Odin's fixes for standing water (evapotranspiration/FINDINGS.md, model issues 4 and 5): with 5 cm layers
+# and flood irrigation the water would pond and evaporate in place of the crop's transpiration
+SOIL_MOISTURE = {"PondEvaporationByCoverage": True, "InfiltrationByDepth": True}
 
 
 def co2_series(start: date, end: date, base: float, mods: list[dict[str, Any]]) -> pd.Series:
@@ -146,7 +152,10 @@ def load(xlsx: Path = XLSX) -> list[Setup]:
                 tav=float(st["TAV"]),
                 tamp=float(st["TAMP"]),
                 # MONICA's own soil temperature: the lower boundary, its TAV (default 9.5 °C, Germany)
-                site_params={"SoilTemperatureParameters": {"BaseTemperature": float(st["TAV"])}},
+                site_params={
+                    "SoilTemperatureParameters": {"BaseTemperature": float(st["TAV"])},
+                    "SoilMoistureParameters": dict(SOIL_MOISTURE),
+                },
                 co2_daily=co2_series(start, end, float(st["CO2Y"]), rows[tid].get("Env_modifications", [])),
                 albedo=nan_to_none(soil_meta.loc[soil_id].get("SALB")),  # as in the Maricopa flow
                 horizons=horizons(sheets, soil_id, notes),
@@ -166,14 +175,19 @@ def load(xlsx: Path = XLSX) -> list[Setup]:
                 # IRADP > 0: buried drip lines (23 cm), the water goes into the layer at that depth
                 irrigations=[(to_date(r["IDATE"]), float(r["IRVAL"]), float(r["IRADP"]) / 100) for r in irrigations],
                 cultivar=CULTIVAR,
+                species=SPECIES,
                 no_of_layers=NO_OF_LAYERS,
                 obs=Observations(
                     et=pd.Series(dtype=float),
                     emergence=to_date(summary.get("PLDAE")),
+                    ear_emergence=to_date(summary.get("EEMD")),
                     anthesis=to_date(summary.get("ADAT")),
                     maturity=to_date(summary.get("MDAT")),
                     lai_max=nan_to_none(summary.get("LAIX")),
                     grain_yield=nan_to_none(summary.get("GWAM")),
+                    lai=daily_obs(rows[tid].get("Obs_crop_daily_means", []), "LAID"),
+                    biomass=daily_obs(rows[tid].get("Obs_crop_daily_means", []), "CWAD"),
+                    green_leaf=daily_obs(rows[tid].get("Obs_crop_daily_means", []), "WLVG"),
                 ),
                 notes=notes,
             )
