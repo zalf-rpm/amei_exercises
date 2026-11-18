@@ -56,11 +56,16 @@ def main() -> int:
     ap.add_argument("--monica-run", type=Path, default=DEFAULT_MONICA_RUN, help="default: the Odin port")
     ap.add_argument("--params", type=Path, default=HERE / "phase_1/params")
     ap.add_argument("--cultivar", help="include path relative to --params; default: the site's")
+    ap.add_argument("--species", help="include path relative to --params; default: crop.json's")
     ap.add_argument("--module-code", default="MOFAPM")
     ap.add_argument("--kind", default="Orig", choices=["Orig", "Imp"])
     ap.add_argument("--out", type=Path, help="default: evapotranspiration/out_<site>")
     ap.add_argument("--no-water-stress", action="store_true", help="WaterDeficitResponseOn = false")
-    ap.add_argument("--nitrogen-stress", action="store_true", help="NitrogenResponseOn = true")
+    ap.add_argument(
+        "--nitrogen-stress",
+        action=argparse.BooleanOptionalAction,
+        help="NitrogenResponseOn; default: the site's (NITROGEN_STRESS)",
+    )
     ap.add_argument("--vp-factor", type=float, default=1.0, help="vapor pressure (kPa) is multiplied by this")
     ap.add_argument(
         "--soil-moisture",
@@ -82,9 +87,9 @@ def main() -> int:
             logger.error("unknown treatment(s) %s, known: %s", sorted(unknown), sorted(known))
             return 1
         setups = [s for s in setups if s.id in args.treatments]
-    if args.cultivar:
-        for s in setups:
-            s.cultivar = args.cultivar
+    for s in setups:
+        s.cultivar = args.cultivar or s.cultivar
+        s.species = args.species or s.species
     try:
         soil_moisture = {k: json.loads(v) for k, v in (kv.split("=", 1) for kv in args.soil_moisture)}
     except ValueError as e:
@@ -97,7 +102,9 @@ def main() -> int:
     opts = Options(
         params=args.params,
         water_stress=not args.no_water_stress,
-        nitrogen_stress=args.nitrogen_stress,
+        nitrogen_stress=getattr(site, "NITROGEN_STRESS", False)
+        if args.nitrogen_stress is None
+        else args.nitrogen_stress,
         vp_factor=args.vp_factor,
     )
     results_dir = out / "results"

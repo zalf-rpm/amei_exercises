@@ -81,6 +81,7 @@ class Fertilization:
     no3: float
     name: str
     urea: float = 0.0  # fraction of the N
+    depth_m: float = 0.0  # placed (e.g. injected) at this depth; 0 = at the surface (Odin only)
 
 
 @dataclass
@@ -88,10 +89,13 @@ class Observations:
     et: pd.Series  # 24 h ET [mm/d], date index
     et_daytime: pd.Series | None = None  # e.g. Avignon's 6-18 h eddy covariance sums
     emergence: date | None = None
+    ear_emergence: date | None = None  # MONICA (wheat): the start of stage 4
     anthesis: date | None = None
     maturity: date | None = None
     lai_max: float | None = None
     grain_yield: float | None = None  # kg/ha
+    lai: pd.Series | None = None  # daily observations [m2 m-2], date index
+    biomass: pd.Series | None = None  # above ground [kg DM ha-1], date index
 
 
 @dataclass
@@ -121,7 +125,9 @@ class Setup:
     site_params: dict[str, dict[str, Any]] = field(default_factory=dict)
     albedo: float | None = None
     initial_moisture: list[tuple[float, float, float]] = field(default_factory=list)  # (top cm, bottom cm, m3 m-3)
-    initial_n_total_kg_ha: float | None = None  # spread evenly, if the horizons have no N
+    initial_n_total_kg_ha: float | None = None  # spread over the profile, if the horizons have no N
+    species: str | None = None  # include path, relative to the params dir; None: crop.json's
+    initial_n_by_soc: bool = False  # spread initial_n_total_kg_ha by organic carbon, not evenly
     # (top cm, bottom cm, NO3-N kg/ha, NH4-N kg/ha) as measured, None = not measured; overrides the horizons' N
     initial_n: list[tuple[float, float, float | None, float | None]] = field(default_factory=list)
     fertilizations: list[Fertilization] = field(default_factory=list)
@@ -337,11 +343,16 @@ def soil_layers(s: Setup) -> tuple[list[dict[str, Any]], list[str]]:
     no3_conc = [(t, b, None if no3 is None else no3 / 10000.0 / ((b - t) / 100)) for t, b, no3, _ in s.initial_n]
     nh4_conc = [(t, b, None if nh4 is None else nh4 / 10000.0 / ((b - t) / 100)) for t, b, _, nh4 in s.initial_n]
     no_n = []
-    even_nitrate = (
-        s.initial_n_total_kg_ha / 10000.0 / profile_depth
-        if s.initial_n_total_kg_ha is not None and not horizons_have_n
-        else None
-    )
+
+    def horizon_at(i: int) -> Horizon:
+        mid = (i + 0.5) * dz * 100
+        return next((h for h in s.horizons if h.top_cm <= mid < h.bottom_cm), s.horizons[-1])
+
+    # the total initial N as nitrate per layer [kg N m-3]: evenly or in proportion to the organic carbon
+    total_nitrate: list[float] | None = None
+    if s.initial_n_total_kg_ha is not None and not horizons_have_n:
+        weights = [horizon_at(i).soc if s.initial_n_by_soc else 1.0 for i in range(s.no_of_layers)]
+        total_nitrate = [s.initial_n_total_kg_ha / 10000.0 * w / (sum(weights) * dz) for w in weights]
     notes: list[str] = []
     if s.horizons[-1].bottom_cm < profile_depth * 100:
         notes.append(
@@ -351,8 +362,7 @@ def soil_layers(s: Setup) -> tuple[list[dict[str, Any]], list[str]]:
     layers, above_fc = [], []
     for i in range(s.no_of_layers):
         top_cm, bottom_cm = i * dz * 100, (i + 1) * dz * 100
-        mid = (top_cm + bottom_cm) / 2
-        h = next((h for h in s.horizons if h.top_cm <= mid < h.bottom_cm), s.horizons[-1])
+        h = horizon_at(i)
         layer: dict[str, Any] = {
             "Thickness": [dz, "m"],
             "Sand": [h.sand / 100, "kg kg-1"],
@@ -388,8 +398,8 @@ def soil_layers(s: Setup) -> tuple[list[dict[str, Any]], list[str]]:
                 no_n.append(i + 1)
         elif h.nitrate_kg_ha is not None:
             layer["SoilNitrate"] = [h.nitrate_kg_ha / 10000.0 / horizon_m, "kg NO3-N m-3"]
-        elif even_nitrate is not None:
-            layer["SoilNitrate"] = [even_nitrate, "kg NO3-N m-3"]
+        elif total_nitrate is not None:
+            layer["SoilNitrate"] = [total_nitrate[i], "kg NO3-N m-3"]
         if h.ammonium_kg_ha is not None:
             layer["SoilAmmonium"] = [h.ammonium_kg_ha / 10000.0 / horizon_m, "kg NH4-N m-3"]
         layers.append(layer)
@@ -406,6 +416,8 @@ def worksteps(s: Setup, sowing_template: dict[str, Any]) -> list[dict[str, Any]]
     sowing = copy.deepcopy(sowing_template)
     sowing["date"] = str(s.sowing)
     sowing["crop"]["cropParams"]["cultivar"] = ["include-from-file", s.cultivar]
+    if s.species is not None:
+        sowing["crop"]["cropParams"]["species"] = ["include-from-file", s.species]
     steps: list[dict[str, Any]] = [sowing]
     if s.harvest is not None:
         steps.append({"type": "Harvest", "date": str(s.harvest)})
@@ -425,6 +437,7 @@ def worksteps(s: Setup, sowing_template: dict[str, Any]) -> list[dict[str, Any]]
                 "date": str(f.date),
                 "amount": [f.kg_n, "kg N"],
                 "partition": {"id": f.name, "name": f.name, "Carbamid": f.urea, "NH4": f.nh4, "NO3": f.no3},
+                **({"depth": f.depth_m} if f.depth_m > 0 else {}),
             }
         )
     for day, mm, *depth in s.irrigations:

@@ -3,13 +3,15 @@
     pixi run python evapotranspiration/calibrate.py --site bushland --step phenology \\
         --params-csv evapotranspiration/calibration/bushland_1_phenology.csv [--reps 3000]
 
-The steps (see STEPS): phenology (emergence, anthesis, maturity dates). Later steps (LAI and
+The steps (see STEPS): phenology (emergence, ear emergence, anthesis, maturity dates); growth
+(daily LAI and above ground biomass, LAI in units of LAI_SCALE, biomass of BIOMASS_SCALE). Later steps (LAI and
 biomass, yield, water) start from the cultivar a previous step wrote (--cultivar).
 
 The parameters come from a CSV in the format of the Maricopa flows' calibratethese_*.csv:
 
     name,position in array,low,high,step,optguess,minbound,maxbound,derived params
 
+- `species.<Name>` instead of a cultivar parameter's name: the species parameter
 - a cultivar parameter with a position ("1", or "0_1" for an array of arrays) and low/high: that
   element is calibrated
 - a name that isn't a cultivar parameter, without a position, with low/high: a free variable,
@@ -26,7 +28,7 @@ crop would never reach maturity, and the error would be unknown. A date the mode
 counts as MISSING_PENALTY_DAYS after the last simulated day.
 
 Writes to <out> (default evapotranspiration/calibration/<site>_<step>/):
-- cultivar.json: the cultivar with the best values, ready as the next step's --cultivar
+- cultivar.json, species.json: with the best values, ready as the next step's --cultivar/--species
 - best.csv: the best values of the calibrated rows; report.csv: obs/default/calibrated per treatment
 - spotpy.csv: every evaluation (spotpy's database)
 """
@@ -51,7 +53,7 @@ from typing import Any
 
 import pandas as pd
 import spotpy
-from et_monica import DEFAULT_MONICA_RUN, HERE, Options, Setup, collect, dump, prepare, run_monica
+from et_monica import DEFAULT_MONICA_RUN, HERE, Options, Setup, collect, dump, number, prepare, run_monica
 
 logger = logging.getLogger("calibrate")
 
@@ -105,6 +107,22 @@ def read_rows(path: Path) -> list[Row]:
     return rows
 
 
+SPECIES = "species."  # the prefix of species parameters in the combined parameters
+
+
+def combine(cultivar: dict[str, Any], species: dict[str, Any]) -> dict[str, Any]:
+    """The cultivar and the species parameters in one dict, the latter as species.<Name>."""
+    return cultivar | {SPECIES + k: v for k, v in species.items()}
+
+
+def split(params: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
+    """combine()'s inverse: (cultivar, species)."""
+    return (
+        {k: v for k, v in params.items() if not k.startswith(SPECIES)},
+        {k.removeprefix(SPECIES): v for k, v in params.items() if k.startswith(SPECIES)},
+    )
+
+
 def values_of(cultivar: dict[str, Any], name: str) -> list[Any]:
     """The array of a cultivar parameter: [[...], "unit"] -> [...], [...] -> [...]."""
     v = cultivar[name]
@@ -114,6 +132,11 @@ def values_of(cultivar: dict[str, Any], name: str) -> list[Any]:
         return v
     msg = f"cultivar parameter {name} is no array: {v!r}"
     raise ValueError(msg)
+
+
+def scalar(v: Any) -> Any:
+    """[value, "unit"] -> value."""
+    return v[0] if isinstance(v, list) and len(v) == 2 and isinstance(v[1], str) else v
 
 
 def set_value(cultivar: dict[str, Any], row: Row, value: float) -> None:
@@ -133,7 +156,8 @@ def set_value(cultivar: dict[str, Any], row: Row, value: float) -> None:
 def apply(cultivar: dict[str, Any], rows: list[Row], x: dict[str, float]) -> dict[str, Any]:
     """The cultivar with the calibrated values x (key -> value) and the derived ones."""
     c = copy.deepcopy(cultivar)
-    ns: dict[str, Any] = {"cultivar": cultivar, "math": math, **x}
+    species = {k.removeprefix(SPECIES): v for k, v in cultivar.items() if k.startswith(SPECIES)}
+    ns: dict[str, Any] = {"cultivar": cultivar, "species": species, "math": math, **x}
     for r in rows:
         if r.derived is not None:
             value = eval(r.derived, {"__builtins__": {}}, ns)  # noqa: S307 - our own CSV
@@ -156,15 +180,45 @@ def day(v: Any) -> date | None:
     return pd.Timestamp(v).date() if v not in (None, "") and not pd.isna(v) else None
 
 
+# MONICA's wheat stage (the Stage output, 1 = sowing) that ear emergence starts: stage 4 (to anthesis,
+# ~180 °C d) fits the observed 1-13 days between ear emergence and anthesis; stage 3 starts in winter
+# already, so jointing (JDAT) falls inside it and isn't used
+EAR_EMERGENCE_STAGE = 4
+
+
 def phenology(s: Setup, daily: list[dict[str, Any]], summary: dict[str, Any]) -> dict[str, float]:
-    """Days simulated - observed for emergence, anthesis and maturity."""
+    """Days simulated - observed for emergence, ear emergence, anthesis and maturity."""
     last = day(daily[-1]["DATE"]) if daily else s.end
+    sim_ear = next((day(r["DATE"]) for r in daily if int(float(r["Stage"])) >= EAR_EMERGENCE_STAGE), None)
     res = {}
-    for code, obs in (("PLDAE", s.obs.emergence), ("ADAT", s.obs.anthesis), ("MDAT", s.obs.maturity)):
+    for code, obs, sim in (
+        ("PLDAE", s.obs.emergence, day(summary.get("PLDAE"))),
+        ("EEMD", s.obs.ear_emergence, sim_ear),
+        ("ADAT", s.obs.anthesis, day(summary.get("ADAT"))),
+        ("MDAT", s.obs.maturity, day(summary.get("MDAT"))),
+    ):
         if obs is None:
             continue
-        sim = day(summary.get(code)) or last + timedelta(days=MISSING_PENALTY_DAYS)
-        res[code] = float((sim - obs).days)
+        res[code] = float(((sim or last + timedelta(days=MISSING_PENALTY_DAYS)) - obs).days)
+    return res
+
+
+# the residuals' units: 1 LAI unit weighs as much as 3 t/ha biomass (about their ranges' ratio)
+LAI_SCALE = 1.0
+BIOMASS_SCALE = 3000.0  # kg DM ha-1
+
+
+def growth(s: Setup, daily: list[dict[str, Any]], summary: dict[str, Any]) -> dict[str, float]:
+    """(simulated - observed) / scale of the daily LAI and above ground biomass, keys LAID@<date>, CWAD@<date>."""
+    sim = {day(r["DATE"]): r for r in daily}
+    # the runs harvest at maturity: an observation after it is compared with the crop at maturity
+    maturity = day(summary.get("MDAT"))
+    res = {}
+    for code, obs, scale in (("LAID", s.obs.lai, LAI_SCALE), ("CWAD", s.obs.biomass, BIOMASS_SCALE)):
+        for d, v in (obs if obs is not None else {}).items():
+            at = maturity if maturity is not None and d > maturity else d
+            if (r := sim.get(at)) is not None and (x := number(r.get(code))) is not None:
+                res[f"{code}@{d}"] = (x - v) / scale
     return res
 
 
@@ -174,7 +228,7 @@ class Step:
     unit: str
 
 
-STEPS = {"phenology": Step(phenology, "d")}
+STEPS = {"phenology": Step(phenology, "d"), "growth": Step(growth, "LAI, 3 t/ha")}
 
 
 # ---------------------------------------------------------------------------------------------
@@ -200,7 +254,7 @@ class Calibration:
             crop = copy.deepcopy(self.crop_json[s.id])
             for ws in crop["cropRotation"][0]["worksteps"]:
                 if ws["type"] == "Sowing":
-                    ws["crop"]["cropParams"]["cultivar"] = cultivar
+                    ws["crop"]["cropParams"]["cultivar"], ws["crop"]["cropParams"]["species"] = split(cultivar)
             (self.run_dirs[s.id] / "crop.json").write_text(dump(crop))
             try:
                 run_monica(self.monica_run, self.run_dirs[s.id])
@@ -281,6 +335,10 @@ def main() -> int:
         "--cultivar",
         help="the cultivar to start from: a JSON file, or an include path relative to --params; default: the site's",
     )
+    ap.add_argument(
+        "--species",
+        help="the species to start from: a JSON file, or an include path relative to --params; default: crop.json's",
+    )
     ap.add_argument("--monica-run", type=Path, default=DEFAULT_MONICA_RUN, help="default: the Odin port")
     ap.add_argument("--reps", type=int, default=3000, help="maximum number of evaluations (SCE-UA)")
     ap.add_argument("--seed", type=int, default=1)
@@ -300,8 +358,16 @@ def main() -> int:
     cultivar_path = Path(args.cultivar) if args.cultivar and Path(args.cultivar).is_file() else None
     cultivar_include = None if cultivar_path else (args.cultivar or setups[0].cultivar)
     cultivar = json.loads((cultivar_path or args.params / cultivar_include).read_text())
-    if unknown := [r.key for r in rows if r.position is not None and r.name not in cultivar]:
-        logger.error("not in the cultivar: %s", unknown)
+    species_path = Path(args.species) if args.species and Path(args.species).is_file() else None
+    species_include = args.species or next(
+        ws["crop"]["cropParams"]["species"][1]
+        for ws in json.loads((HERE / "crop.json").read_text())["cropRotation"][0]["worksteps"]
+        if ws["type"] == "Sowing"
+    )
+    species = json.loads((species_path or args.params / species_include).read_text())
+    params = combine(cultivar, species)
+    if unknown := [r.key for r in rows if r.position is not None and r.name not in params]:
+        logger.error("not in the cultivar/species: %s", unknown)
         return 1
 
     run_dirs, crop_json = {}, {}
@@ -314,12 +380,16 @@ def main() -> int:
         if cultivar_include is not None:
             s.cultivar = cultivar_include
         run_dirs[s.id] = out / "work" / s.id
-        prepare(s, run_dirs[s.id], Options(params=args.params, water_stress=True, nitrogen_stress=False))
+        prepare(
+            s,
+            run_dirs[s.id],
+            Options(params=args.params, water_stress=True, nitrogen_stress=getattr(site, "NITROGEN_STRESS", False)),
+        )
         crop_json[s.id] = json.loads((run_dirs[s.id] / "crop.json").read_text())
 
     step = STEPS[args.step]
-    cal = Calibration(setups, run_dirs, crop_json, cultivar, rows, step, args.monica_run, args.jobs)
-    default_res = cal.residuals_of(cultivar)
+    cal = Calibration(setups, run_dirs, crop_json, params, rows, step, args.monica_run, args.jobs)
+    default_res = cal.residuals_of(params)
     flat = [v for r in default_res.values() for v in r.values()]
     logger.info(
         "%d treatments, %d residuals; default cultivar: RMSE %.1f %s", len(setups), len(flat), rmse(flat), step.unit
@@ -333,17 +403,20 @@ def main() -> int:
     sampler.sample(args.reps, ngs=max(2, len(free)), kstop=5, peps=0.01, pcento=0.005)
     results = sampler.getdata()
     best = spotpy.analyser.get_best_parameterset(results, maximize=False)[0]
-    x = {name.removeprefix("par"): float(v) for name, v in zip(best.dtype.names, best, strict=True)}
+    # by position: spotpy's names lose characters like the "." of species.<Name>
+    x = {r.key: float(v) for r, v in zip(free, list(best)[: len(free)], strict=True)}
 
-    best_cultivar = apply(cultivar, rows, x)
+    best_params = apply(params, rows, x)
+    best_cultivar, best_species = split(best_params)
     (out / "cultivar.json").write_text(dump(best_cultivar))
-    best_res = cal.residuals_of(best_cultivar)
+    (out / "species.json").write_text(dump(best_species))
+    best_res = cal.residuals_of(best_params)
 
     with (out / "best.csv").open("w", newline="") as f:
         w = csv.writer(f)
         w.writerow(["name", "position in array", "default", "calibrated", "low", "high", "derived params"])
         for r in rows:
-            if r.name not in cultivar:
+            if r.name not in params:
                 w.writerow(
                     [
                         r.name,
@@ -356,10 +429,12 @@ def main() -> int:
                     ]
                 )
                 continue
-            a = values_of(cultivar, r.name) if r.position else None
-            b = values_of(best_cultivar, r.name) if r.position else None
-            for i in r.position or ():
-                a, b = a[i], b[i]
+            if r.position:
+                a, b = values_of(params, r.name), values_of(best_params, r.name)
+                for i in r.position:
+                    a, b = a[i], b[i]
+            else:
+                a, b = scalar(params[r.name]), scalar(best_params[r.name])
             w.writerow(
                 [
                     r.name,
@@ -380,18 +455,24 @@ def main() -> int:
                     "treatment": s.id,
                     "variable": code,
                     "default": default_res[s.id][code],
-                    "calibrated": best_res[s.id][code],
+                    "calibrated": best_res[s.id].get(code),
                 }
             )
     df = pd.DataFrame(report)
     df.to_csv(out / "report.csv", index=False)
     print(f"\nsim - obs [{step.unit}], {cal.evaluations} evaluations")  # noqa: T201
-    print(df.pivot(index="treatment", columns="variable", values=["default", "calibrated"]).to_string())  # noqa: T201
+    if df["variable"].nunique() <= 8:
+        table = df.pivot(index="treatment", columns="variable", values=["default", "calibrated"])
+    else:  # daily residuals: their RMSE per treatment and variable (the part before "@")
+        df["var"] = df["variable"].str.split("@").str[0]
+        table = df.groupby(["treatment", "var"])[["default", "calibrated"]].agg(lambda v: rmse(list(v.dropna())))
+        table = table.unstack("var")
+    print(table.round(2).to_string())  # noqa: T201
     rmse_default = rmse([v for r in default_res.values() for v in r.values()])
     rmse_best = rmse([v for r in best_res.values() for v in r.values()])
     print(f"\nRMSE: default {rmse_default:.1f}, calibrated {rmse_best:.1f} {step.unit}")  # noqa: T201
     print("\n" + (out / "best.csv").read_text())  # noqa: T201
-    print(f"wrote {out}/cultivar.json, best.csv, report.csv, spotpy.csv")  # noqa: T201
+    print(f"wrote {out}/cultivar.json, species.json, best.csv, report.csv, spotpy.csv")  # noqa: T201
     return 0
 
 

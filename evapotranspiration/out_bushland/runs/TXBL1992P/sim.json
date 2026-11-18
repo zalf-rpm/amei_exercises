@@ -13,7 +13,7 @@
   "include-file-base-path": "/home/berg/GitHub/amei_exercises/evapotranspiration/phase_1/params/",
   "_include-file-base-path": "params/",
   "UseSecondaryYields": false,
-  "NitrogenResponseOn": false,
+  "NitrogenResponseOn": true,
   "WaterDeficitResponseOn": true,
   "EmergenceMoistureControlOn": false,
   "EmergenceFloodingControlOn": false,
@@ -46,7 +46,7 @@
     "fertilizers/AN.json"
   ],
   "JulianDayAutomaticFertilising": 89,
-  "NumberOfLayers": 21,
+  "NumberOfLayers": 24,
   "LayerThickness": [
     0.1,
     "m"
@@ -76,15 +76,15 @@
           "Mois|SWWPD",
           [
             1,
-            21,
+            24,
             "AVG"
           ]
         ],
         [
           "PercolationRate|DRND",
           [
-            21,
-            21,
+            24,
+            24,
             "AVG"
           ]
         ],
@@ -94,7 +94,7 @@
           "Nmin|NMND",
           [
             1,
-            21,
+            24,
             "SUM"
           ]
         ],

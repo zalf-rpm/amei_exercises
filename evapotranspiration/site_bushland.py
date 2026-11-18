@@ -5,8 +5,10 @@ ICASA layout (icasa.py): three header rows (names, units, codes), sheets keyed b
 
 from __future__ import annotations
 
+import itertools
 import logging
 import math
+from datetime import date, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -21,8 +23,28 @@ XLSX = HERE / "AMEI_Bushland_v4_2026-01-24(no_soil_T).xlsx"
 # 10 cm layers: with 5 cm the infiltration limit (it scales with the layer thickness) let the
 # irrigation water pond, which then evaporated at 1.1 x ET0 (FINDINGS.md, model issues 4 and 5)
 LAYER_THICKNESS_M = 0.1
-NO_OF_LAYERS = 21  # 2.1 m of the 2.4 m profile
+NO_OF_LAYERS = 24  # the whole 2.4 m profile
 CULTIVAR = "crops/cultivar_winter-wheat.json"
+# the treatments differ in their fertilization (1990, 1993: F about twice P), so with N response
+NITROGEN_STRESS = True
+# Odin's fixes for standing water (FINDINGS.md, model issues 4 and 5), in "Orig" and "Imp" alike: they
+# are not about ET0/ETp
+SOIL_MOISTURE = {"PondEvaporationByCoverage": True, "InfiltrationByDepth": True}
+
+
+def zadoks_date(daily: list[dict[str, Any]], stage: float) -> date | None:
+    """The date the observed Zadoks stage (GSTZD) reached `stage`, linearly interpolated."""
+    obs = sorted((to_date(r["DATE"]), float(r["GSTZD"])) for r in daily if nan_to_none(r.get("GSTZD")) is not None)
+    for (d0, z0), (d1, z1) in itertools.pairwise(obs):
+        if z0 < stage <= z1:
+            return d0 + timedelta(days=round((d1 - d0).days * (stage - z0) / (z1 - z0)))
+    return None
+
+
+def daily_obs(daily: list[dict[str, Any]], code: str) -> pd.Series:
+    """The observed daily values of `code`, date index, without the missing ones."""
+    obs = {to_date(r["DATE"]): float(r[code]) for r in daily if nan_to_none(r.get(code)) is not None}
+    return pd.Series(obs, dtype=float).sort_index()
 
 
 def load(xlsx: Path = XLSX) -> list[Setup]:
@@ -76,12 +98,17 @@ def load(xlsx: Path = XLSX) -> list[Setup]:
                     nh4 / kg_n if known else 1.0,
                     no3 / kg_n if known else 0.0,
                     str(f["FECD"]),
+                    # anhydrous ammonia, injected at 17 cm
+                    depth_m=float(nan_to_none(f.get("FEDEP")) or 0) / 100,
                 )
             )
 
         et = pd.DataFrame(rows[tid].get("ET_Daily", []))
         summary = rows[tid].get("Obs_crop_summary_means", [{}])[0]
         icin = nan_to_none(one(tid, "initial_conditions").get("ICIN"))
+        anthesis = to_date(summary.get("ADAT"))
+        if anthesis is None and (anthesis := zadoks_date(rows[tid].get("Obs_crop_daily_means", []), 61)):
+            notes.append(f"anthesis {anthesis} interpolated from the daily Zadoks stages (GSTZD 61)")
 
         setups.append(
             Setup(
@@ -101,6 +128,8 @@ def load(xlsx: Path = XLSX) -> list[Setup]:
                     for r in sorted(rows[tid].get("initial_condition_layers", []), key=lambda r: r["ICTL"])
                 ],
                 initial_n_total_kg_ha=None if icin is None else float(icin),
+                # only the profile's total is given: put it where the organic matter is
+                initial_n_by_soc=True,
                 sowing=to_date(one(tid, "Planting_events")["PDATE"]),
                 harvest=to_date(one(tid, "Harvest_events")["HADAT"]),
                 fertilizations=fertilizations,
@@ -113,15 +142,19 @@ def load(xlsx: Path = XLSX) -> list[Setup]:
                 cultivar=CULTIVAR,
                 no_of_layers=NO_OF_LAYERS,
                 layer_thickness_m=LAYER_THICKNESS_M,
+                site_params={"SoilMoistureParameters": dict(SOIL_MOISTURE)},
                 obs=Observations(
                     et=pd.Series(et["ETAD"].astype(float).to_numpy(), index=pd.to_datetime(et["DATE"]).dt.date)
                     if len(et)
                     else pd.Series(dtype=float),
                     emergence=to_date(summary.get("PLDAE")),
-                    anthesis=to_date(summary.get("ADAT")),
+                    ear_emergence=to_date(summary.get("EEMD")),
+                    anthesis=anthesis,
                     maturity=to_date(summary.get("MDAT")),
                     lai_max=nan_to_none(summary.get("LAIX")),
                     grain_yield=nan_to_none(summary.get("HWAM")),
+                    lai=daily_obs(rows[tid].get("Obs_crop_daily_means", []), "LAID"),
+                    biomass=daily_obs(rows[tid].get("Obs_crop_daily_means", []), "CWAD"),
                 ),
                 notes=notes,
             )

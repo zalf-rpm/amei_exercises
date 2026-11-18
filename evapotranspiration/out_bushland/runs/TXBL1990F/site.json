@@ -7,7 +7,7 @@
       "m"
     ],
     "NDeposition": 30,
-    "NumberOfLayers": 21,
+    "NumberOfLayers": 24,
     "LayerThickness": [
       0.1,
       "m"
@@ -57,7 +57,7 @@
           "% [0-100]"
         ],
         "SoilNitrate": [
-          0.0011904761904761904,
+          0.0029061565374414538,
           "kg NO3-N m-3"
         ]
       },
@@ -105,7 +105,7 @@
           "% [0-100]"
         ],
         "SoilNitrate": [
-          0.0011904761904761904,
+          0.002363015631172056,
           "kg NO3-N m-3"
         ]
       },
@@ -153,7 +153,7 @@
           "% [0-100]"
         ],
         "SoilNitrate": [
-          0.0011904761904761904,
+          0.0018198747249026578,
           "kg NO3-N m-3"
         ]
       },
@@ -201,7 +201,7 @@
           "% [0-100]"
         ],
         "SoilNitrate": [
-          0.0011904761904761904,
+          0.0018198747249026578,
           "kg NO3-N m-3"
         ]
       },
@@ -249,7 +249,7 @@
           "% [0-100]"
         ],
         "SoilNitrate": [
-          0.0011904761904761904,
+          0.001340217820664748,
           "kg NO3-N m-3"
         ]
       },
@@ -297,7 +297,7 @@
           "% [0-100]"
         ],
         "SoilNitrate": [
-          0.0011904761904761904,
+          0.001340217820664748,
           "kg NO3-N m-3"
         ]
       },
@@ -345,7 +345,7 @@
           "% [0-100]"
         ],
         "SoilNitrate": [
-          0.0011904761904761904,
+          0.0012598047514248633,
           "kg NO3-N m-3"
         ]
       },
@@ -393,7 +393,7 @@
           "% [0-100]"
         ],
         "SoilNitrate": [
-          0.0011904761904761904,
+          0.0012598047514248633,
           "kg NO3-N m-3"
         ]
       },
@@ -441,7 +441,7 @@
           "% [0-100]"
         ],
         "SoilNitrate": [
-          0.0011904761904761904,
+          0.0010721742565317984,
           "kg NO3-N m-3"
         ]
       },
@@ -489,7 +489,7 @@
           "% [0-100]"
         ],
         "SoilNitrate": [
-          0.0011904761904761904,
+          0.0010721742565317984,
           "kg NO3-N m-3"
         ]
       },
@@ -537,7 +537,7 @@
           "% [0-100]"
         ],
         "SoilNitrate": [
-          0.0011904761904761904,
+          0.0010721742565317984,
           "kg NO3-N m-3"
         ]
       },
@@ -585,7 +585,7 @@
           "% [0-100]"
         ],
         "SoilNitrate": [
-          0.0011904761904761904,
+          0.0010721742565317984,
           "kg NO3-N m-3"
         ]
       },
@@ -633,7 +633,7 @@
           "% [0-100]"
         ],
         "SoilNitrate": [
-          0.0011904761904761904,
+          0.0005501946842728966,
           "kg NO3-N m-3"
         ]
       },
@@ -681,7 +681,7 @@
           "% [0-100]"
         ],
         "SoilNitrate": [
-          0.0011904761904761904,
+          0.0005501946842728966,
           "kg NO3-N m-3"
         ]
       },
@@ -729,7 +729,7 @@
           "% [0-100]"
         ],
         "SoilNitrate": [
-          0.0011904761904761904,
+          0.0005501946842728966,
           "kg NO3-N m-3"
         ]
       },
@@ -777,7 +777,7 @@
           "% [0-100]"
         ],
         "SoilNitrate": [
-          0.0011904761904761904,
+          0.0005501946842728966,
           "kg NO3-N m-3"
         ]
       },
@@ -825,7 +825,7 @@
           "% [0-100]"
         ],
         "SoilNitrate": [
-          0.0011904761904761904,
+          0.0005501946842728966,
           "kg NO3-N m-3"
         ]
       },
@@ -873,7 +873,7 @@
           "% [0-100]"
         ],
         "SoilNitrate": [
-          0.0011904761904761904,
+          0.0005501946842728966,
           "kg NO3-N m-3"
         ]
       },
@@ -921,7 +921,7 @@
           "% [0-100]"
         ],
         "SoilNitrate": [
-          0.0011904761904761904,
+          0.0005501946842728966,
           "kg NO3-N m-3"
         ]
       },
@@ -969,7 +969,7 @@
           "% [0-100]"
         ],
         "SoilNitrate": [
-          0.0011904761904761904,
+          0.0005501946842728966,
           "kg NO3-N m-3"
         ]
       },
@@ -1017,7 +1017,143 @@
           "% [0-100]"
         ],
         "SoilNitrate": [
-          0.0011904761904761904,
+          0.0005501946842728966,
+          "kg NO3-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.1,
+          "m"
+        ],
+        "Sand": [
+          0.25,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.38,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.195,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1410.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.3,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.16,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.47,
+          "m3 m-3"
+        ],
+        "pH": 7.7,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilMoisturePercentFC": [
+          68.667,
+          "% [0-100]"
+        ],
+        "SoilNitrate": [
+          0.0005501946842728966,
+          "kg NO3-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.1,
+          "m"
+        ],
+        "Sand": [
+          0.25,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.38,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.195,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1410.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.3,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.16,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.47,
+          "m3 m-3"
+        ],
+        "pH": 7.7,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilNitrate": [
+          0.0005501946842728966,
+          "kg NO3-N m-3"
+        ]
+      },
+      {
+        "Thickness": [
+          0.1,
+          "m"
+        ],
+        "Sand": [
+          0.25,
+          "kg kg-1"
+        ],
+        "Clay": [
+          0.38,
+          "kg kg-1"
+        ],
+        "SoilOrganicCarbon": [
+          0.195,
+          "mass%"
+        ],
+        "SoilBulkDensity": [
+          1410.0,
+          "kg m-3"
+        ],
+        "FieldCapacity": [
+          0.3,
+          "m3 m-3"
+        ],
+        "PermanentWiltingPoint": [
+          0.16,
+          "m3 m-3"
+        ],
+        "PoreVolume": [
+          0.47,
+          "m3 m-3"
+        ],
+        "pH": 7.7,
+        "CN": 10,
+        "Sceleton": [
+          0.0,
+          "m3 m-3"
+        ],
+        "SoilNitrate": [
+          0.0005501946842728966,
           "kg NO3-N m-3"
         ]
       }
@@ -1050,8 +1186,33 @@
     "include-from-file",
     "general/soil-transport.json"
   ],
-  "SoilMoistureParameters": [
-    "include-from-file",
-    "general/soil-moisture.json"
-  ]
+  "SoilMoistureParameters": {
+    "CorrectionRain": 1,
+    "CorrectionSnow": 1.14,
+    "CriticalMoistureDepth": 0.3,
+    "EvaporationZeta": 40,
+    "GroundwaterDischarge": 3,
+    "HydraulicConductivityRedux": 0.1,
+    "KcFactor": 0.75,
+    "MaxPercolationRate": 10,
+    "MaximumEvaporationImpactDepth": 5,
+    "MoistureInitValue": 0,
+    "NewSnowDensityMin": 0.1,
+    "RefreezeParameter1": 1.5,
+    "RefreezeParameter2": 0.36,
+    "RefreezeTemperature": -1.7,
+    "SaturatedHydraulicConductivity": 8640,
+    "SnowAccumulationTresholdTemperature": 1.8,
+    "SnowMaxAdditionalDensity": 0.25,
+    "SnowMeltTemperature": 0.31,
+    "SnowPacking": 0.01,
+    "SnowRetentionCapacityMax": 0.17,
+    "SnowRetentionCapacityMin": 0.05,
+    "SurfaceRoughness": 0.02,
+    "TemperatureLimitForLiquidWater": -3,
+    "XSACriticalSoilMoisture": 0.1,
+    "type": "UserSoilMoistureParameters",
+    "PondEvaporationByCoverage": true,
+    "InfiltrationByDepth": true
+  }
 }

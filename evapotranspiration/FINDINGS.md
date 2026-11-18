@@ -243,10 +243,12 @@ against the other humidity columns.
   ea / es_mean, since `RHUMD` is ambiguous (see above). That lowered ET0 by ~4 % (TXBL1990F
   1149 -> 1105 mm), as expected if RHUMD is closer to the minimum. One `RAIN` column, though the
   comments describe `RAIN_PART`/`RAIN_FULL`.
-- `SLPHW` missing below 160 cm: taken from the horizon above. Since 2026-11-17 **21 layers of
-  10 cm** = 2.1 m of the 2.4 m (before 42 x 5 cm), see "10 cm layers" below.
+- `SLPHW` missing below 160 cm: taken from the horizon above. Since 2026-11-18 **24 layers of
+  10 cm** = the whole 2.4 m profile (2026-11-17: 21 x 10 cm = 2.1 m, before 42 x 5 cm, no reason
+  recorded for leaving out the bottom 30 cm), see "10 cm layers" below. 2.1 -> 2.4 m changes the
+  season ETa by at most 0.2 mm (default cultivar).
 - Initial moisture above FC in 1992 (deep layers) and 1993 (5-70 cm): set to FC.
-- Initial N: only `ICIN` = 25 kg N/ha, spread evenly over 2.1 m. Nitrogen response is off.
+- Initial N: only `ICIN` = 25 kg N/ha, spread evenly over the profile. Nitrogen response is off.
 - Anhydrous ammonia as 100 % NH4. Harvest on the given dates.
 - `WaterDeficitResponseOn` is **true**; `sim_full_run.json` has it false, which would make the
   partial irrigation treatments meaningless.
@@ -360,6 +362,41 @@ treatments reach maturity, LAI max 6.2-7.9 (obs 2.4-7.1, before 10.7-13.2), ET R
 mm/d, bias of the F treatments -0.61..-0.67 mm/d (the cap). Yield off: F +13..+46 %, P -57 % (1990)
 to +88 % (1992). Steps 2-4.
 
+### Second round (2026-11-18): with N response, the ponding fixes and more observations
+
+Setup changes for Bushland, in "Orig" and "Imp" alike (they are not about ET0/ETp): 24 layers
+(2.4 m), `NitrogenResponseOn` (the treatments differ in N: 1990 F 127 / P 64, 1993 F 104 / P 50 kg
+N/ha), `PondEvaporationByCoverage` and `InfiltrationByDepth`, the initial 25 kg N/ha (`ICIN`) spread
+by organic carbon instead of evenly, the anhydrous ammonia at its injection depth (17 cm, `FEDEP`;
+Odin's MineralFertilization got `atLayer`/`depth` for it). `calibrate.py` can now calibrate species
+parameters (`species.<Name>`), `run_et.py` has `--species`. Not calibrated against ET (it is what the
+study evaluates).
+
+**Step 1, phenology** (`calibration/bushland_1_phenology.csv`): 24 dates, ear emergence (`EEMD`,
+compared with the start of MONICA's stage 4) added, anthesis of TXBL1992P interpolated from the
+daily Zadoks stages (61). Jointing (`JDAT`) isn't used: MONICA's stage 3 starts in December already,
+jointing falls inside it. With the daylength requirement free, it traded off with the vegetative
+temperature sums (two seeds: ×1.07 / 16.7 h vs ×1.45 / 12.7 h, same RMSE), so it stays at 20 h.
+RMSE 11.9 -> 3.6 d, two seeds agree: TSUM ×0.80 for stages 2-3, stage 4 103-122 °C d, maturity
+459-467 °C d, vernalisation 34 d. Left: TXBL1992P 4-8 days late (it develops earlier than F in
+reality; MONICA accelerates with stress only from stage 4 on).
+
+**Step 2, growth** (`calibration/bushland_2_growth.csv`, the F treatments, daily LAI and above
+ground biomass; the organ weights aren't used: LAI / leaf weight contradicts `SLAD`, 1993F stem >
+total): with the step 1 cultivar LAI was 2-6× too high (winter 4-6 vs 0.5-1.3), biomass 2-5× too high
+in winter. Calibrated (two seeds agree): MaxAssimilationRate 38 (30), species
+MinimumTemperatureForAssimilation 4.1 °C (0), SLA ×0.74, leaf senescence 0.02 in stage 4 (0) and 0.15
+from anthesis (0.05, at the bound). RMSE (1 LAI ~ 3 t/ha) 3.4 -> 0.8; LAI max 3.7-5.1 (obs 2.4-7.1).
+Leaf partitioning traded off with SLA, it stays at the default.
+
+**Open: nitrogen.** From March on the F treatments are strongly N-limited (N stress factor
+0.4-0.55), the crop takes up ~113 kg N of ~170 kg supplied (25 initial, 104-112 fertilizer, ~33 net
+mineralisation), and late biomass stays 4-6 t/ha below the observed (1992F, 1993F). No N
+observations to check against. And water: the P treatments show no water stress in MONICA (1992P
+transpiration reduced ≤ 5 %), while their observed LAI collapses in April. ET with the step 2
+parameters: F bias -0.85…-0.92 mm/d (lower LAI, same cap). Yield: F 4.8-4.9 t/ha (obs 4.5-6.4), P
+1.4 / 5.1 / 3.3 (obs 1.9 / 3.2 / 5.0).
+
 ## Open questions
 
 By relevance for Bushland and Avignon (2026-11-16):
@@ -373,7 +410,7 @@ By relevance for Bushland and Avignon (2026-11-16):
 3. **ETO column** (model issue 2): the crop-dependent ET0 as now, or the FAO-56 grass reference
    from a crop-free run?
 4. **Not looked into yet:** FRAV_2006's bias (-1.11 mm/d, 45 vs 96 mm on the measured days, far
-   worse than the other Avignon years); Bushland rooting depth up to 3.9 m in a 2.1 m profile.
+   worse than the other Avignon years); Bushland rooting depth up to 3.9 m in a 2.4 m profile.
 5. **For the data providers** (no effect on the runs, RH is derived from ea / es_mean): Bushland,
    is RHUMD the mean or the minimum? Avignon, VPRSD is the deficit, not the vapor pressure.
 6. **Ponding** (model issues 4 and 5): switches in Odin, off by default. Use them for "Imp"
