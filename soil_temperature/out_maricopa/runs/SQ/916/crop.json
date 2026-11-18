@@ -13,11 +13,11 @@
             "cropParams": {
               "species": [
                 "include-from-file",
-                "crops/species_wheat.json"
+                "crops/species_wheat_maricopa_2_growth.json"
               ],
               "cultivar": [
                 "include-from-file",
-                "crops/cultivar_spring-wheat_with_1_calibrated_phenology.json"
+                "crops/cultivar_spring-wheat_maricopa_3_yield.json"
               ]
             },
             "residueParams": [
