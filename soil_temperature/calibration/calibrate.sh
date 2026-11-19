@@ -11,6 +11,10 @@
 #
 # Takes about 30 minutes.
 #
+# The adopted Maricopa runs (2026-11-18) were without the previous crop's residue, which the setup has
+# since 2026-11-19 (FINDINGS.md, "Things MONICA can't represent" 1): a rerun now includes it and gives
+# slightly different parameters (the residue's effect on the calibrated crop is small, see there).
+#
 #     soil_temperature/calibration/calibrate.sh             # the adopted runs
 #     SEED_CHECK=1 soil_temperature/calibration/calibrate.sh  # + seed 7 of each step, to /tmp
 #

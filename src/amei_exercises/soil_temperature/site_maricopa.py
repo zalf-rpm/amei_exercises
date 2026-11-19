@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+import json
 import logging
 import math
 from datetime import date, timedelta
@@ -18,6 +19,7 @@ from amei_exercises.soil_temperature.st_monica import (
     ST_DIR,
     Fertilization,
     Observations,
+    OrganicAddition,
     Setup,
     daily_obs,
     horizons,
@@ -100,6 +102,37 @@ def fertilization(f: dict[str, Any]) -> Fertilization | None:
     return Fertilization(to_date(f["FEDATE"]), kg_n, nh4 / forms, no3 / forms, str(f["FECD"]), urea / forms)
 
 
+# the previous crop's residue (sheet Residue) as MONICA's crop residue of wheat, its N content the workbook's
+RESIDUE_PARAMS = "crops/residue_wheat.json"
+
+
+def residue_additions(r: dict[str, Any], notes: list[str]) -> list[OrganicAddition]:
+    """Above ground residue (ICRAG) and roots (ICRT) of the previous crop, kg DM/ha, into the soil on ICRDAT.
+
+    Both evenly from the surface to ICRDP (ICRIP = 100 %: all incorporated), as MONICA's wheat residue
+    with the workbook's N concentration (ICRN, %; given for the residue, used for the roots as well).
+    """
+    params = json.loads((PARAMS / RESIDUE_PARAMS).read_text())
+    if (n := nan_to_none(r.get("ICRN"))) is not None:
+        params["NConcentration"] = [n / 100, "kg N kg DM-1"]
+    incorporated = nan_to_none(r.get("ICRIP")) or 0.0
+    depth = float(nan_to_none(r.get("ICRDP")) or 0.0) if incorporated > 0 else 0.0
+    if 0 < incorporated < 100:
+        notes.append(f"residue {incorporated:g} % incorporated: all of it put to 0-{depth:g} cm")
+    day = to_date(r["ICRDAT"])
+    adds = [
+        OrganicAddition(day, float(kg), 0.0, depth, params, name)
+        for name, kg in (("residue", nan_to_none(r.get("ICRAG"))), ("roots", nan_to_none(r.get("ICRT"))))
+        if kg
+    ]
+    if adds:
+        notes.append(
+            f"residue {r.get('ICRAG', 0):g} kg DM/ha ({r.get('ICPCR')}, {params['NConcentration'][0] * 100:g} % N) "
+            f"+ roots {r.get('ICRT', 0):g} kg DM/ha into 0-{depth:g} cm on {day}"
+        )
+    return adds
+
+
 def load(xlsx: Path = XLSX) -> list[Setup]:
     sheets = read_sheets(xlsx)
     treatments = {str(r["TREAT_ID"]): r for r in sheets["Treatments"].to_dict("records")}
@@ -135,11 +168,7 @@ def load(xlsx: Path = XLSX) -> list[Setup]:
         st = station.loc[t["wst_id"]]
         start, end = to_date(t["SDAT"]), to_date(t["ENDAT"])
 
-        residue = one(tid, "Residue")
-        notes.append(
-            f"residue not simulated: {residue['ICRAG']:g} kg/ha {residue['ICPCR']} ({residue['ICRN']:g} % N) "
-            f"+ {residue['ICRT']:g} kg/ha roots, incorporated to {residue['ICRDP']:g} cm"
-        )
+        organic_additions = residue_additions(one(tid, "Residue"), notes)
         irrigations = [r for r in rows[tid].get("Irrigation_events", []) if float(r["IRVAL"]) > 0]
 
         summary = rows[tid].get("Obs_crop_summary_means", [{}])[0]
@@ -176,6 +205,7 @@ def load(xlsx: Path = XLSX) -> list[Setup]:
                 fertilizations=[
                     f for r in rows[tid].get("Fertilizer_events", []) if (f := fertilization(r)) is not None
                 ],
+                organic_additions=organic_additions,
                 # IRADP > 0: buried drip lines (23 cm), the water goes into the layer at that depth
                 irrigations=[(to_date(r["IDATE"]), float(r["IRVAL"]), float(r["IRADP"]) / 100) for r in irrigations],
                 cultivar=CULTIVAR,

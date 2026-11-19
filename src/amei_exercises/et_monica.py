@@ -86,6 +86,20 @@ class Fertilization:
 
 
 @dataclass
+class OrganicAddition:
+    """Organic matter into the soil, e.g. the previous crop's residue: an OrganicFertilization workstep
+    per layer from top_cm to bottom_cm, the amount spread by thickness (top_cm == bottom_cm: the top
+    layer, not incorporated)."""
+
+    date: date
+    kg_dm: float  # kg dry matter ha-1
+    top_cm: float
+    bottom_cm: float
+    params: dict[str, Any]  # MONICA's organic matter parameters, inline (e.g. a crop residue file's)
+    name: str = ""
+
+
+@dataclass
 class Observations:
     et: pd.Series  # 24 h ET [mm/d], date index
     et_daytime: pd.Series | None = None  # e.g. Avignon's 6-18 h eddy covariance sums
@@ -133,6 +147,7 @@ class Setup:
     # (top cm, bottom cm, NO3-N kg/ha, NH4-N kg/ha) as measured, None = not measured; overrides the horizons' N
     initial_n: list[tuple[float, float, float | None, float | None]] = field(default_factory=list)
     fertilizations: list[Fertilization] = field(default_factory=list)
+    organic_additions: list[OrganicAddition] = field(default_factory=list)
     # (date, mm) or (date, mm, depth m): below the surface (buried drip lines) into the layer at that
     # depth (Odin MONICA and the AMEI branch since 2026-11-17)
     irrigations: list[tuple[date, float] | tuple[date, float, float]] = field(default_factory=list)
@@ -422,6 +437,31 @@ def soil_layers(s: Setup) -> tuple[list[dict[str, Any]], list[str]]:
     return layers, notes
 
 
+def organic_worksteps(o: OrganicAddition, layer_cm: float) -> list[dict[str, Any]]:
+    dm = o.params.get("AOM_DryMatterContent", 1.0)
+    dm = float(dm[0] if isinstance(dm, list) else dm)  # kg DM / kg FM
+    if o.bottom_cm <= o.top_cm:
+        shares, incorporated = {1: 1.0}, False
+    else:
+        shares, incorporated = {}, True
+        for i in range(int(o.top_cm // layer_cm), math.ceil(o.bottom_cm / layer_cm)):
+            overlap = min((i + 1) * layer_cm, o.bottom_cm) - max(i * layer_cm, o.top_cm)
+            if overlap > 0:
+                shares[i + 1] = overlap / (o.bottom_cm - o.top_cm)
+    return [
+        {
+            "type": "OrganicFertilization",
+            "date": str(o.date),
+            **({"name": o.name} if o.name else {}),
+            "amount": [o.kg_dm * share / dm, "kg FM ha-1"],
+            "parameters": o.params,
+            "incorporation": incorporated,
+            "incorporateIntoLayerNo": layer,
+        }
+        for layer, share in shares.items()
+    ]
+
+
 def worksteps(s: Setup, sowing_template: dict[str, Any]) -> list[dict[str, Any]]:
     sowing = copy.deepcopy(sowing_template)
     sowing["date"] = str(s.sowing)
@@ -450,6 +490,8 @@ def worksteps(s: Setup, sowing_template: dict[str, Any]) -> list[dict[str, Any]]
                 **({"depth": f.depth_m} if f.depth_m > 0 else {}),
             }
         )
+    for o in s.organic_additions:
+        steps += organic_worksteps(o, s.layer_thickness_m * 100)
     for day, mm, *depth in s.irrigations:
         steps.append(
             {

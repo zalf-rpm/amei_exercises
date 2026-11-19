@@ -9,12 +9,16 @@ no FBP flow. Shares the ET study's MONICA input code (`et_monica.py`) and its IC
     pixi run run-st --site bushland
     soil_temperature/calibration/calibrate.sh   # the Maricopa calibration, step by step
     pixi run evaluate-maricopa --cultivar ... --out ...   # all 16 Maricopa treatments vs observed
+    pixi run evaluate-st --site maricopa|bushland   # the models against each other, plots per depth
 
 - `site_maricopa.py`, `site_bushland.py`: the site's workbook -> one `Setup` per treatment
 - `st_monica.py`: the soil temperature models, the outputs, the three result files
 - `out_maricopa/runs/<model>/<treatment>/`: everything MONICA got and returned (repeat by hand with
   `monica-run sim.json`); `out_maricopa/results/`: the protocol's files, named as it asks
   (`DSMOSummaryMaricopa.txt`, `DSMODailyMaricopa901.txt`, `DSMOLayersMaricopa901.txt`, ...)
+- `out_<site>/evaluation/`: `soil_temperature_<depth>cm.png` (5, 20, 50, 100 cm; per treatment the
+  range and median of the 9 AMEI models and MO) and `model_deviation.csv` (each model against the
+  9 models' median). No measured soil temperature in the workbooks, so no comparison with data.
 
 160 runs (10 models x 16 treatments) take about 35 s. Odin MONICA (`monica_odin`, branch
 `simplify_copilot`), soil temperature model by `"Modules": {"SoilTemperature": {"impl": ...}}` in
@@ -58,6 +62,11 @@ MO and iMO give identical results (all 16 treatments), as in the old flow's setu
   "Maricopa calibration"; before: the flows' `cultivar_spring-wheat_with_1_calibrated_phenology.json`).
 - Odin's standing water fixes (`SOIL_MOISTURE` in site_maricopa.py), since 2026-11-18.
 - Water and N stress on (low and high N treatments).
+- Previous crop's residue (sheet `Residue`, since 2026-11-19): above ground residue (ICRAG) and roots
+  (ICRT) as MONICA's wheat crop residue (`crops/residue_wheat.json`) with the workbook's N content
+  (ICRN, used for the roots as well), on ICRDAT (= SDAT) spread evenly over the 5 cm layers to ICRDP
+  (30 cm in 1993/94, 10 cm in 1996/97; ICRIP 100 %): one `OrganicFertilization` workstep per layer
+  (`incorporateIntoLayerNo`). No MONICA change needed.
 
 ## Outputs
 
@@ -103,12 +112,21 @@ MO and iMO give identical results (all 16 treatments), as in the old flow's setu
 
 ## Things MONICA can't represent (questions for the data providers)
 
-1. **Residue** of the previous crop (1100-4300 kg/ha wheat residue + 500 kg/ha roots, incorporated
-   to 10-30 cm): not simulated.
+1. ~~**Residue** of the previous crop (1100-4300 kg/ha wheat residue + 500 kg/ha roots, incorporated
+   to 10-30 cm): not simulated.~~ Simulated since 2026-11-19 as organic fertilization (see Inputs).
+   Effect (with the calibrated cultivar; not recalibrated): soil temperature practically unchanged
+   (mean difference < 0.02 °C for every model, at most 0.7 °C on single days, SW); the crop only
+   through N immobilization, mostly in 1997 (4300 kg/ha straw with 0.53 % N): low N biomass 913/915
+   -0.6/-0.7 t/ha (already too low: 5.8/7.0 vs 13.3/12.4 t/ha observed), the others < 0.2 t/ha.
+   All 16 treatments vs observed: LAI RMSE 1.24 -> 1.23, biomass 1.76 -> 1.80 t/ha, yield 1.47 ->
+   1.52 t/ha (controls 0.98 -> 0.97); LowN/HighN yield 1997 0.42/0.36 -> 0.38/0.34 (observed
+   1.02/0.85). So it doesn't help 1997's low N problem (Maricopa calibration, N), it adds to it.
 2. **1994 (905-908): no initial NO3/NH4 below 120 cm.** MONICA's default used for layers 25-42
    (0.005 kg NO3-N m-3 and 0.0005 kg NH4-N m-3: 2.75 kg N/ha per 5 cm, about 50 kg N/ha in all).
    The protocol says not to estimate missing inputs.
-3. The 1994 harvest (HADAT 1994-06-01) is after ENDAT (1994-05-31): no harvest in the run.
+3. ~~The 1994 harvest (HADAT 1994-06-01) is after ENDAT (1994-05-31): no harvest in the run.~~
+   The user set HADAT to 1994-05-31 in the workbook (2026-11-19). No effect on the results: the
+   calibrated crop matures on 05-11/05-15, and the summary reports at maturity.
 4. The protocol's checklist doesn't match its templates: 32/34/11 columns (templates: 35/40/11),
    "last row = day of maturity" (protocol text: report SDAT..ENDAT, done here), 144 summary rows
    (16 per model file).
@@ -138,6 +156,32 @@ MO and iMO give identical results (all 16 treatments), as in the old flow's setu
 4. **ST doesn't use TAV**: STICS starts the profile at the first day's air temperature (8 °C at
    205 cm in 901), the deep layers warm to about 25 °C by May.
 5. **SW's surface stays cool**: TSSAV maximum 16-24 °C over the 16 treatments, the others 27-38 °C.
+
+## The models against each other (`evaluate-st`, 2026-11-19)
+
+Deviation from the median of the 9 AMEI models, all treatments and days, mean (RMSD) in °C
+(Maricopa with the residue since 2026-11-19: changes only SW, by <= 0.07 °C):
+
+| | Maricopa 5 cm | 20 cm | 50 cm | 100 cm | Bushland 5 cm | 20 cm | 50 cm | 100 cm |
+|---|---|---|---|---|---|---|---|---|
+| AP | +1.5 (1.9) | +0.3 (0.6) | -1.1 (1.7) | -1.3 (2.3) | +1.0 (1.9) | +1.5 (2.2) | +2.3 (4.2) | +3.5 (5.2) |
+| PS | -0.5 (0.9) | +0.3 (0.9) | +1.5 (2.0) | +1.9 (2.4) | -0.8 (1.4) | -0.5 (1.1) | -0.4 (1.2) | -0.3 (1.3) |
+| SW | -2.0 (3.3) | -0.9 (2.7) | +0.6 (2.7) | +1.3 (2.6) | -2.5 (4.3) | -1.9 (3.5) | -1.5 (2.9) | -0.9 (2.1) |
+| DE | +1.4 (2.1) | +1.7 (2.2) | +2.2 (2.7) | +2.8 (3.2) | +1.0 (2.7) | +1.0 (2.6) | +0.8 (2.3) | +0.5 (1.8) |
+| DS | -0.3 (1.0) | -0.5 (1.0) | -0.5 (1.4) | -0.2 (1.5) | -0.5 (1.6) | -0.4 (1.4) | -0.5 (1.6) | -0.7 (2.0) |
+| MO | +3.3 (3.8) | +2.2 (2.8) | +0.8 (1.4) | -0.2 (0.8) | +2.2 (3.2) | +1.8 (2.4) | +1.0 (2.5) | +0.1 (2.6) |
+| SA | +0.2 (1.7) | -0.1 (2.1) | -0.2 (2.4) | +0.1 (2.4) | +0.3 (1.8) | +0.4 (1.9) | +0.3 (2.5) | -0.1 (3.4) |
+| SQ | -1.2 (1.7) | -1.7 (2.3) | -2.3 (3.1) | -2.8 (3.9) | -0.7 (2.2) | -0.6 (2.4) | -0.7 (2.8) | -1.0 (4.0) |
+| ST | -0.4 (1.2) | -1.4 (1.5) | -2.2 (2.5) | -2.7 (3.4) | -0.5 (2.0) | -0.4 (1.0) | -0.5 (1.9) | -0.8 (3.6) |
+
+- **MO is the warmest model near the surface** (+2-3 °C at 5 cm, up to 9-10 °C above the median in
+  May/June), close to the median at 100 cm. iMO (MONICA's own implementation) is identical to MO
+  everywhere (max difference 0.0 °C), so the Crop2ML port reproduces MONICA exactly.
+- The band's smooth lower edge from March on is **SW** (model note 5): at Bushland its 5 cm
+  temperature in June is ~13 °C, the others 26-34 °C, almost its own 50 cm value.
+- **SQ** changes 1-2 °C from day to day at 100 cm (the others 0.03-0.7): its one temperature for
+  all layers (model note 3). In Maricopa's winter SQ, ST and AP form the band's lower edge at 1 m
+  (~7-10 °C against ~15 °C for MO/median), DE and SA the upper one.
 
 ## Bushland
 
