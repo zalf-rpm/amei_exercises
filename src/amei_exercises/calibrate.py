@@ -5,7 +5,8 @@
 
 The steps (see STEPS): phenology (emergence, ear emergence, anthesis, maturity dates); growth
 (daily LAI and above ground biomass, LAI in units of LAI_SCALE, biomass of BIOMASS_SCALE); yield
-(grain yield at maturity). Later steps (LAI and
+(grain yield at maturity); water (measured ET per period and soil water, where the site has them;
+not for the ET study, where ET is what's evaluated). Later steps (LAI and
 biomass, yield, water) start from the cultivar a previous step wrote (--cultivar).
 
 The parameters come from a CSV in the format of the Maricopa flows' calibratethese_*.csv:
@@ -59,7 +60,20 @@ from typing import Any
 import pandas as pd
 import spotpy
 
-from amei_exercises.et_monica import DEFAULT_MONICA_RUN, Options, Setup, collect, dump, number, prepare, run_monica
+from amei_exercises.et_monica import (
+    DEFAULT_MONICA_RUN,
+    EXTRA_DAILY,
+    SOIL_WATER_DEPTHS_CM,
+    Options,
+    Setup,
+    collect,
+    daily_outputs,
+    dump,
+    number,
+    output_events,
+    prepare,
+    run_monica,
+)
 from amei_exercises.paths import ET_DIR
 
 logger = logging.getLogger("calibrate")
@@ -248,13 +262,42 @@ def grain_yield(s: Setup, daily: list[dict[str, Any]], summary: dict[str, Any]) 
     return {"HWAM": ((sim or 0.0) - s.obs.grain_yield) / 1000}
 
 
+# the residuals' units of the water step: 1 mm/d ET weighs as much as 50 mm soil water
+ET_SCALE = 1.0  # mm/d
+SOIL_WATER_SCALE = 50.0  # mm
+SOIL_WATER_OUTPUT = "SW_profile"  # the extra daily output of the water step: mean moisture of SOIL_WATER_DEPTHS_CM
+
+
+def water(s: Setup, daily: list[dict[str, Any]], summary: dict[str, Any]) -> dict[str, float]:
+    """(simulated - observed) / scale of the measured ET per period (mean mm/d) and the soil water [mm] in
+    SOIL_WATER_DEPTHS_CM, keys <code>@<date>. Only where the site has them (Observations.et_periods,
+    soil_water)."""
+    sim = {day(r["DATE"]): r for r in daily}
+    top, bottom = SOIL_WATER_DEPTHS_CM
+    res = {}
+    for a, b, v in s.obs.et_periods:
+        days = [a + timedelta(days=i) for i in range((b - a).days + 1)]
+        et = [number(sim[d].get("ETAD")) for d in days if d in sim]
+        if len(et) == len(days) and None not in et:
+            res[f"ETAP@{a}"] = (sum(et) / len(et) - v) / ET_SCALE
+    for d, v in (s.obs.soil_water if s.obs.soil_water is not None else {}).items():
+        if (r := sim.get(d)) is not None and (x := number(r.get(SOIL_WATER_OUTPUT))) is not None:
+            res[f"SW@{d}"] = (x * (bottom - top) * 10 - v) / SOIL_WATER_SCALE
+    return res
+
+
 @dataclass
 class Step:
     residuals: Callable[[Setup, list[dict[str, Any]], dict[str, Any]], dict[str, float]]
     unit: str
 
 
-STEPS = {"phenology": Step(phenology, "d"), "growth": Step(growth, "LAI, 3 t/ha"), "yield": Step(grain_yield, "t/ha")}
+STEPS = {
+    "phenology": Step(phenology, "d"),
+    "growth": Step(growth, "LAI, 3 t/ha"),
+    "yield": Step(grain_yield, "t/ha"),
+    "water": Step(water, "mm/d ET, 50 mm soil water"),
+}
 
 
 # ---------------------------------------------------------------------------------------------
@@ -422,10 +465,17 @@ def main() -> int:
         if cultivar_include is not None:
             s.cultivar = cultivar_include
         run_dirs[s.id] = out / "work" / s.id
+        events = None
+        if args.step == "water":  # the soil water of the measured depths
+            first = round(SOIL_WATER_DEPTHS_CM[0] / 100 / s.layer_thickness_m) + 1
+            last = round(SOIL_WATER_DEPTHS_CM[1] / 100 / s.layer_thickness_m)
+            events = output_events(
+                daily_outputs(s.no_of_layers) | EXTRA_DAILY | {SOIL_WATER_OUTPUT: ["Mois", [first, last, "AVG"]]}
+            )
         prepare(
             s,
             run_dirs[s.id],
-            Options(params=params_dir, water_stress=True, nitrogen_stress=nitrogen_stress),
+            Options(params=params_dir, water_stress=True, nitrogen_stress=nitrogen_stress, events=events),
         )
         crop_json[s.id] = json.loads((run_dirs[s.id] / "crop.json").read_text())
 

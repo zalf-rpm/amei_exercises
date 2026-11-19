@@ -112,6 +112,14 @@ class Observations:
     lai: pd.Series | None = None  # daily observations [m2 m-2], date index
     biomass: pd.Series | None = None  # above ground [kg DM ha-1], date index
     green_leaf: pd.Series | None = None  # green leaf weight (WLVG) [kg DM ha-1], date index
+    # measured ET as means over periods: (first day, last day, mm/d)
+    et_periods: list[tuple[date, date, float]] = field(default_factory=list)
+    # measured soil water [mm] in SOIL_WATER_DEPTHS_CM, date index
+    soil_water: pd.Series | None = None
+
+
+# the soil layer whose measured water Observations.soil_water holds: top, bottom [cm]
+SOIL_WATER_DEPTHS_CM = (20, 200)
 
 
 @dataclass

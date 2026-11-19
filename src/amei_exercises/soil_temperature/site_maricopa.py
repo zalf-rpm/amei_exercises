@@ -16,6 +16,7 @@ import pandas as pd
 
 from amei_exercises.soil_temperature.st_monica import (
     MARICOPA_DIR,
+    SOIL_WATER_DEPTHS_CM,
     ST_DIR,
     Fertilization,
     Observations,
@@ -133,6 +134,35 @@ def residue_additions(r: dict[str, Any], notes: list[str]) -> list[OrganicAdditi
     return adds
 
 
+# Cum_evapotranspiration_means' ETAP: 1993/94 the mean ET per period [mm/d], 1996/97 (10-day periods)
+# the sum over the period [mm] (values up to 88; the definition says "averaged over a given period", mm)
+ETAP_SUMS = {"AZMA1996", "AZMA1997"}
+
+
+def et_periods(rows: list[dict[str, Any]]) -> list[tuple[date, date, float]]:
+    """The measured ET per period as (first day, last day, mm/d)."""
+    out = []
+    for r in rows:
+        a, b, v = to_date(r["SMDATE"]), to_date(r["EMDATE"]), nan_to_none(r.get("ETAP"))
+        if a is None or b is None or v is None:
+            continue
+        out.append((a, b, float(v) / ((b - a).days + 1) if r["EID"] in ETAP_SUMS else float(v)))
+    return out
+
+
+def soil_water(rows: list[dict[str, Any]]) -> pd.Series:
+    """Measured soil water [mm] in SOIL_WATER_DEPTHS_CM: neutron probe readings (SWLD at SLSD every 20 cm,
+    30-210 cm), each for its depth +-10 cm; only dates with all depths of the layer."""
+    top, bottom = SOIL_WATER_DEPTHS_CM
+    wanted = set(range(top + 10, bottom, 20))
+    by_date: dict[date, dict[int, float]] = {}
+    for r in rows:
+        if (v := nan_to_none(r.get("SWLD"))) is not None and int(r["SLSD"]) in wanted:
+            by_date.setdefault(to_date(r["DATE"]), {})[int(r["SLSD"])] = float(v)
+    mm = {d: sum(v.values()) * 200 for d, v in by_date.items() if set(v) == wanted}
+    return pd.Series(mm, dtype=float).sort_index()
+
+
 def load(xlsx: Path = XLSX) -> list[Setup]:
     sheets = read_sheets(xlsx)
     treatments = {str(r["TREAT_ID"]): r for r in sheets["Treatments"].to_dict("records")}
@@ -222,6 +252,8 @@ def load(xlsx: Path = XLSX) -> list[Setup]:
                     lai=daily_obs(rows[tid].get("Obs_crop_daily_means", []), "LAID"),
                     biomass=daily_obs(rows[tid].get("Obs_crop_daily_means", []), "CWAD"),
                     green_leaf=daily_obs(rows[tid].get("Obs_crop_daily_means", []), "WLVG"),
+                    et_periods=et_periods(rows[tid].get("Cum_evapotranspiration_means", [])),
+                    soil_water=soil_water(rows[tid].get("Soil_moisture_means", [])),
                 ),
                 notes=notes,
             )

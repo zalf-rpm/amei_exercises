@@ -144,6 +144,27 @@ State 2026-11-19 (the `calibrate.py` cultivar, previous crop residue; `pixi run 
 2. **Water and N responses** (the controls fit: e.g. 902 biomass 17.5 vs 18.3 t/ha observed):
    - **The dry treatments get no water stress**: Dry/Wet biomass 0.99-1.01 (observed 0.77-0.82),
      so their biomass is 20-30 % too high (905: 17.7 vs 13.9 t/ha), as in Bushland's P treatments.
+     Why (2026-11-19, with the calibrated cultivar of steps 1-3):
+     - **MONICA's water demand is too low.** Its ET0 is right: the same as FAO-56 grass ET0 from the
+       weather (902 season 555 vs 553 mm). But its crop uses about ET0 (StageKcFactor 1.1): season ET
+       400-450 mm, at most ~5.8 mm/d. The measured ET (`Cum_evapotranspiration_means`) of the wet
+       treatments is 7.5-11 mm/d in April/May, 1.6-1.9 x ET0 (FAO-56: ~1.15 for wheat), the dry ones
+       6-8 mm/d. So MONICA's demand is ~60 % of the measured one, and the dry treatments' water
+       (1993: 592 mm irrigation + 156 mm rain, 1994: 287 + 107 mm, plus the soil) covers it: dry 901
+       even drains 218 mm. Measured dry ET falls behind wet from late March; MONICA's dry = wet.
+     - Test, StageKcFactor stages 2-5 0.7/1.1/1.1/0.8 -> 1.0/1.7/1.7/1.3: 1994 Dry/Wet biomass 0.87
+       (FACE 0.75), observed 0.77/0.82; 1993 still 1.00.
+     - **1993: MONICA's profile holds too much water.** Against the neutron probe readings
+       (`Soil_moisture_means`, 30-210 cm): from January 100-170 mm more water in 20-220 cm, below
+       120 cm at the horizons' FC (0.25) where the probes show mostly 0.16-0.21 (at 110-130 cm down
+       to 0.07-0.10, below the workbook's PWP of 0.14-0.16). The measured dry profile drew down ~140 mm
+       from mid January to late April, MONICA's ~50 mm.
+     - For the data providers: how was the measured ET obtained (a soil water balance would count
+       drainage as ET)? `ETAP` is the mean per period in mm/d in 1993/94, but the sum over the
+       (10-day) period in 1996/97 (values up to 88; the definition says "averaged", mm). And the
+       deep layers' FC/PWP vs the probe readings.
+     - Hence step 4 of the Maricopa calibration (StageKcFactor against the measured ET and soil
+       water), see there.
    - **1997 low N far too N-limited**: biomass 913/915 5.8/7.0 vs 13.3/12.4 t/ha, crop N 51/49 vs
      136/124 kg N/ha; the residue (4300 kg/ha straw, N immobilization) made it a bit worse. 1996's
      low N effect is too weak instead (yield ratio 0.94/0.89 vs 0.76/0.86).
@@ -268,6 +289,22 @@ Results in `soil_temperature/calibration/maricopa_*`, parameters in
   share of the assimilates in stage 4 (ear emergence to anthesis) 0.68 (0.97, rest to the stem);
   RMSE 2.1 -> 1.0 t/ha. AssimilateReallocation instead went to its bound (0) with the same fit, the
   grain share after anthesis stayed at 1; both keep their defaults.
+- **Step 4, water** (2026-11-19, `calibration/maricopa_4_water.csv`, `calibrate.py --step water`;
+  **not adopted yet**): StageKcFactor of stages 2-5 against the measured ET per period
+  (`Cum_evapotranspiration_means`, 282 periods, mm/d) and the soil water in 20-200 cm (neutron probes,
+  628 dates; 50 mm weigh as 1 mm/d), all 16 treatments, from the step 3 cultivar. Against ET: only
+  for this study, where ET isn't what's evaluated (see model issue 2). Seeds 1 and 7 agree:
+  StageKcFactor 1.93 / 1.38 / 1.79 / 1.55 (seed 7: 1.89 / 1.42 / 1.73 / 1.35; before 0.7 / 1.1 /
+  1.1 / 0.8); stage 2 near its bound 2.0 (the measured ET in Feb/March is higher than MONICA's
+  at its small LAI). ET bias -1.26 -> -0.42 mm/d, RMSE 1.96 -> 1.91 mm/d (the dry 1994
+  treatments' ET now too high, 905/907 1.0 -> 1.9-2.0); soil water bias +82 -> +27 mm, RMSE 106 ->
+  65 mm (1993 FACE 903/904 still ~110 mm: the deep layers, model issue 2).
+  All 16 treatments: LAI RMSE 1.23 -> 1.11, biomass 1.80 -> 1.61 t/ha, yield 1.52 -> 1.35 t/ha
+  (controls 0.97 -> 0.97), phenology unchanged. Dry/Wet biomass 1993 0.96/0.95, 1994 0.76/0.65
+  (observed 0.82/0.78, 0.77/0.82; before ~1.0). The wet control 902 loses 1.4 t/ha (16.1 vs 18.3
+  observed). Soil temperature (all 10 models, April/May): SW +0.6-0.7 °C (dry treatments +1.2 °C
+  at 20 cm: less biomass, less cover), AP up to +0.3 °C, the others <= 0.1 °C; single days up to
+  4.6 °C (DS).
 
 All 16 treatments, final parameters (`cultivar_spring-wheat_maricopa_3_yield.json` +
 `species_wheat_maricopa_2_growth.json`), and the flow's for comparison (phase 1 cultivar

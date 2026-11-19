@@ -1,0 +1,5 @@
+name,position in array,low,high,step,optguess,minbound,maxbound,derived params
+StageKcFactor,1,0.5,2.0,,0.7,,,
+StageKcFactor,2,0.5,2.0,,1.1,,,
+StageKcFactor,3,0.5,2.0,,1.1,,,
+StageKcFactor,4,0.3,2.0,,0.8,,,
