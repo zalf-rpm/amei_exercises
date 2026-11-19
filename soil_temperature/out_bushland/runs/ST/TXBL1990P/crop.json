@@ -19,7 +19,8 @@
             "Carbamid": 0.0,
             "NH4": 1.0,
             "NO3": 0.0
-          }
+          },
+          "depth": 0.1725
         },
         {
           "date": "1989-10-11",
@@ -32,7 +33,7 @@
               ],
               "cultivar": [
                 "include-from-file",
-                "crops/cultivar_winter-wheat.json"
+                "crops/cultivar_winter-wheat_bushland_2_growth.json"
               ]
             },
             "residueParams": [
@@ -45,7 +46,7 @@
           "type": "Irrigation",
           "date": "1989-10-13",
           "amount": [
-            10.64533800000001,
+            10.645338,
             "mm"
           ],
           "parameters": {
@@ -81,7 +82,7 @@
           "type": "Irrigation",
           "date": "1989-10-24",
           "amount": [
-            9.653586000000018,
+            9.65358600000002,
             "mm"
           ],
           "parameters": {
@@ -99,7 +100,7 @@
           "type": "Irrigation",
           "date": "1989-10-27",
           "amount": [
-            15.44413800000001,
+            15.444138,
             "mm"
           ],
           "parameters": {
@@ -117,7 +118,7 @@
           "type": "Irrigation",
           "date": "1989-10-31",
           "amount": [
-            15.46013399999998,
+            15.460134,
             "mm"
           ],
           "parameters": {
@@ -153,7 +154,7 @@
           "type": "Irrigation",
           "date": "1989-11-22",
           "amount": [
-            16.56385799999998,
+            16.563858,
             "mm"
           ],
           "parameters": {

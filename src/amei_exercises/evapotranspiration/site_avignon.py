@@ -13,8 +13,8 @@ from pathlib import Path
 from typing import Any
 
 import pandas as pd
-from et_monica import (
-    HERE,
+
+from amei_exercises.et_monica import (
     WEATHER_COLUMNS,
     Fertilization,
     Horizon,
@@ -25,11 +25,12 @@ from et_monica import (
     to_date,
     wind_at_2m,
 )
+from amei_exercises.paths import ET_DIR
 
 logger = logging.getLogger("site_avignon")
 
 NAME = "Avignon"
-XLSX = HERE / "AgMIP_Wheat_Avignon_full_vPublish.xlsx"
+XLSX = ET_DIR / "AgMIP_Wheat_Avignon_full_vPublish.xlsx"
 NO_OF_LAYERS = 38  # 1.9 m, the depth of the soil profile
 CULTIVAR = "crops/cultivar_winter-wheat.json"  # durum wheat in reality; MONICA has no durum cultivar here
 LATEST_HARVEST = (7, 15)  # month, day in the harvest year: no harvest dates in the data

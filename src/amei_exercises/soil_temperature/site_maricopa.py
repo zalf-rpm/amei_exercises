@@ -12,8 +12,10 @@ from pathlib import Path
 from typing import Any
 
 import pandas as pd
-from st_monica import (
-    HERE,
+
+from amei_exercises.soil_temperature.st_monica import (
+    MARICOPA_DIR,
+    ST_DIR,
     Fertilization,
     Observations,
     Setup,
@@ -29,16 +31,18 @@ logger = logging.getLogger("site_maricopa")
 
 NAME = "Maricopa"
 TITLE = "Maricopa Wheat FACE"
-DATA_DIR = HERE / "Maricopa wheat FACE"
+DATA_DIR = ST_DIR / "Maricopa wheat FACE"
 XLSX = DATA_DIR / "MARICOPA Wheat FACE data_2026-10-15 (ICASA data format v4.1)(PM9)(BAK1)(no SoilT).xlsx"
 TEMPLATES = {
     "summary": DATA_DIR / "AMIE_template_MarcicopaWheatFACE_summary_output.txt",
     "daily": DATA_DIR / "AMIE_template_MarcicopaWheatFACE_daily_output.txt",
     "layers": DATA_DIR / "AMIE_template_MarcicopaWheatFACE_layers_output.txt",
 }
-# the parameters of evapotranspiration/calibrate.py --site maricopa (phenology, growth, yield; FINDINGS.md);
+# the parameters of calibrate.py --site maricopa (soil_temperature/calibration/calibrate.sh) (phenology, growth, yield; FINDINGS.md);
 # the calibration flow's cultivar was crops/cultivar_spring-wheat_with_1_calibrated_phenology.json
-PARAMS = HERE.parent / "maricopa_wheat_face/params"
+PARAMS = MARICOPA_DIR / "params"
+# calibrate.py --site maricopa writes to <CALIBRATION_DIR>/maricopa_<step>
+CALIBRATION_DIR = ST_DIR / "calibration"
 CULTIVAR = "crops/cultivar_spring-wheat_maricopa_3_yield.json"
 SPECIES = "crops/species_wheat_maricopa_2_growth.json"
 NO_OF_LAYERS = 42  # 2.1 m in 5 cm layers, as the protocol asks

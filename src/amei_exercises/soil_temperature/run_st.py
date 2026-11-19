@@ -11,8 +11,8 @@ the MONICA build (monica_build.txt), so a single run can be inspected and repeat
 The result files go to <out>/results/. git ignores monica_out.csv and the layers results (too big);
 <out>/checksums.txt holds their sha256, so `git diff` shows which changed after a rerun.
 
-    pixi run python soil_temperature/run_st.py --site maricopa [--models MO DS] [--treatments 901 902]
-    pixi run python soil_temperature/run_st.py --site bushland
+    pixi run run-st --site maricopa [--models MO DS] [--treatments 901 902]
+    pixi run run-st --site bushland
 """
 
 from __future__ import annotations
@@ -26,12 +26,12 @@ import sys
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
-from st_monica import (
+from amei_exercises.soil_temperature.st_monica import (
     DEFAULT_MONICA_RUN,
     FRAMEWORK_ID,
-    HERE,
     MODELS,
     NA,
+    ST_DIR,
     TEMPLATE_ENCODING,
     Options,
     collect,
@@ -77,8 +77,8 @@ def main() -> int:
     args = ap.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(levelname)-7s %(message)s")
 
-    site = importlib.import_module(f"site_{args.site}")
-    out: Path = args.out or HERE / f"out_{args.site}"
+    site = importlib.import_module(f"amei_exercises.soil_temperature.site_{args.site}")
+    out: Path = args.out or ST_DIR / f"out_{args.site}"
     setups = site.load(args.xlsx or site.XLSX)
     if args.treatments:
         known = {s.id for s in setups}

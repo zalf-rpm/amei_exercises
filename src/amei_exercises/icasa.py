@@ -10,7 +10,8 @@ from pathlib import Path
 from typing import Any
 
 import pandas as pd
-from et_monica import WEATHER_COLUMNS, Horizon, nan_to_none, sat_vapor_pressure
+
+from amei_exercises.et_monica import WEATHER_COLUMNS, Horizon, nan_to_none, sat_vapor_pressure
 
 
 def read_sheets(xlsx: Path) -> dict[str, pd.DataFrame]:

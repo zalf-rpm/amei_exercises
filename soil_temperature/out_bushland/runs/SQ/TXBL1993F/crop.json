@@ -19,7 +19,8 @@
             "Carbamid": 0.0,
             "NH4": 1.0,
             "NO3": 0.0
-          }
+          },
+          "depth": 0.1725
         },
         {
           "date": "1992-09-29",
@@ -32,7 +33,7 @@
               ],
               "cultivar": [
                 "include-from-file",
-                "crops/cultivar_winter-wheat.json"
+                "crops/cultivar_winter-wheat_bushland_2_growth.json"
               ]
             },
             "residueParams": [
@@ -45,7 +46,7 @@
           "type": "Irrigation",
           "date": "1992-10-02",
           "amount": [
-            37.84653599999999,
+            37.846536,
             "mm"
           ],
           "parameters": {
@@ -63,7 +64,7 @@
           "type": "Irrigation",
           "date": "1992-10-09",
           "amount": [
-            11.06123400000001,
+            11.061234,
             "mm"
           ],
           "parameters": {
@@ -81,7 +82,7 @@
           "type": "Irrigation",
           "date": "1992-10-13",
           "amount": [
-            16.33991399999999,
+            16.339914,
             "mm"
           ],
           "parameters": {
@@ -114,10 +115,26 @@
           }
         },
         {
+          "type": "MineralFertilization",
+          "date": "1993-03-29",
+          "amount": [
+            50.0,
+            "kg N"
+          ],
+          "partition": {
+            "id": "Anhydrous ammonia",
+            "name": "Anhydrous ammonia",
+            "Carbamid": 0.0,
+            "NH4": 1.0,
+            "NO3": 0.0
+          },
+          "depth": 0.1725
+        },
+        {
           "type": "Irrigation",
           "date": "1993-03-30",
           "amount": [
-            31.56010800000001,
+            31.560108,
             "mm"
           ],
           "parameters": {
@@ -135,7 +152,7 @@
           "type": "Irrigation",
           "date": "1993-04-02",
           "amount": [
-            24.84178800000001,
+            24.841788,
             "mm"
           ],
           "parameters": {
@@ -153,7 +170,7 @@
           "type": "Irrigation",
           "date": "1993-04-07",
           "amount": [
-            21.61859400000003,
+            21.618594,
             "mm"
           ],
           "parameters": {
@@ -171,7 +188,7 @@
           "type": "Irrigation",
           "date": "1993-04-12",
           "amount": [
-            22.63433999999998,
+            22.63434,
             "mm"
           ],
           "parameters": {
@@ -207,7 +224,7 @@
           "type": "Irrigation",
           "date": "1993-04-20",
           "amount": [
-            24.09797399999999,
+            24.097974,
             "mm"
           ],
           "parameters": {
@@ -225,7 +242,7 @@
           "type": "Irrigation",
           "date": "1993-04-23",
           "amount": [
-            37.84653599999999,
+            37.846536,
             "mm"
           ],
           "parameters": {
@@ -243,7 +260,7 @@
           "type": "Irrigation",
           "date": "1993-04-27",
           "amount": [
-            25.16170799999998,
+            25.161708,
             "mm"
           ],
           "parameters": {
@@ -261,7 +278,7 @@
           "type": "Irrigation",
           "date": "1993-05-06",
           "amount": [
-            22.77830399999996,
+            22.778304,
             "mm"
           ],
           "parameters": {
@@ -279,7 +296,7 @@
           "type": "Irrigation",
           "date": "1993-05-11",
           "amount": [
-            22.97025599999998,
+            22.970256,
             "mm"
           ],
           "parameters": {
@@ -297,7 +314,7 @@
           "type": "Irrigation",
           "date": "1993-05-14",
           "amount": [
-            28.53686400000001,
+            28.536864,
             "mm"
           ],
           "parameters": {
@@ -315,7 +332,7 @@
           "type": "Irrigation",
           "date": "1993-05-19",
           "amount": [
-            21.29067599999999,
+            21.290676,
             "mm"
           ],
           "parameters": {
@@ -333,7 +350,7 @@
           "type": "Irrigation",
           "date": "1993-05-24",
           "amount": [
-            23.25018600000004,
+            23.250186,
             "mm"
           ],
           "parameters": {
@@ -369,7 +386,7 @@
           "type": "Irrigation",
           "date": "1993-06-03",
           "amount": [
-            24.10597200000001,
+            24.105972,
             "mm"
           ],
           "parameters": {
@@ -387,7 +404,7 @@
           "type": "Irrigation",
           "date": "1993-06-07",
           "amount": [
-            21.34666199999998,
+            21.346662,
             "mm"
           ],
           "parameters": {

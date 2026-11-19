@@ -1,22 +1,17 @@
 """MONICA runs for the AMEI soil temperature model intercomparison: what differs from the ET study.
 
 The MONICA inputs (`Setup` -> sim.json, crop.json, site.json, climate.csv) come from the ET study's
-evapotranspiration/et_monica.py and the ICASA readers from evapotranspiration/icasa.py. Here: the
+amei_exercises.et_monica and the ICASA readers from amei_exercises.icasa. Here: the
 soil temperature models, the outputs and the three AMEI result files (summary, daily, layers).
 `run_st.py` is the command line.
 """
 
 from __future__ import annotations
 
-import sys
 from pathlib import Path
 from typing import Any
 
-HERE = Path(__file__).resolve().parent
-# appended: this directory comes first, its site_bushland.py isn't the ET study's
-sys.path.append(str(HERE.parent / "evapotranspiration"))
-
-from et_monica import (  # noqa: E402
+from amei_exercises.et_monica import (
     DEFAULT_MONICA_RUN,
     EVENTS,
     LAYER_THICKNESS_M,
@@ -40,12 +35,15 @@ from et_monica import (  # noqa: E402
     write_checksums,
     write_result,
 )
-from icasa import horizons, read_sheets, treatment_id_resolver, weather  # noqa: E402
+from amei_exercises.icasa import horizons, read_sheets, treatment_id_resolver, weather
+from amei_exercises.paths import ET_DIR, MARICOPA_DIR, ST_DIR
 
 __all__ = [
     "daily_obs",
     "DEFAULT_MONICA_RUN",
-    "HERE",
+    "ET_DIR",
+    "MARICOPA_DIR",
+    "ST_DIR",
     "WEATHER_COLUMNS",
     "Fertilization",
     "Observations",

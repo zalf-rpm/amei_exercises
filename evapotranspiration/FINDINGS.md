@@ -3,9 +3,14 @@
 ## Setup
 
 ```
-pixi run python evapotranspiration/run_et.py --site bushland|avignon [--treatments ...] [--monica-run ...]
-pixi run python evapotranspiration/evaluate_et.py --site bushland|avignon
+pixi run run-et --site bushland|avignon [--treatments ...] [--monica-run ...]
+pixi run evaluate-et --site bushland|avignon
+evapotranspiration/calibration/calibrate.sh   # the Bushland calibration, step by step
 ```
+
+The scripts are in `src/amei_exercises/` (since 2026-11-19; before in this folder): the ET study's
+in `evapotranspiration/`, `et_monica.py`, `icasa.py` and `calibrate.py` shared with the soil
+temperature study; `paths.py` points to the data folders. The pixi tasks run them as modules.
 
 - `site_bushland.py`, `site_avignon.py`: read the site's xlsx into site-independent `Setup`s
   (weather, soil, initial conditions, management, observations). All site-specific assumptions
@@ -16,7 +21,7 @@ pixi run python evapotranspiration/evaluate_et.py --site bushland|avignon
   any other build; the template header records which one (`Model: MONICA (MOFAPM,
   monica_odin simplify_copilot@<commit>)`). See "MONICA builds" below.
 - `checks.py`: reproduces the checks behind the data and ET0 statements below
-  (`checks.py humidity`, `checks.py et0`).
+  (`pixi run et-checks humidity`, `pixi run et-checks et0`).
 - `out_<site>/runs/<id>/`: everything MONICA got and returned, per treatment (not in git;
   `cd` there and `monica-run sim.json` repeats a run). `out_<site>/results/`: the template files
   for submission. `out_<site>/evaluation.{png,csv}`: comparison with the measured ET.

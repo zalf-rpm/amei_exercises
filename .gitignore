@@ -1,19 +1,19 @@
 out_/
 out/
-ames_bare_soil/out/
-/ames_bare_soil/out_uploaded_from_linux
-ames_bare_soil/~$AMEI_fallow_Ames_2024-05-16.xlsx
+soil_temperature/Ames/out/
+/soil_temperature/Ames/out_uploaded_from_linux
+soil_temperature/Ames/~$AMEI_fallow_Ames_2024-05-16.xlsx
 maricopa_wheat_face/~$MARICOPA Wheat FACE data_2024-10-25 (ICASA data format v4.1)(PM6)(BAK1)(no soil temp).xlsx
 .idea/csv-editor.xml
-/ames_bare_soil/compare/
+/soil_temperature/Ames/compare/
 /thiago/SoilTemperature_AP_APC/Outputs/SoilTemperature_AP_APC_USMA_SILO_L7_AW1.00.txt
-/soil_temperature_sensitivity_analysis/out/
+/soil_temperature/sensitivity_analysis/out/
 /maricopa_wheat_face/compare/
 # pixi environments
 .pixi/*
 !.pixi/config.toml
 **/__pycache__/
-soil_temperature_sensitivity_analysis/logs/
+soil_temperature/sensitivity_analysis/logs/
 maricopa_wheat_face/logs/
 maricopa_wheat_face/out_direct_runs/
 maricopa_wheat_face/load-balance-test-out/
@@ -26,3 +26,4 @@ soil_temperature/out_*/results/*Layers*.txt
 
 # calibrate.py: the MONICA run folders of the evaluations
 evapotranspiration/calibration/*/work/
+soil_temperature/calibration/*/work/

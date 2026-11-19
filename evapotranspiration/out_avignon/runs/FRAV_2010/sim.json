@@ -126,7 +126,11 @@
           "round": 2,
           "name": "SMTrans"
         },
-        "Infilt|Infilt"
+        "Infilt|Infilt",
+        [
+          "OrgGreenBiom|WLVG",
+          "Leaf"
+        ]
       ],
       "Sowing",
       [

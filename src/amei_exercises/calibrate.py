@@ -1,6 +1,6 @@
 """Calibrate MONICA cultivar parameters against a site's observations, one step at a time.
 
-    pixi run python evapotranspiration/calibrate.py --site bushland --step phenology \\
+    pixi run calibrate --site bushland --step phenology \\
         --params-csv evapotranspiration/calibration/bushland_1_phenology.csv [--reps 3000]
 
 The steps (see STEPS): phenology (emergence, ear emergence, anthesis, maturity dates); growth
@@ -28,7 +28,10 @@ EXTEND_DAYS after the observed harvest or where the weather has a gap; with the 
 crop would never reach maturity, and the error would be unknown. A date the model doesn't reach
 counts as MISSING_PENALTY_DAYS after the last simulated day.
 
-Writes to <out> (default evapotranspiration/calibration/<site>_<step>/):
+The calibrations done so far, in order: evapotranspiration/calibration/calibrate.sh (Bushland) and
+soil_temperature/calibration/calibrate.sh (Maricopa).
+
+Writes to <out> (default <the site's CALIBRATION_DIR, else evapotranspiration/calibration>/<site>_<step>/):
 - cultivar.json (species.json, if species parameters were calibrated): with the best values, ready
   as the next step's --cultivar/--species
 - best.csv: the best values of the calibrated rows; report.csv: obs/default/calibrated per treatment
@@ -55,11 +58,17 @@ from typing import Any
 
 import pandas as pd
 import spotpy
-from et_monica import DEFAULT_MONICA_RUN, HERE, Options, Setup, collect, dump, number, prepare, run_monica
+
+from amei_exercises.et_monica import DEFAULT_MONICA_RUN, Options, Setup, collect, dump, number, prepare, run_monica
+from amei_exercises.paths import ET_DIR
 
 logger = logging.getLogger("calibrate")
 
-SITES = ("bushland", "avignon", "maricopa")  # site_<name>.py here or in ../soil_temperature
+SITES = {
+    "bushland": "amei_exercises.evapotranspiration.site_bushland",
+    "avignon": "amei_exercises.evapotranspiration.site_avignon",
+    "maricopa": "amei_exercises.soil_temperature.site_maricopa",
+}
 EXTEND_DAYS = 60  # the runs last at most this long after the observed harvest
 MISSING_PENALTY_DAYS = 30  # a date not reached: this many days after the last simulated day
 
@@ -345,7 +354,7 @@ def main() -> int:
     ap.add_argument("--site", choices=SITES, required=True)
     ap.add_argument("--step", choices=list(STEPS), required=True)
     ap.add_argument("--params-csv", type=Path, required=True, help="the parameters to calibrate")
-    ap.add_argument("--xlsx", type=Path, help="default: the site's workbook in evapotranspiration/")
+    ap.add_argument("--xlsx", type=Path, help="default: the site's workbook")
     ap.add_argument("--treatments", nargs="*", help="only these")
     ap.add_argument("--params", type=Path, help="default: the site's PARAMS, else evapotranspiration/phase_1/params")
     ap.add_argument(
@@ -365,14 +374,17 @@ def main() -> int:
     ap.add_argument("--reps", type=int, default=3000, help="maximum number of evaluations (SCE-UA)")
     ap.add_argument("--seed", type=int, default=1)
     ap.add_argument("--jobs", type=int, default=os.cpu_count(), help="MONICA runs in parallel")
-    ap.add_argument("--out", type=Path, help="default: evapotranspiration/calibration/<site>_<step>")
+    ap.add_argument(
+        "--out",
+        type=Path,
+        help="default: the site's CALIBRATION_DIR (else evapotranspiration/calibration)/<site>_<step>",
+    )
     args = ap.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(levelname)-7s %(message)s")
 
-    sys.path.append(str(HERE.parent / "soil_temperature"))  # site_maricopa.py
-    site = importlib.import_module(f"site_{args.site}")
-    params_dir: Path = args.params or getattr(site, "PARAMS", HERE / "phase_1/params")
-    out: Path = args.out or HERE / "calibration" / f"{args.site}_{args.step}"
+    site = importlib.import_module(SITES[args.site])
+    params_dir: Path = args.params or getattr(site, "PARAMS", ET_DIR / "phase_1/params")
+    out: Path = args.out or getattr(site, "CALIBRATION_DIR", ET_DIR / "calibration") / f"{args.site}_{args.step}"
     rows = read_rows(args.params_csv)
     free = [r for r in rows if r.derived is None and r.low is not None and r.high is not None]
 
@@ -385,7 +397,7 @@ def main() -> int:
     species_path = Path(args.species) if args.species and Path(args.species).is_file() else None
     species_include = args.species or next(
         ws["crop"]["cropParams"]["species"][1]
-        for ws in json.loads((HERE / "crop.json").read_text())["cropRotation"][0]["worksteps"]
+        for ws in json.loads((ET_DIR / "crop.json").read_text())["cropRotation"][0]["worksteps"]
         if ws["type"] == "Sowing"
     )
     species = json.loads((species_path or params_dir / species_include).read_text())

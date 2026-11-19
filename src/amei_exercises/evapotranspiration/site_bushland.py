@@ -13,13 +13,15 @@ from pathlib import Path
 from typing import Any
 
 import pandas as pd
-from et_monica import HERE, Fertilization, Observations, Setup, daily_obs, nan_to_none, to_date
-from icasa import horizons, read_sheets, treatment_id_resolver, weather
+
+from amei_exercises.et_monica import Fertilization, Observations, Setup, daily_obs, nan_to_none, to_date
+from amei_exercises.icasa import horizons, read_sheets, treatment_id_resolver, weather
+from amei_exercises.paths import ET_DIR
 
 logger = logging.getLogger("site_bushland")
 
 NAME = "Bushland"
-XLSX = HERE / "AMEI_Bushland_v4_2026-01-24(no_soil_T).xlsx"
+XLSX = ET_DIR / "AMEI_Bushland_v4_2026-01-24(no_soil_T).xlsx"
 # 10 cm layers: with 5 cm the infiltration limit (it scales with the layer thickness) let the
 # irrigation water pond, which then evaporated at 1.1 x ET0 (FINDINGS.md, model issues 4 and 5)
 LAYER_THICKNESS_M = 0.1

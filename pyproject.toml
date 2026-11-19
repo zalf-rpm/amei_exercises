@@ -85,3 +85,11 @@ components-service = { cmd = "python -m zalfmas_fbp.run.local_components_service
 regenerate-components-cache = { cmd = "python -m zalfmas_fbp.run.local_components_service configs/local_components_service.toml --regenerate_cache --force" }
 channel-service = { cmd = "python -m zalfmas_fbp.run.channel_starter_service configs/local_channel_starter_service.toml" }
 flow = { cmd = "python -m zalfmas_fbp.run.run_fbp_flow" }
+# the ET and soil temperature studies (src/amei_exercises), arguments are passed on, e.g.
+# pixi run run-et --site bushland
+run-et = { cmd = "python -m amei_exercises.evapotranspiration.run_et" }
+evaluate-et = { cmd = "python -m amei_exercises.evapotranspiration.evaluate_et" }
+et-checks = { cmd = "python -m amei_exercises.evapotranspiration.checks" }
+run-st = { cmd = "python -m amei_exercises.soil_temperature.run_st" }
+evaluate-maricopa = { cmd = "python -m amei_exercises.soil_temperature.evaluate_maricopa" }
+calibrate = { cmd = "python -m amei_exercises.calibrate" }

@@ -11,8 +11,8 @@ can be inspected and repeated by hand:
 
 The template files go to <out>/results/.
 
-    pixi run python evapotranspiration/run_et.py --site bushland [--treatments TXBL1990F ...]
-    pixi run python evapotranspiration/run_et.py --site avignon
+    pixi run run-et --site bushland [--treatments TXBL1990F ...]
+    pixi run run-et --site avignon
 
 --soil-moisture puts parameters on top of general/soil-moisture.json, e.g. Odin's
 MaxPotentialEvapotranspiration=15, PondEvaporationByCoverage=true, InfiltrationByDepth=true,
@@ -28,9 +28,8 @@ import logging
 import sys
 from pathlib import Path
 
-from et_monica import (
+from amei_exercises.et_monica import (
     DEFAULT_MONICA_RUN,
-    HERE,
     TEMPLATES,
     Options,
     collect,
@@ -43,6 +42,7 @@ from et_monica import (
     write_checksums,
     write_result,
 )
+from amei_exercises.paths import ET_DIR
 
 logger = logging.getLogger("run_et")
 SITES = ("bushland", "avignon")
@@ -54,7 +54,7 @@ def main() -> int:
     ap.add_argument("--xlsx", type=Path, help="default: the site's workbook in evapotranspiration/")
     ap.add_argument("--treatments", nargs="*", help="only these")
     ap.add_argument("--monica-run", type=Path, default=DEFAULT_MONICA_RUN, help="default: the Odin port")
-    ap.add_argument("--params", type=Path, default=HERE / "phase_1/params")
+    ap.add_argument("--params", type=Path, default=ET_DIR / "phase_1/params")
     ap.add_argument("--cultivar", help="include path relative to --params; default: the site's")
     ap.add_argument("--species", help="include path relative to --params; default: crop.json's")
     ap.add_argument("--module-code", default="MOFAPM")
@@ -78,8 +78,8 @@ def main() -> int:
     args = ap.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(levelname)-7s %(message)s")
 
-    site = importlib.import_module(f"site_{args.site}")
-    out: Path = args.out or HERE / f"out_{args.site}"
+    site = importlib.import_module(f"amei_exercises.evapotranspiration.site_{args.site}")
+    out: Path = args.out or ET_DIR / f"out_{args.site}"
     setups = site.load(args.xlsx or site.XLSX)
     if args.treatments:
         known = {s.id for s in setups}

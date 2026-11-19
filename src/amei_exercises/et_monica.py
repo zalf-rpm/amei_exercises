@@ -23,10 +23,11 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
+from amei_exercises.paths import ET_DIR
+
 logger = logging.getLogger("et_monica")
 
-HERE = Path(__file__).resolve().parent
-TEMPLATES = HERE / "3_Templates/Evaluation"
+TEMPLATES = ET_DIR / "3_Templates/Evaluation"
 LAYER_THICKNESS_M = 0.05  # the default; Setup.layer_thickness_m
 # the Odin port (zalf-rpm/monica, branch simplify_copilot): `pixi run build monica-run` in odin/
 DEFAULT_MONICA_RUN = Path.home() / "GitHub/monica_odin/odin/build/monica-run"
@@ -543,14 +544,14 @@ def dump(o: Any) -> str:
 def prepare(s: Setup, run_dir: Path, opts: Options) -> list[str]:
     """Writes sim.json, crop.json, site.json and climate.csv into run_dir. Returns notes."""
     run_dir.mkdir(parents=True, exist_ok=True)
-    crop_template = json.loads((HERE / "crop.json").read_text())
+    crop_template = json.loads((ET_DIR / "crop.json").read_text())
     sowing_template = next(ws for ws in crop_template["cropRotation"][0]["worksteps"] if ws["type"] == "Sowing")
     crop = {k: v for k, v in crop_template.items() if k not in ("ws", "cropRotation")}
     crop["cropRotation"] = [{"worksteps": worksteps(s, sowing_template)}]
 
     layers, notes = soil_layers(s)
-    site_base = json.loads((HERE / "site.json").read_text())
-    sim_base = json.loads((HERE / "sim_full_run.json").read_text())
+    site_base = json.loads((ET_DIR / "site.json").read_text())
+    sim_base = json.loads((ET_DIR / "sim_full_run.json").read_text())
 
     write_climate(run_dir / "climate.csv", s, opts.vp_factor)
     (run_dir / "crop.json").write_text(dump(crop))

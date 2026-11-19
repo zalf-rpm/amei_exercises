@@ -1,11 +1,14 @@
 # AMEI soil temperature intercomparison: MONICA runs
 
 Script-based, like the ET study (`evapotranspiration/`): plain `monica-run` per model and treatment,
-no FBP flow. Shares the ET study's MONICA input code (`evapotranspiration/et_monica.py`) and its
-ICASA readers (`evapotranspiration/icasa.py`, also used by Bushland's ET reader).
+no FBP flow. Shares the ET study's MONICA input code (`et_monica.py`) and its ICASA readers
+(`icasa.py`, also used by Bushland's ET reader). The scripts are in
+`src/amei_exercises/soil_temperature/` (since 2026-11-19; before in this folder).
 
-    pixi run python soil_temperature/run_st.py --site maricopa [--models MO DS] [--treatments 901 902]
-    pixi run python soil_temperature/run_st.py --site bushland
+    pixi run run-st --site maricopa [--models MO DS] [--treatments 901 902]
+    pixi run run-st --site bushland
+    soil_temperature/calibration/calibrate.sh   # the Maricopa calibration, step by step
+    pixi run evaluate-maricopa --cultivar ... --out ...   # all 16 Maricopa treatments vs observed
 
 - `site_maricopa.py`, `site_bushland.py`: the site's workbook -> one `Setup` per treatment
 - `st_monica.py`: the soil temperature models, the outputs, the three result files
@@ -146,17 +149,25 @@ evenly, residue sheet (all 0 kg/ha).
 
 - 48 layers of 5 cm (0-240 cm, the whole profile): the protocol says "48 soil layers ... from 0 to
   2.40 m" but also "(0 to 210 cm)", the latter probably taken over from Maricopa.
-- ET study's parameters and cultivar (`crops/cultivar_winter-wheat.json`, not calibrated), water
-  stress on, N stress off (as in the ET study; the treatments differ in water only).
+- ET study's parameters and its calibrated cultivar (`crops/cultivar_winter-wheat_bushland_2_growth.json`,
+  since 2026-11-18; before: the uncalibrated `cultivar_winter-wheat.json`), as in the ET study's runs:
+  water and N stress on, Odin's standing water fixes (`SOIL_MOISTURE`), the anhydrous ammonia at FEDEP
+  (17.25 cm). Not as in the ET study: 48 × 5 cm layers (24 × 10 cm there), this workbook's initial N
+  per layer (spread by SOC there).
 - TAV 11.4, TAMP 17 °C, CO2 355 ppm from `Weather_stations`; MONICA's BaseTemperature = TAV.
 - Sprinkler irrigation at the surface; RH from VPRSD as in the ET study.
 - MO == iMO in all 6 treatments.
 
 Data questions (for Thiago Berton Ferreira):
 
-1. **Fertilizer TXBL1993**: a row without TREAT_ID (50 kg N, 1992-09-15, skipped), and TXBL1993P's
-   only row is dated 1993-09-29, after ENDAT (34 kg N, broadcast; dropped). So TXBL1993P gets no N
-   at all. 1992-09-29 (its sowing) probably meant; the empty row maybe TXBL1993P's too.
+1. **Fertilizer TXBL1993**: the original workbook had a row without TREAT_ID (50 kg N, 1992-09-15,
+   skipped), and TXBL1993P's only row was dated 1993-09-29, after ENDAT (34 kg N, broadcast;
+   dropped), so TXBL1993P got no N at all. Corrected in the workbook by Michael (2026-11-19, asked
+   the data providers, no answer yet): the row without TREAT_ID is TXBL1993F's, dated 1993-03-29
+   (the ET study's spring application), TXBL1993P's is dated 1992-09-29 (its sowing). Now TXBL1993F
+   gets 50 + 50 kg N (injected), TXBL1993P 34 kg N (broadcast); the ET study's workbook has 54 + 50
+   and 50 (all injected). Source cited in FE_NOTES: Howell et al. (1995), Trans. ASAE 38(3):745-759,
+   doi:10.13031/2013.27888 (not freely available).
 2. The initial conditions are dated 2-4 weeks after SDAT (ICDAT = sowing), used at SDAT.
 3. Initial water and N end at 220 cm: layers 45-48 get MONICA's defaults (water: the default,
    N: 2.75 kg N/ha per layer).
@@ -165,20 +176,25 @@ Data questions (for Thiago Berton Ferreira):
 5. The comments say RAIN_FULL for F and RAIN_PART for P, the sheet has a single RAIN column.
 6. ICLST (initial soil temperature per layer, 1990/1992): MONICA and the modules start their soil
    temperature themselves, not used.
-7. Anhydrous ammonia injected at 17.25 cm, applied at the surface (MONICA's mineral fertilization).
+7. Anhydrous ammonia injected at 17.25 cm: applied at that depth since 2026-11-18 (Odin's
+   MineralFertilization `depth`), at the surface before.
 
-Model state: the default cultivar is far off: LAI max 11-13 (observed 2.4-7.1), maturity 2-4 weeks
-late, not reached by ENDAT in TXBL1990F and both 1993 treatments (no maturity values). Calibration
-pending, as for the ET study.
+Model state with the calibrated cultivar (2026-11-18): close to the ET study's runs. Anthesis
+1990-05-16/19, 1992-05-06, 1993-05-14/15; all treatments mature; LAI max 3.3-4.6.
+Yields (t/ha, MO, obs F 4.5/5.8/6.4, P 1.9/3.2/5.0): F 4.5/5.0/4.5, P 1.1/5.0/3.0 (ET study F
+4.3/4.4/4.4, P 1.0/4.3/3.1). With the workbook's original 1993 fertilization (data question 1:
+F 50 kg N, P none) 1993 was F 3.3, P 2.1 t/ha; the correction changes only 1993's soil temperatures,
+by 0-0.07 °C on average (SW: 0.06/0.45 °C, 0-20 cm in P 1.0 °C, max 4.8 °C). Before (uncalibrated):
+LAI max 11-13, maturity 2-4 weeks late, not reached in TXBL1990F and 1993.
 
-## Maricopa calibration (`evapotranspiration/calibrate.py --site maricopa`, 2026-11-18)
+## Maricopa calibration (`calibrate.py --site maricopa`, 2026-11-18; `calibration/calibrate.sh`)
 
 Independent of the Maricopa flows (their parameters and cultivars not used), the same way as Bushland
 (evapotranspiration/FINDINGS.md, "Calibration"): from `cultivar_spring-wheat_default.json`, not
 against ET, no crop parameters that change MONICA's crop ET0, two seeds per step. Setup: this
 study's (42 × 5 cm, N response on, FACE CO2, buried drip) plus the ponding/infiltration fixes
 (`SOIL_MOISTURE` in site_maricopa.py, also for the soil temperature runs, rerun with the calibrated cultivar on 2026-11-18).
-Results in `evapotranspiration/calibration/maricopa_*`, parameters in
+Results in `soil_temperature/calibration/maricopa_*`, parameters in
 `maricopa_wheat_face/params/crops/{cultivar_spring-wheat,species_wheat}_maricopa_*.json`.
 
 - **Step 1, phenology** (all 16 treatments, emergence, ear emergence = start of stage 4, anthesis,
@@ -203,7 +219,8 @@ Results in `evapotranspiration/calibration/maricopa_*`, parameters in
 All 16 treatments, final parameters (`cultivar_spring-wheat_maricopa_3_yield.json` +
 `species_wheat_maricopa_2_growth.json`), and the flow's for comparison (phase 1 cultivar
 `cultivar_spring-wheat_with_1_calibrated_phenology.json`, phase 2 = its best.csv applied to it), the
-same setup for all:
+same setup for all (`pixi run evaluate-maricopa`, the flow's phase 2 cultivar as
+`calibration/flow_phase_2_cultivar.json`):
 
 | | anthesis RMSE d | maturity RMSE d | LAI RMSE | biomass RMSE t/ha | yield RMSE t/ha (controls) |
 |---|---|---|---|---|---|
@@ -233,6 +250,6 @@ What the treatments that weren't calibrated show (ratios of final biomass / yiel
 1. Recalibrate the phenology (and LAI) with this setup?
 2. Upload iMO, or only the 9 protocol models?
 3. Residue, missing 1994 N below 120 cm: ask Pierre Martre?
-4. Bushland: calibrate the cultivar (shared with the ET study?), and the data questions above.
+4. Bushland: the data questions above (1 now matters: N stress on).
    Avignon once its data are clear.
 5. The AMEI branch's crop stalling with a dry topsoil (MONICA change 2).

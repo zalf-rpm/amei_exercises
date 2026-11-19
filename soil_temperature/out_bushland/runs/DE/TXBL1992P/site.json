@@ -651,7 +651,7 @@
           "kg kg-1"
         ],
         "SoilOrganicCarbon": [
-          0.44649999999999995,
+          0.4465,
           "mass%"
         ],
         "SoilBulkDensity": [
@@ -703,7 +703,7 @@
           "kg kg-1"
         ],
         "SoilOrganicCarbon": [
-          0.44649999999999995,
+          0.4465,
           "mass%"
         ],
         "SoilBulkDensity": [
@@ -755,7 +755,7 @@
           "kg kg-1"
         ],
         "SoilOrganicCarbon": [
-          0.44649999999999995,
+          0.4465,
           "mass%"
         ],
         "SoilBulkDensity": [
@@ -807,7 +807,7 @@
           "kg kg-1"
         ],
         "SoilOrganicCarbon": [
-          0.44649999999999995,
+          0.4465,
           "mass%"
         ],
         "SoilBulkDensity": [
@@ -1059,7 +1059,7 @@
           "m"
         ],
         "Sand": [
-          0.19299999999999998,
+          0.193,
           "kg kg-1"
         ],
         "Clay": [
@@ -1111,7 +1111,7 @@
           "m"
         ],
         "Sand": [
-          0.19299999999999998,
+          0.193,
           "kg kg-1"
         ],
         "Clay": [
@@ -1163,7 +1163,7 @@
           "m"
         ],
         "Sand": [
-          0.19299999999999998,
+          0.193,
           "kg kg-1"
         ],
         "Clay": [
@@ -1215,7 +1215,7 @@
           "m"
         ],
         "Sand": [
-          0.19299999999999998,
+          0.193,
           "kg kg-1"
         ],
         "Clay": [
@@ -2527,8 +2527,33 @@
     "include-from-file",
     "general/soil-transport.json"
   ],
-  "SoilMoistureParameters": [
-    "include-from-file",
-    "general/soil-moisture.json"
-  ]
+  "SoilMoistureParameters": {
+    "CorrectionRain": 1,
+    "CorrectionSnow": 1.14,
+    "CriticalMoistureDepth": 0.3,
+    "EvaporationZeta": 40,
+    "GroundwaterDischarge": 3,
+    "HydraulicConductivityRedux": 0.1,
+    "KcFactor": 0.75,
+    "MaxPercolationRate": 10,
+    "MaximumEvaporationImpactDepth": 5,
+    "MoistureInitValue": 0,
+    "NewSnowDensityMin": 0.1,
+    "RefreezeParameter1": 1.5,
+    "RefreezeParameter2": 0.36,
+    "RefreezeTemperature": -1.7,
+    "SaturatedHydraulicConductivity": 8640,
+    "SnowAccumulationTresholdTemperature": 1.8,
+    "SnowMaxAdditionalDensity": 0.25,
+    "SnowMeltTemperature": 0.31,
+    "SnowPacking": 0.01,
+    "SnowRetentionCapacityMax": 0.17,
+    "SnowRetentionCapacityMin": 0.05,
+    "SurfaceRoughness": 0.02,
+    "TemperatureLimitForLiquidWater": -3,
+    "XSACriticalSoilMoisture": 0.1,
+    "type": "UserSoilMoistureParameters",
+    "PondEvaporationByCoverage": true,
+    "InfiltrationByDepth": true
+  }
 }

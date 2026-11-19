@@ -1,6 +1,6 @@
 """Bushland (Texas, USA), soil temperature study: the ICASA workbook in "Bushland/" -> Setups.
 
-Same experiment as the ET study's Bushland (evapotranspiration/site_bushland.py), but its own,
+Same experiment as the ET study's Bushland (amei_exercises.evapotranspiration.site_bushland), but its own,
 newer workbook: earlier SDATs (the fertilization), initial N per layer, a 240 cm profile. See
 FINDINGS.md for what had to be decided.
 """
@@ -13,8 +13,10 @@ from pathlib import Path
 from typing import Any
 
 import pandas as pd
-from st_monica import (
-    HERE,
+
+from amei_exercises.soil_temperature.st_monica import (
+    ET_DIR,
+    ST_DIR,
     Fertilization,
     Observations,
     Setup,
@@ -30,18 +32,20 @@ logger = logging.getLogger("site_bushland")
 
 NAME = "Bushland"
 TITLE = "Bushland, TX"  # the summary template's first line says "Maricopa Wheat FACE"
-DATA_DIR = HERE / "Bushland"
+DATA_DIR = ST_DIR / "Bushland"
 XLSX = DATA_DIR / "BUSHLAND_data_2026-10-03(ICASA data format v4.1)(PM1)(TBF1)(noSoilT).xlsx"
 TEMPLATES = {
     "summary": DATA_DIR / "AMEI_template_Bushland_summary_output.txt",
     "daily": DATA_DIR / "AMEI_template_Bushland_daily_output.txt",
     "layers": DATA_DIR / "AMEI_template_Bushland_layers_output.txt",
 }
-# the ET study's parameters and cultivar
-PARAMS = HERE.parent / "evapotranspiration/phase_1/params"
-CULTIVAR = "crops/cultivar_winter-wheat.json"
+# the ET study's parameters and its calibrated cultivar (evapotranspiration/FINDINGS.md, "Calibration")
+PARAMS = ET_DIR / "phase_1/params"
+CULTIVAR = "crops/cultivar_winter-wheat_bushland_2_growth.json"
 NO_OF_LAYERS = 48  # 2.4 m in 5 cm layers: the protocol's "48 layers ... 0 to 2.40 m", the whole profile
-NITROGEN_STRESS = False  # as in the ET study; the treatments differ in water only
+NITROGEN_STRESS = True  # as in the ET study's runs with the calibrated cultivar
+# Odin's fixes for standing water (evapotranspiration/FINDINGS.md, model issues 4 and 5), as in the ET study
+SOIL_MOISTURE = {"PondEvaporationByCoverage": True, "InfiltrationByDepth": True}
 SETUP_SHEETS = (
     "Plots",
     "Residue",
@@ -63,7 +67,9 @@ def fertilization(f: dict[str, Any]) -> Fertilization | None:
     if forms <= 0:
         msg = f"{f['TREAT_ID']} {f['FEDATE']}: {f['FECD']} with {kg_n} kg N but no NO3/NH4 split"
         raise ValueError(msg)
-    return Fertilization(to_date(f["FEDATE"]), kg_n, nh4 / forms, no3 / forms, str(f["FECD"]))
+    # anhydrous ammonia, injected at FEDEP (17.25 cm)
+    depth_m = float(nan_to_none(f.get("FEDEP")) or 0) / 100
+    return Fertilization(to_date(f["FEDATE"]), kg_n, nh4 / forms, no3 / forms, str(f["FECD"]), depth_m=depth_m)
 
 
 def load(xlsx: Path = XLSX) -> list[Setup]:
@@ -108,8 +114,6 @@ def load(xlsx: Path = XLSX) -> list[Setup]:
         residue = one(tid, "Residue")
         if float(residue["ICRAG"]) > 0 or float(residue["ICRT"]) > 0:
             notes.append(f"residue not simulated: {residue['ICRAG']} kg/ha, roots {residue['ICRT']} kg/ha")
-        if any(float(nan_to_none(f.get("FEDEP")) or 0) > 0 for f in rows[tid].get("Fertilizer_events", [])):
-            notes.append("fertilizer injected below the surface (FEDEP) applied at the surface")
 
         summary = rows[tid].get("Obs_crop_summary_means", [{}])[0]
         setups.append(
@@ -126,7 +130,10 @@ def load(xlsx: Path = XLSX) -> list[Setup]:
                 tav=float(st["TAV"]),
                 tamp=float(st["TAMP"]),
                 # MONICA's own soil temperature: the lower boundary, its TAV (default 9.5 °C, Germany)
-                site_params={"SoilTemperatureParameters": {"BaseTemperature": float(st["TAV"])}},
+                site_params={
+                    "SoilTemperatureParameters": {"BaseTemperature": float(st["TAV"])},
+                    "SoilMoistureParameters": dict(SOIL_MOISTURE),
+                },
                 albedo=nan_to_none(soil_meta.loc[soil_id].get("SALB")),
                 horizons=horizons(sheets, soil_id, notes),
                 initial_moisture=[(float(r["ICTL"]), float(r["ICBL"]), float(r["ICH2O"])) for r in ic_layers],

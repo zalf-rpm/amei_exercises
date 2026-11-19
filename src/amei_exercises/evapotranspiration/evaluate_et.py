@@ -4,7 +4,7 @@ Prints a table per treatment (daily ET vs measured, phenology, yield, LAI max) a
 <out>/evaluation.csv and <out>/evaluation.png: simulated ETa and ET0 against the measured ET, one
 panel per treatment.
 
-    pixi run python evapotranspiration/evaluate_et.py --site bushland
+    pixi run evaluate-et --site bushland
 """
 
 from __future__ import annotations
@@ -22,7 +22,9 @@ mpl.use("Agg")
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 import pandas as pd
-from et_monica import HERE, read_result, result_names
+
+from amei_exercises.et_monica import read_result, result_names
+from amei_exercises.paths import ET_DIR
 
 SURFACE, INK, INK_2, GRID = "#fcfcfb", "#1f1f1e", "#5f5e58", "#e6e5e0"
 SIM_ETA, OBS_ET, SIM_ET0, OBS_ET_DAYTIME = "#2a78d6", "#eb6834", "#1baf7a", "#eda100"
@@ -45,8 +47,8 @@ def main() -> int:
     ap.add_argument("--module-code", default="MOFAPM")
     args = ap.parse_args()
 
-    site = importlib.import_module(f"site_{args.site}")
-    out: Path = args.out or HERE / f"out_{args.site}"
+    site = importlib.import_module(f"amei_exercises.evapotranspiration.site_{args.site}")
+    out: Path = args.out or ET_DIR / f"out_{args.site}"
     res = out / "results"
     summary_name, daily_name = result_names(args.kind, args.module_code, site.NAME)
     summary = read_result(res / summary_name).set_index("TREAT_ID")

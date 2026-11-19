@@ -1,8 +1,8 @@
 """Reproducible checks behind statements in FINDINGS.md.
 
-    pixi run python evapotranspiration/checks.py humidity   # what RHUMD/RHAVD and VPRSD really are, per site
-    pixi run python evapotranspiration/checks.py et0        # MONICA's ET0: crop vs no crop, vapor pressure in hPa
-    pixi run python evapotranspiration/checks.py            # both
+    pixi run et-checks humidity   # what RHUMD/RHAVD and VPRSD really are, per site
+    pixi run et-checks et0        # MONICA's ET0: crop vs no crop, vapor pressure in hPa
+    pixi run et-checks            # both
 
 humidity: each RH column is compared with what it would be under each reading, from the dew point
 (ea = ea(TDEW)): minimum ≈ ea / es(Tmax), mean ≈ ea / es_mean, maximum ≈ ea / es(Tmin). VPRSD is
@@ -27,14 +27,15 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from et_monica import DEFAULT_MONICA_RUN, HERE, Options, prepare, read_sections, run_monica, sat_vapor_pressure
+
+from amei_exercises.et_monica import DEFAULT_MONICA_RUN, Options, prepare, read_sections, run_monica, sat_vapor_pressure
+from amei_exercises.paths import ET_DIR, MARICOPA_DIR
 
 WORKBOOKS = {
-    "Bushland": (HERE / "AMEI_Bushland_v4_2026-01-24(no_soil_T).xlsx", 2),
-    "Avignon": (HERE / "AgMIP_Wheat_Avignon_full_vPublish.xlsx", 0),
+    "Bushland": (ET_DIR / "AMEI_Bushland_v4_2026-01-24(no_soil_T).xlsx", 2),
+    "Avignon": (ET_DIR / "AgMIP_Wheat_Avignon_full_vPublish.xlsx", 0),
     "Maricopa": (
-        HERE.parent
-        / "maricopa_wheat_face/MARICOPA Wheat FACE data_2026-10-15 (ICASA data format v4.1)(PM9)(BAK1)(no SoilT).xlsx",
+        MARICOPA_DIR / "MARICOPA Wheat FACE data_2026-10-15 (ICASA data format v4.1)(PM9)(BAK1)(no SoilT).xlsx",
         2,
     ),
 }
@@ -90,7 +91,7 @@ def daily_et0(run_dir: Path, monica_run: Path) -> pd.DataFrame:
 
 
 def et0(site_name: str, treatment: str, monica_run: Path, params: Path) -> None:
-    site = importlib.import_module(f"site_{site_name}")
+    site = importlib.import_module(f"amei_exercises.evapotranspiration.site_{site_name}")
     setup = next(s for s in site.load() if s.id == treatment)
     tmp = Path(tempfile.mkdtemp(prefix="et0_check_"))
     try:
@@ -126,7 +127,7 @@ def main() -> int:
     ap.add_argument("--site", default="bushland", choices=("bushland", "avignon"), help="for et0")
     ap.add_argument("--treatment", default="TXBL1990F", help="for et0")
     ap.add_argument("--monica-run", type=Path, default=DEFAULT_MONICA_RUN, help="default: the Odin port")
-    ap.add_argument("--params", type=Path, default=HERE / "phase_1/params")
+    ap.add_argument("--params", type=Path, default=ET_DIR / "phase_1/params")
     args = ap.parse_args()
     if args.check in ("humidity", "all"):
         humidity()
