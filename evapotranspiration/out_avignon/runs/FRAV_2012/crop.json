@@ -17,7 +17,7 @@
               ],
               "cultivar": [
                 "include-from-file",
-                "crops/cultivar_winter-wheat.json"
+                "crops/cultivar_winter-wheat_avignon_2_growth.json"
               ]
             },
             "residueParams": [

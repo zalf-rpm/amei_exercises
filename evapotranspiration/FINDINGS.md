@@ -5,7 +5,7 @@
 ```
 pixi run run-et --site bushland|avignon [--treatments ...] [--monica-run ...]
 pixi run evaluate-et --site bushland|avignon
-evapotranspiration/calibration/calibrate.sh   # the Bushland calibration, step by step
+evapotranspiration/calibration/calibrate.sh   # the Bushland and Avignon calibrations, step by step
 ```
 
 The scripts are in `src/amei_exercises/` (since 2026-11-19; before in this folder): the ET study's
@@ -25,7 +25,8 @@ temperature study; `paths.py` points to the data folders. The pixi tasks run the
 - `out_<site>/runs/<id>/`: everything MONICA got and returned, per treatment (not in git;
   `cd` there and `monica-run sim.json` repeats a run). `out_<site>/results/`: the template files
   for submission. `out_<site>/evaluation.{png,csv}`: comparison with the measured ET.
-- Model: MONICA FAO56-PM, `MOFAPM`, "Orig"; default winter wheat cultivar, uncalibrated.
+- Model: MONICA FAO56-PM, `MOFAPM`, "Orig"; per site a calibrated winter wheat cultivar (since
+  2026-11-18/19, see "Calibration" and "Avignon calibration"; before the default, uncalibrated).
 - Environment parameters: `general/environment.json` with the site's values on top. (The first
   Bushland version replaced the include with just three values, so the rest silently fell back to
   MONICA's built-in defaults. Fixed; emergence moved by ~5 days.)
@@ -278,13 +279,16 @@ against the other humidity columns.
   only 4 initial moisture layers, simulated by the providers (SIMPLACE Lintul-5).
 - Fertilizer FE001 (ammonium nitrate) as 50 % NH4 / 50 % NO3; the P/K applications (FE009)
   are skipped. Previous crop residues (ICRAG) and tillage are not used.
-- Cultivars are durum wheat (Artimon, Acalou, Dakter, Isildur); simulated with the generic
-  winter wheat. The comments give vernalization/photosensitivity scores.
+- Cultivars are durum wheat (Artimon, Acalou, Dakter, Isildur), one per season; simulated with
+  one winter wheat cultivar calibrated for all four ("Avignon calibration"). The comments give
+  vernalization/photosensitivity scores.
 - Observed ET: eddy covariance; 24 h values (`ETDAILY_100`, else `_90`) are compared, the much
   more frequent 6-18 h values (`ETDAY_*`) are only plotted. 2012 has 6 days of 24 h ET.
 - Phenology: where ADAT/MDAT are missing, estimated from BBCH as the comments suggest (anthesis
   4 days before BBCH 69 or 150 °C d after BBCH 55/58; maturity at BBCH 89, else 87).
 - Yield: `HWAH_machine`, as recommended in the comments.
+- Daily LAI (`LAID`) and above ground biomass (`TDRW`, total dry weight) from `Obs_daily`, for
+  the calibration.
 
 ## First results (default winter wheat cultivar, uncalibrated)
 
@@ -475,6 +479,68 @@ Phenology: emergence -3…+2 d, anthesis -5…+4 d, maturity -2…+12 d (TXBL199
 for the calibration: N (F yields 1992/1993, data providers), FC at 80-140 cm (data providers),
 winter ET and the cap (MONICA's ET0/ETp, "Imp").
 
+## Avignon calibration (2026-11-19)
+
+The same steps and parameter CSVs as Bushland's (`calibration/avignon_<n>_<step>.csv`, copies), and
+since then the same setup: **N response on and Odin's standing water fixes** (they were off for
+Avignon before; the user: they are fixes that belong to the current MONICA). 38 x 5 cm layers as
+before. From the default winter wheat; one cultivar for the four durum cultivars, since there's one
+season per cultivar. Not against ET. Each step in `calibration/calibrate.sh`.
+
+**Step 1, phenology** (all 4 seasons: emergence, anthesis, maturity where given; no ear emergence,
+the BBCH 55/58 dates already make two anthesis estimates; N response on). RMSE 12.3 -> 4.9 d (seed
+1, adopted) / 5.2 d (seed 7, which trades stages 1-2 against stage 3 and vernalisation): TSUM 194 /
+235 / 314 / 229 / 385 (default 148 / 284 / 380 / 180 / 420), VernalisationRequirement 8.7 d (50),
+which fits the comments' low vernalization scores (1.5-4.5 of 5, three of the four <= 2.5).
+
+| sim - obs (d) | 2004 | 2006 | 2010 | 2012 |
+|---|---|---|---|---|
+| emergence | -5 | +3 | 0 | 0 |
+| anthesis | +12 | -5 | -5 | 0 |
+| maturity | - | +1 | +4 | -4 |
+
+FRAV_2004's anthesis (04-28) is the comments' estimate, 150 °C d after BBCH 58 (04-19). The same
+season's `Obs_daily` has Zadoks 61 (anthesis begins) on 05-06 and 65 (mid-anthesis) on 05-18, so
+anthesis was in the first half of May, as simulated (05-10). The early estimate likely pulls the
+other seasons' anthesis 5 days early. **For the data providers:** which one holds?
+
+**Step 2, growth** (daily LAI and biomass of 2004, 2006, 2010, N response off as for Bushland;
+2012 left out: the comments report N stress from leaching and late fertilization plus a poor
+stand). Seeds 1 and 7 agree (RMSE 1.2 -> 0.8): MaxAssimilationRate 34 (30), SLA x1.14, leaf
+senescence 0.019 (stage 4) and 0.117 (from anthesis). Biomass RMSE per season 0.20-0.53 x 3 t/ha,
+LAI 0.75-1.51. LAI can't fit all seasons: 2004 stays at LAI 2.7 with high biomass, and 2010's LAI
+6.4 on 05-07 means an SLA of 45 m2/kg from that date's leaf weight, against 12-31 on every other
+date: one of the two is probably wrong (data providers).
+
+**Step 3, yield** (AssimilateReallocation, N off): **not adopted**. It goes to its lower bound 0
+(RMSE 2.1 -> 1.6 t/ha) and FRAV_2006 stays +2.7 t/ha. 2006 is the season with the largest gap
+between the two observed yields (machine 4.5, counted 6.1 t/ha) and the only one irrigated.
+
+`crops/cultivar_winter-wheat_avignon_2_growth.json` is the Avignon `CULTIVAR`, out_avignon rerun.
+The steps first ran in the old setup (N off, no fixes); the cultivars came out almost the same, so
+the difference between the columns is the setup's:
+
+| | default cultivar, old setup | calibrated, old setup | **calibrated, N + fixes** |
+|---|---|---|---|
+| ET bias / RMSE mm/d, all 136 days | -0.58 / 1.26 | -0.60 / 0.96 | **-0.71 / 1.06** |
+| FRAV_2004 bias / RMSE | -0.23 / 1.46 | -0.40 / 0.65 | -0.48 / 0.72 |
+| FRAV_2006 | -1.11 / 1.26 | -0.86 / 1.06 | -0.89 / 1.07 |
+| FRAV_2010 | -0.40 / 0.95 | -0.66 / 1.16 | -0.88 / 1.41 |
+| FRAV_2012 | -0.44 / 0.95 | -0.09 / 0.96 | -0.14 / 0.93 |
+| LAI max (obs 2.7 / 5.5 / 6.4 / 1.2) | 8.7 / 8.5 / 7.5 / 10.5 | 4.4 / 5.1 / 3.8 / 6.5 | 3.6 / 3.6 / 2.3 / 5.1 |
+| yield t/ha (obs 6.7 / 4.5 / 7.0 / 5.1) | 6.3 / 6.0 / 8.4 / 7.7 | 7.7 / 7.9 / 7.0 / 8.3 | 7.1 / 6.6 / 5.7 / 7.5 |
+
+The fixes hardly matter here (with N off: bias -0.41/-0.86/-0.64/-0.11 vs -0.40/-0.86/-0.66/-0.09);
+**the N response does**: LAI max -0.7 to -1.5, ET 2010 -0.88 instead of -0.64 mm/d. Not a lack
+of N over the season (crop N at maturity the same with and without, 2010: 238 vs 240 kg N/ha) but
+**winter N dilution**: in FRAV_2010 the crop's N stays at ~4 kg N/ha from December to the first
+fertilization (03-17) while its biomass grows from 120 to 700 kg/ha, so NDef falls to 0.25 in
+February, although the roots are 0.8-1.8 m deep and the soil holds ~20 kg NO3-N/ha in 0-60 cm
+and ~40 below. Why MONICA's uptake stalls there isn't traced yet (transpiration-driven uptake in
+winter?). The simulated winter biomass is also too high (2010-02-03: ~450 vs 181 kg/ha observed;
+step 2's residuals: +0.1-0.2 x 3 t/ha on the winter dates), which makes the dilution worse.
+Open: the winter N uptake (MONICA), the initial soil N (estimated by the providers, comments).
+
 ## Open questions
 
 By relevance for Bushland and Avignon (2026-11-16):
@@ -483,6 +549,7 @@ By relevance for Bushland and Avignon (2026-11-16):
    Bushland mostly not mature at harvest, so Kc and soil cover are wrong. Calibrate per cultivar
    (Bushland: TAM200, TAM107, Mesa; Avignon: four durum cultivars) with the calibration flow, or
    is "Orig" meant uncalibrated?
+   *Since 2026-11-18/19 both sites calibrated (one cultivar per site), see above.*
 2. **6.5 mm/d cap** (model issue 1): most of the late-season ETa underestimation at Bushland
    (-0.6 mm/d in the fully irrigated treatments). Part of "Orig", removed in "Imp"?
 3. **ETO column** (model issue 2): the crop-dependent ET0 as now, or the FAO-56 grass reference

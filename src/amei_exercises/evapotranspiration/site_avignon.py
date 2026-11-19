@@ -20,6 +20,7 @@ from amei_exercises.et_monica import (
     Horizon,
     Observations,
     Setup,
+    daily_obs,
     nan_to_none,
     sat_vapor_pressure,
     to_date,
@@ -32,8 +33,12 @@ logger = logging.getLogger("site_avignon")
 NAME = "Avignon"
 XLSX = ET_DIR / "AgMIP_Wheat_Avignon_full_vPublish.xlsx"
 NO_OF_LAYERS = 38  # 1.9 m, the depth of the soil profile
-CULTIVAR = "crops/cultivar_winter-wheat.json"  # durum wheat in reality; MONICA has no durum cultivar here
+CULTIVAR = "crops/cultivar_winter-wheat_avignon_2_growth.json"  # calibrate.sh; durum wheat (4 cultivars) in reality
 LATEST_HARVEST = (7, 15)  # month, day in the harvest year: no harvest dates in the data
+# as Bushland: N response on (2012 was N limited, comments), and Odin's fixes for standing water
+# (FINDINGS.md, model issues 4 and 5), in "Orig" and "Imp" alike: they are not about ET0/ETp
+NITROGEN_STRESS = True
+SOIL_MOISTURE = {"PondEvaporationByCoverage": True, "InfiltrationByDepth": True}
 FERTILIZERS = {"FE001": ("Ammonium nitrate", 0.5, 0.5)}  # code -> (name, NH4 share, NO3 share)
 
 
@@ -165,6 +170,7 @@ def load(xlsx: Path = XLSX) -> list[Setup]:
 
         et_rows = by_trno(sheets["ET_daily"], trno, "TRNO")
         summary = (by_trno(sheets["Obs_summary"], trno) or [{}])[0]
+        obs_daily = by_trno(sheets["Obs_daily"], trno)
         anthesis, maturity = to_date(summary.get("ADAT")), to_date(summary.get("MDAT"))
         if anthesis is None or maturity is None:
             est_anthesis, est_maturity = phenology_from_bbch(by_trno(sheets["BBCH_Obs"], trno), wth, notes)
@@ -186,6 +192,7 @@ def load(xlsx: Path = XLSX) -> list[Setup]:
                 irrigations=[(to_date(i["IDATE"]), float(i["IRVAL"])) for i in by_trno(sheets["Irrigations"], trno)],
                 cultivar=CULTIVAR,
                 no_of_layers=NO_OF_LAYERS,
+                site_params={"SoilMoistureParameters": dict(SOIL_MOISTURE)},
                 obs=Observations(
                     et=series(et_rows, "ETDAILY_100", "ETDAILY_90"),
                     et_daytime=series(et_rows, "ETDAY_100", "ETDAY_90"),
@@ -194,6 +201,8 @@ def load(xlsx: Path = XLSX) -> list[Setup]:
                     maturity=maturity,
                     lai_max=nan_to_none(summary.get("LAIX")),
                     grain_yield=nan_to_none(summary.get("HWAH_machine")),  # recommended in the comments
+                    lai=daily_obs(obs_daily, "LAID"),
+                    biomass=daily_obs(obs_daily, "TDRW"),  # total above ground dry weight
                 ),
                 notes=notes,
             )

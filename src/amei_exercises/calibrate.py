@@ -28,7 +28,7 @@ EXTEND_DAYS after the observed harvest or where the weather has a gap; with the 
 crop would never reach maturity, and the error would be unknown. A date the model doesn't reach
 counts as MISSING_PENALTY_DAYS after the last simulated day.
 
-The calibrations done so far, in order: evapotranspiration/calibration/calibrate.sh (Bushland) and
+The calibrations done so far, in order: evapotranspiration/calibration/calibrate.sh (Bushland, Avignon) and
 soil_temperature/calibration/calibrate.sh (Maricopa).
 
 Writes to <out> (default <the site's CALIBRATION_DIR, else evapotranspiration/calibration>/<site>_<step>/):

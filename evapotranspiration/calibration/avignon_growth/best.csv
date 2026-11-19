@@ -1,0 +1,10 @@
+name,position in array,default,calibrated,low,high,derived params
+MaxAssimilationRate,,30,33.590656,10.0,60.0,
+sla_f,,,1.1374319,0.4,1.5,
+SpecificLeafArea,0,0.002,0.0022748638,,,cultivar['SpecificLeafArea'][0][0] * sla_f
+SpecificLeafArea,1,0.0018,0.00204737742,,,cultivar['SpecificLeafArea'][0][1] * sla_f
+SpecificLeafArea,2,0.0017,0.0019336342299999998,,,cultivar['SpecificLeafArea'][0][2] * sla_f
+SpecificLeafArea,3,0.0016,0.00181989104,,,cultivar['SpecificLeafArea'][0][3] * sla_f
+OrganSenescenceRate,3_1,0,0.01881681,0.0,0.05,
+OrganSenescenceRate,4_1,0.05,0.11749812,0.01,0.4,
+OrganSenescenceRate,5_1,0.05,0.11749812,,,OrganSenescenceRate_4_1

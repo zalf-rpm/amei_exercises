@@ -13,7 +13,7 @@
   "include-file-base-path": "/home/berg/GitHub/amei_exercises/evapotranspiration/phase_1/params/",
   "_include-file-base-path": "params/",
   "UseSecondaryYields": false,
-  "NitrogenResponseOn": false,
+  "NitrogenResponseOn": true,
   "WaterDeficitResponseOn": true,
   "EmergenceMoistureControlOn": false,
   "EmergenceFloodingControlOn": false,
