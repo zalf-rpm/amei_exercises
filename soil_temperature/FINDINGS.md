@@ -133,29 +133,38 @@ MO and iMO give identical results (all 16 treatments), as in the old flow's setu
 
 ## Model issues
 
-1. **Phenology is far off with the calibrated cultivar** (MO, Odin):
+State 2026-11-19 (the `calibrate.py` cultivar, previous crop residue; `pixi run evaluate-maricopa
+--species crops/species_wheat_maricopa_2_growth.json`, all 16 treatments against the observations).
 
-   | | anthesis | maturity |
-   |---|---|---|
-   | 1993 (901-904) | +28..30 d | +9..16 d |
-   | 1994 (905-908) | +15..18 d | +6..9 d |
-   | 1996 (909-912) | +20..23 d | +10..12 d, 910/912 not before ENDAT |
-   | 1997 (913-916) | +16..18 d | +2..8 d |
-
-   Stage 4 (which the calibration matched with Zadoks 61) starts 1993-04-11 in 901, observed
-   anthesis 03-25. Not the code: the C++ AMEI branch gives the same stages on the same inputs.
-   Not water stress (the soil started at 1 % FC gives the same stages), not the latitude (52.5°
-   instead of 33°: 1 day). Whatever differed in the calibration flow (objective 4.5) isn't found.
-   Recalibrating with these inputs is the way out. 910/912 have no maturity values.
-2. **Biomass at maturity about 50 % too high** (e.g. 901: 23.5 vs 14.9 t/ha), and the dry
-   treatments are hardly stressed: 901/903 come out as 902/904, 905 as 906 (25.6 t/ha both; observed
-   15-25 % less biomass in the dry ones). Calibration (LAI step) not applied.
-3. **SQ has one temperature for all layers**: SiriusQuality's model has no layers, the binding
-   writes the mean of its minimum and maximum everywhere. Its minimum/maximum could go into
+1. **Phenology: fine since the recalibration** (2026-11-18, "Maricopa calibration"): anthesis RMSE
+   4.6 d, maturity 4.4 d; left is a year effect (1993 anthesis about a week late, 1997 a few days
+   early). Before, with the flow-calibrated cultivar, anthesis was 2-4 weeks late in this setup
+   (1993 +28..30 d) for reasons not found (not the code: the C++ AMEI branch gave the same; not water
+   stress, not the latitude); hence the recalibration in this setup.
+2. **Water and N responses** (the controls fit: e.g. 902 biomass 17.5 vs 18.3 t/ha observed):
+   - **The dry treatments get no water stress**: Dry/Wet biomass 0.99-1.01 (observed 0.77-0.82),
+     so their biomass is 20-30 % too high (905: 17.7 vs 13.9 t/ha), as in Bushland's P treatments.
+   - **1997 low N far too N-limited**: biomass 913/915 5.8/7.0 vs 13.3/12.4 t/ha, crop N 51/49 vs
+     136/124 kg N/ha; the residue (4300 kg/ha straw, N immobilization) made it a bit worse. 1996's
+     low N effect is too weak instead (yield ratio 0.94/0.89 vs 0.76/0.86).
+   - CO2 (FACE/Ambient) a bit too strong: biomass 1.13-1.24 vs 0.94-1.14, yield 1.10-1.27 vs
+     0.97-1.20.
+3. **SQ has one temperature for all layers**: SiriusQuality's model has no layers (its design), the
+   binding writes the mean of its minimum and maximum everywhere. Its minimum/maximum could go into
    TSSMX/TSSMN.
-4. **ST doesn't use TAV**: STICS starts the profile at the first day's air temperature (8 °C at
-   205 cm in 901), the deep layers warm to about 25 °C by May.
-5. **SW's surface stays cool**: TSSAV maximum 16-24 °C over the 16 treatments, the others 27-38 °C.
+4. **ST doesn't use TAV**: STICS starts the whole profile at the first day's mean air temperature
+   (8 °C at 205 cm in 901, the other models ~17 °C), the deep layers warm to about 25 °C by May. The
+   model's design, not a missing input: the Crop2ML component's only parameters are the layer
+   thicknesses and `air_temp_day1` (Odin's binding as the C++ AMEI adapter).
+5. **SW's surface stays cool**: TSSAV maximum 17-26 °C over the 16 treatments, the others 27-38 °C.
+   SWAT's surface temperature is `bcv * T(top layer, previous day) + (1 - bcv) * T(bare soil)`, with
+   the soil cover `bcv = CV / (CV + exp(7.563 - 1.297e-4 CV))` from the above ground biomass CV
+   (kg/ha): 0.81 at 4.6 t/ha, 0.96 at 11 t/ha, 0.99 at 16 t/ha (902). So from mid April the surface
+   only repeats the top layer and stops following the weather (902, 05-14: SW 17.5 °C, the others'
+   median 28.0 °C). The model's design (SWAT's cover by canopy and residue); MONICA gives its
+   simulated above ground biomass in kg DM/ha, as SWAT wants and as the C++ AMEI adapter does. The
+   only MONICA side: the biomass itself, but even the observed one (14-18 t/ha at maturity in the wet
+   treatments) gives a cover of 0.98-0.99.
 
 ## The models against each other (`evaluate-st`, 2026-11-19)
 
@@ -283,17 +292,19 @@ What the treatments that weren't calibrated show (ratios of final biomass / yiel
   treatments, as in Bushland's P treatments.
 - **N**: Low/High N measured 0.75-0.98, MONICA 1996 0.89-0.96 (too weak), 1997 0.36-0.43 (far too
   strong: crop N 53-56 vs 124-136 kg/ha measured; the 1997 low-N soil supplies too little N in
-  MONICA - residues aren't simulated, initial N?).
+  MONICA - initial N? The residue, simulated since 2026-11-19, makes it a bit worse, see "Things
+  MONICA can't represent" 1).
 - **CO2**: FACE/Ambient measured 0.94-1.20, MONICA 1.13-1.27: a bit too strong.
 - Crop N with high N (1997): 232-234 vs 191-223 kg/ha measured.
-- Setup: the 1994 harvest (1994-06-01) is after the simulation's end (ENDAT 1994-05-31), so it's
-  dropped (the season ends without harvest).
+- Setup: the 1994 harvest (1994-06-01) was after the simulation's end (ENDAT 1994-05-31); since
+  2026-11-19 05-31 in the workbook. No effect: the crop matures before.
 
 ## Open questions
 
-1. Recalibrate the phenology (and LAI) with this setup?
-2. Upload iMO, or only the 9 protocol models?
-3. Residue, missing 1994 N below 120 cm: ask Pierre Martre?
+1. Upload iMO, or only the 9 protocol models?
+2. Missing 1994 N below 120 cm (MONICA's default used, "Things MONICA can't represent" 2): ask
+   the data providers. Points 3-5 of the model issues: worth reporting, not MONICA's to fix.
+3. Water stress in the dry treatments and 1997 low N (model issue 2).
 4. Bushland: the data questions above (1 now matters: N stress on).
    Avignon once its data are clear.
 5. The AMEI branch's crop stalling with a dry topsoil (MONICA change 2).
