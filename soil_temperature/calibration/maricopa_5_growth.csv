@@ -1,0 +1,20 @@
+name,position in array,low,high,step,optguess,minbound,maxbound,derived params
+MaxAssimilationRate,,10,90,,52,,,
+sla_early,,0.0010,0.0040,,0.0019,,,
+SpecificLeafArea,0,,,,,,,sla_early
+SpecificLeafArea,1,,,,,,,sla_early
+sla_late,,0.0010,0.0040,,0.00165,,,
+SpecificLeafArea,2,,,,,,,sla_late
+SpecificLeafArea,3,,,,,,,sla_late
+leaf2,,0.05,0.75,,0.2,,,
+AssimilatePartitioningCoeff,1_1,,,,,,,leaf2
+AssimilatePartitioningCoeff,1_2,,,,,,,0.8 - leaf2
+leaf3,,0.05,0.75,,0.2,,,
+AssimilatePartitioningCoeff,2_1,,,,,,,leaf3
+AssimilatePartitioningCoeff,2_2,,,,,,,0.87 - leaf3
+OrganSenescenceRate,3_1,0,0.05,,0.001,,,
+OrganSenescenceRate,4_1,0.01,0.4,,0.05,,,
+OrganSenescenceRate,5_1,,,,,,,OrganSenescenceRate_4_1
+init_f,,0.1,1.5,,1,,,
+species.InitialOrganBiomass,0,,,,,,,species['InitialOrganBiomass'][0] * init_f
+species.InitialOrganBiomass,1,,,,,,,species['InitialOrganBiomass'][1] * init_f

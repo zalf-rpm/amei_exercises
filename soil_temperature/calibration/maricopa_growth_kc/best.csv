@@ -1,0 +1,20 @@
+name,position in array,default,calibrated,low,high,derived params
+MaxAssimilationRate,,52,30.301846,10.0,90.0,
+sla_early,,,0.0023413429,0.001,0.004,
+SpecificLeafArea,0,0.002,0.0023413429,,,sla_early
+SpecificLeafArea,1,0.0018,0.0023413429,,,sla_early
+sla_late,,,0.002393402,0.001,0.004,
+SpecificLeafArea,2,0.0017,0.002393402,,,sla_late
+SpecificLeafArea,3,0.0016,0.002393402,,,sla_late
+leaf2,,,0.36290145,0.05,0.75,
+AssimilatePartitioningCoeff,1_1,0.2,0.36290145,,,leaf2
+AssimilatePartitioningCoeff,1_2,0.6,0.43709855000000003,,,0.8 - leaf2
+leaf3,,,0.100636065,0.05,0.75,
+AssimilatePartitioningCoeff,2_1,0.2,0.100636065,,,leaf3
+AssimilatePartitioningCoeff,2_2,0.67,0.769363935,,,0.87 - leaf3
+OrganSenescenceRate,3_1,0,0.0015988062,0.0,0.05,
+OrganSenescenceRate,4_1,0.05,0.063114725,0.01,0.4,
+OrganSenescenceRate,5_1,0.05,0.063114725,,,OrganSenescenceRate_4_1
+init_f,,,0.8250652,0.1,1.5,
+species.InitialOrganBiomass,0,53,43.728455600000004,,,species['InitialOrganBiomass'][0] * init_f
+species.InitialOrganBiomass,1,53,43.728455600000004,,,species['InitialOrganBiomass'][1] * init_f

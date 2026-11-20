@@ -41,13 +41,14 @@ TEMPLATES = {
     "daily": DATA_DIR / "AMIE_template_MarcicopaWheatFACE_daily_output.txt",
     "layers": DATA_DIR / "AMIE_template_MarcicopaWheatFACE_layers_output.txt",
 }
-# the parameters of calibrate.py --site maricopa (soil_temperature/calibration/calibrate.sh) (phenology, growth, yield; FINDINGS.md);
+# the parameters of calibrate.py --site maricopa (soil_temperature/calibration/calibrate.sh, FINDINGS.md): phenology,
+# water (StageKcFactor against the measured ET and soil water), growth and yield on top of it (steps 1, 4-6);
 # the calibration flow's cultivar was crops/cultivar_spring-wheat_with_1_calibrated_phenology.json
 PARAMS = MARICOPA_DIR / "params"
 # calibrate.py --site maricopa writes to <CALIBRATION_DIR>/maricopa_<step>
 CALIBRATION_DIR = ST_DIR / "calibration"
-CULTIVAR = "crops/cultivar_spring-wheat_maricopa_3_yield.json"
-SPECIES = "crops/species_wheat_maricopa_2_growth.json"
+CULTIVAR = "crops/cultivar_spring-wheat_maricopa_6_yield.json"
+SPECIES = "crops/species_wheat_maricopa_5_growth.json"
 NO_OF_LAYERS = 42  # 2.1 m in 5 cm layers, as the protocol asks
 NITROGEN_STRESS = True  # low and high N treatments
 # Odin's fixes for standing water (evapotranspiration/FINDINGS.md, model issues 4 and 5): with 5 cm layers

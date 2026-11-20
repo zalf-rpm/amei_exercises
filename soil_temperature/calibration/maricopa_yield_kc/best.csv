@@ -1,0 +1,4 @@
+name,position in array,default,calibrated,low,high,derived params
+ear4,,,0.670478,0.2,0.97,
+AssimilatePartitioningCoeff,3_3,0.97,0.670478,,,ear4
+AssimilatePartitioningCoeff,3_2,0.03,0.329522,,,1 - ear4

@@ -1,0 +1,4 @@
+name,position in array,low,high,step,optguess,minbound,maxbound,derived params
+ear4,,0.2,0.97,,0.97,,,
+AssimilatePartitioningCoeff,3_3,,,,,,,ear4
+AssimilatePartitioningCoeff,3_2,,,,,,,1 - ear4

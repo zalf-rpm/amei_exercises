@@ -57,9 +57,10 @@ MO and iMO give identical results (all 16 treatments), as in the old flow's setu
   shares of FENO3/FENH4/FEUREA, including the N in the irrigation water.
 - Irrigations (`Irrigation_events`) into the layer at IRADP (buried drip lines at 23 cm: layer 5,
   20-25 cm; the few at 0 cm at the surface). Sowing PDATE, harvest HADAT.
-- Cultivar `crops/cultivar_spring-wheat_maricopa_3_yield.json` and species
-  `crops/species_wheat_maricopa_2_growth.json` of `maricopa_wheat_face/params` (since 2026-11-18, see
-  "Maricopa calibration"; before: the flows' `cultivar_spring-wheat_with_1_calibrated_phenology.json`).
+- Cultivar `crops/cultivar_spring-wheat_maricopa_6_yield.json` and species
+  `crops/species_wheat_maricopa_5_growth.json` of `maricopa_wheat_face/params` (since 2026-11-20:
+  calibration steps 1 and 4-6, see "Maricopa calibration"; 2026-11-18/19: steps 1-3,
+  `..._3_yield.json` + `..._2_growth.json`; before: the flows' `cultivar_spring-wheat_with_1_calibrated_phenology.json`).
 - Odin's standing water fixes (`SOIL_MOISTURE` in site_maricopa.py), since 2026-11-18.
 - Water and N stress on (low and high N treatments).
 - Previous crop's residue (sheet `Residue`, since 2026-11-19): above ground residue (ICRAG) and roots
@@ -133,18 +134,22 @@ MO and iMO give identical results (all 16 treatments), as in the old flow's setu
 
 ## Model issues
 
-State 2026-11-19 (the `calibrate.py` cultivar, previous crop residue; `pixi run evaluate-maricopa
---species crops/species_wheat_maricopa_2_growth.json`, all 16 treatments against the observations).
+State 2026-11-20 (the `calibrate.py` parameters of steps 1 and 4-6, previous crop residue;
+`pixi run evaluate-maricopa --species crops/species_wheat_maricopa_5_growth.json`, all 16 treatments
+against the observations).
 
 1. **Phenology: fine since the recalibration** (2026-11-18, "Maricopa calibration"): anthesis RMSE
    4.6 d, maturity 4.4 d; left is a year effect (1993 anthesis about a week late, 1997 a few days
    early). Before, with the flow-calibrated cultivar, anthesis was 2-4 weeks late in this setup
    (1993 +28..30 d) for reasons not found (not the code: the C++ AMEI branch gave the same; not water
    stress, not the latitude); hence the recalibration in this setup.
-2. **Water and N responses** (the controls fit: e.g. 902 biomass 17.5 vs 18.3 t/ha observed):
-   - **The dry treatments get no water stress**: Dry/Wet biomass 0.99-1.01 (observed 0.77-0.82),
-     so their biomass is 20-30 % too high (905: 17.7 vs 13.9 t/ha), as in Bushland's P treatments.
-     Why (2026-11-19, with the calibrated cultivar of steps 1-3):
+2. **Water and N responses** (the controls fit: e.g. 902 biomass 16.6 vs 18.3 t/ha observed):
+   - **The dry treatments got no water stress** with the parameters of steps 1-3: Dry/Wet biomass
+     0.99-1.01 (observed 0.77-0.82), so their biomass was 20-30 % too high (905: 17.7 vs 13.9 t/ha),
+     as in Bushland's P treatments. **Since steps 4-6** (2026-11-20, crop coefficients against the
+     measured ET and soil water): 1993 0.95/0.95 (observed 0.82/0.78), 1994 0.73/0.65 (0.77/0.82;
+     905: 13.2 vs 13.9 t/ha). 1993's dry treatments are still hardly stressed (the deep soil water,
+     below). Why (2026-11-19, with the parameters of steps 1-3):
      - **MONICA's water demand is too low.** Its ET0 is right: the same as FAO-56 grass ET0 from the
        weather (902 season 555 vs 553 mm). But its crop uses about ET0 (StageKcFactor 1.1): season ET
        400-450 mm, at most ~5.8 mm/d. The measured ET (`Cum_evapotranspiration_means`) of the wet
@@ -163,12 +168,12 @@ State 2026-11-19 (the `calibrate.py` cultivar, previous crop residue; `pixi run 
        drainage as ET)? `ETAP` is the mean per period in mm/d in 1993/94, but the sum over the
        (10-day) period in 1996/97 (values up to 88; the definition says "averaged", mm). And the
        deep layers' FC/PWP vs the probe readings.
-     - Hence step 4 of the Maricopa calibration (StageKcFactor against the measured ET and soil
-       water), see there.
-   - **1997 low N far too N-limited**: biomass 913/915 5.8/7.0 vs 13.3/12.4 t/ha, crop N 51/49 vs
+     - Hence steps 4-6 of the Maricopa calibration (StageKcFactor against the measured ET and soil
+       water, then growth and yield again), see there; adopted 2026-11-20.
+   - **1997 low N far too N-limited**: biomass 913/915 6.4/7.7 vs 13.3/12.4 t/ha, crop N 54/53 vs
      136/124 kg N/ha; the residue (4300 kg/ha straw, N immobilization) made it a bit worse. 1996's
-     low N effect is too weak instead (yield ratio 0.94/0.89 vs 0.76/0.86).
-   - CO2 (FACE/Ambient) a bit too strong: biomass 1.13-1.24 vs 0.94-1.14, yield 1.10-1.27 vs
+     low N effect is too weak instead (yield ratio 0.96/0.92 vs 0.76/0.86).
+   - CO2 (FACE/Ambient) a bit too strong: biomass 1.00-1.20 vs 0.94-1.14, yield 1.10-1.26 vs
      0.97-1.20.
 3. **SQ has one temperature for all layers**: SiriusQuality's model has no layers (its design), the
    binding writes the mean of its minimum and maximum everywhere. Its minimum/maximum could go into
@@ -190,21 +195,21 @@ State 2026-11-19 (the `calibrate.py` cultivar, previous crop residue; `pixi run 
 ## The models against each other (`evaluate-st`, 2026-11-19)
 
 Deviation from the median of the 9 AMEI models, all treatments and days, mean (RMSD) in °C
-(Maricopa with the residue since 2026-11-19: changes only SW, by <= 0.07 °C):
+(Maricopa since 2026-11-20: calibration steps 1 and 4-6, with the residue):
 
 | | Maricopa 5 cm | 20 cm | 50 cm | 100 cm | Bushland 5 cm | 20 cm | 50 cm | 100 cm |
 |---|---|---|---|---|---|---|---|---|
-| AP | +1.5 (1.9) | +0.3 (0.6) | -1.1 (1.7) | -1.3 (2.3) | +1.0 (1.9) | +1.5 (2.2) | +2.3 (4.2) | +3.5 (5.2) |
-| PS | -0.5 (0.9) | +0.3 (0.9) | +1.5 (2.0) | +1.9 (2.4) | -0.8 (1.4) | -0.5 (1.1) | -0.4 (1.2) | -0.3 (1.3) |
-| SW | -2.0 (3.3) | -0.9 (2.7) | +0.6 (2.7) | +1.3 (2.6) | -2.5 (4.3) | -1.9 (3.5) | -1.5 (2.9) | -0.9 (2.1) |
-| DE | +1.4 (2.1) | +1.7 (2.2) | +2.2 (2.7) | +2.8 (3.2) | +1.0 (2.7) | +1.0 (2.6) | +0.8 (2.3) | +0.5 (1.8) |
-| DS | -0.3 (1.0) | -0.5 (1.0) | -0.5 (1.4) | -0.2 (1.5) | -0.5 (1.6) | -0.4 (1.4) | -0.5 (1.6) | -0.7 (2.0) |
-| MO | +3.3 (3.8) | +2.2 (2.8) | +0.8 (1.4) | -0.2 (0.8) | +2.2 (3.2) | +1.8 (2.4) | +1.0 (2.5) | +0.1 (2.6) |
-| SA | +0.2 (1.7) | -0.1 (2.1) | -0.2 (2.4) | +0.1 (2.4) | +0.3 (1.8) | +0.4 (1.9) | +0.3 (2.5) | -0.1 (3.4) |
-| SQ | -1.2 (1.7) | -1.7 (2.3) | -2.3 (3.1) | -2.8 (3.9) | -0.7 (2.2) | -0.6 (2.4) | -0.7 (2.8) | -1.0 (4.0) |
-| ST | -0.4 (1.2) | -1.4 (1.5) | -2.2 (2.5) | -2.7 (3.4) | -0.5 (2.0) | -0.4 (1.0) | -0.5 (1.9) | -0.8 (3.6) |
+| AP | +1.4 (1.9) | +0.2 (0.6) | -1.1 (1.6) | -1.3 (2.2) | +1.0 (1.9) | +1.5 (2.2) | +2.3 (4.2) | +3.5 (5.2) |
+| PS | -0.5 (0.9) | +0.4 (1.0) | +1.7 (2.3) | +2.2 (2.6) | -0.8 (1.4) | -0.5 (1.1) | -0.4 (1.2) | -0.3 (1.3) |
+| SW | -1.7 (3.0) | -0.6 (2.5) | +1.1 (2.8) | +1.7 (2.8) | -2.5 (4.3) | -1.9 (3.5) | -1.5 (2.9) | -0.9 (2.1) |
+| DE | +1.4 (2.1) | +1.7 (2.2) | +2.4 (2.9) | +2.9 (3.4) | +1.0 (2.7) | +1.0 (2.6) | +0.8 (2.3) | +0.5 (1.8) |
+| DS | -0.3 (1.0) | -0.6 (1.1) | -0.5 (1.4) | 0.0 (1.5) | -0.5 (1.6) | -0.4 (1.4) | -0.5 (1.6) | -0.7 (2.0) |
+| MO | +3.2 (3.8) | +2.1 (2.7) | +0.7 (1.3) | -0.3 (0.9) | +2.2 (3.2) | +1.8 (2.4) | +1.0 (2.5) | +0.1 (2.6) |
+| SA | +0.1 (1.7) | -0.2 (2.0) | -0.2 (2.3) | +0.1 (2.4) | +0.3 (1.8) | +0.4 (1.9) | +0.3 (2.5) | -0.1 (3.4) |
+| SQ | -1.2 (1.8) | -1.8 (2.4) | -2.4 (3.2) | -2.9 (4.0) | -0.7 (2.2) | -0.6 (2.4) | -0.7 (2.8) | -1.0 (4.0) |
+| ST | -0.4 (1.2) | -1.5 (1.6) | -2.3 (2.5) | -2.8 (3.5) | -0.5 (2.0) | -0.4 (1.0) | -0.5 (1.9) | -0.8 (3.6) |
 
-- **MO is the warmest model near the surface** (+2-3 °C at 5 cm, up to 9-10 °C above the median in
+- **MO is the warmest model near the surface** (+2-3 °C at 5 cm, up to 9 °C (Maricopa) and 10 °C (Bushland) above the median in
   May/June), close to the median at 100 cm. iMO (MONICA's own implementation) is identical to MO
   everywhere (max difference 0.0 °C), so the Crop2ML port reproduces MONICA exactly.
 - The band's smooth lower edge from March on is **SW** (model note 5): at Bushland its 5 cm
@@ -290,7 +295,7 @@ Results in `soil_temperature/calibration/maricopa_*`, parameters in
   RMSE 2.1 -> 1.0 t/ha. AssimilateReallocation instead went to its bound (0) with the same fit, the
   grain share after anthesis stayed at 1; both keep their defaults.
 - **Step 4, water** (2026-11-19, `calibration/maricopa_4_water.csv`, `calibrate.py --step water`;
-  **not adopted yet**): StageKcFactor of stages 2-5 against the measured ET per period
+  **adopted 2026-11-20** with steps 5-6): StageKcFactor of stages 2-5 against the measured ET per period
   (`Cum_evapotranspiration_means`, 282 periods, mm/d) and the soil water in 20-200 cm (neutron probes,
   628 dates; 50 mm weigh as 1 mm/d), all 16 treatments, from the step 3 cultivar. Against ET: only
   for this study, where ET isn't what's evaluated (see model issue 2). Seeds 1 and 7 agree:
@@ -305,9 +310,33 @@ Results in `soil_temperature/calibration/maricopa_*`, parameters in
   observed). Soil temperature (all 10 models, April/May): SW +0.6-0.7 °C (dry treatments +1.2 °C
   at 20 cm: less biomass, less cover), AP up to +0.3 °C, the others <= 0.1 °C; single days up to
   4.6 °C (DS).
+- **Steps 5-6, growth and yield again on top of step 4** (2026-11-20, `calibration/maricopa_5_growth.csv`,
+  `maricopa_6_yield.csv`, copies of steps 2-3; **adopted 2026-11-20**, the study's parameters since): from the step 1 cultivar with step 4's
+  StageKcFactor (`cultivar_spring-wheat_maricopa_4_water.json`), as steps 2-3 from step 1's, the
+  default species. Step 5 (controls, seeds 1 and 7 agree, seed 1 adopted): MaxAssimilationRate 30
+  (step 2: 31), SLA 0.0023 / 0.0024 (0.0024 / 0.0020), leaf share 0.36 in stage 2 (0.36) and 0.10 in
+  stage 3 (0.17), leaf senescence 0.0016 / 0.063 (0.0007 / 0.069), InitialOrganBiomass ×0.83
+  (×0.55); RMSE 0.9 -> 0.7 (the same). Step 6: the ear's share in stage 4 0.67 (0.68), the controls'
+  yield RMSE 2.1 -> 0.9 t/ha. Results in `calibration/maricopa_{growth,yield}_kc/`, parameters
+  `cultivar_spring-wheat_maricopa_{5_growth,6_yield}.json`, `species_wheat_maricopa_5_growth.json`.
 
-All 16 treatments, final parameters (`cultivar_spring-wheat_maricopa_3_yield.json` +
-`species_wheat_maricopa_2_growth.json`), and the flow's for comparison (phase 1 cultivar
+  | all 16 treatments | steps 1-3 (the study's) | + step 4 | + steps 5-6 |
+  |---|---|---|---|
+  | LAI RMSE | 1.23 | 1.11 | 1.16 |
+  | biomass RMSE t/ha | 1.80 | 1.61 | 1.60 |
+  | yield RMSE t/ha (controls) | 1.52 (0.97) | 1.35 (0.97) | 1.32 (0.93) |
+  | Dry/Wet biomass 1993, 1994 (obs 0.82/0.78, 0.77/0.82) | 1.01/1.00, 1.01/0.99 | 0.96/0.95, 0.76/0.65 | 0.95/0.95, 0.73/0.65 |
+  | ET bias / RMSE mm/d | -1.26 / 1.96 | -0.42 / 1.91 | -0.39 / 1.89 |
+  | soil water bias / RMSE mm | +82 / 106 | +27 / 65 | +23 / 63 |
+
+  Phenology unchanged (anthesis 4.6 d, maturity 4.5 d). The refit changes little: growth and yield
+  hardly depended on the water demand in the wet controls. Soil temperature (all 10 models,
+  April/May, against the study's runs): as with step 4 alone, SW +0.6-0.7 °C (dry treatments +1.2 °C
+  at 20 cm), AP up to +0.4 °C at 100 cm, the others <= 0.1 °C; SQ and ST unchanged.
+
+All 16 treatments, the parameters of steps 1-3 (`cultivar_spring-wheat_maricopa_3_yield.json` +
+`species_wheat_maricopa_2_growth.json`, 2026-11-18, without the residue) and of steps 1, 4-6 (the
+study's since 2026-11-20, with the residue; see the table of steps 4-6 above), and the flow's for comparison (phase 1 cultivar
 `cultivar_spring-wheat_with_1_calibrated_phenology.json`, phase 2 = its best.csv applied to it), the
 same setup for all (`pixi run evaluate-maricopa`, the flow's phase 2 cultivar as
 `calibration/flow_phase_2_cultivar.json`):
@@ -318,6 +347,7 @@ same setup for all (`pixi run evaluate-maricopa`, the flow's phase 2 cultivar as
 | flow phase 2 | 21.7 | 10.6 (2 not reached) | 2.20 | 2.47 | 3.29 (2.76) |
 | calibrate.py step 2 | 4.8 | 4.6 | 1.23 | 1.77 | 2.85 (2.06) |
 | calibrate.py step 3 | 4.6 | 4.3 | 1.24 | 1.76 | 1.47 (0.98) |
+| calibrate.py steps 4-6 (with residue) | 4.6 | 4.5 | 1.16 | 1.60 | 1.32 (0.93) |
 
 The flow's phenology is 2-4 weeks late in this setup (as noticed before, "Phenology of the
 flow-calibrated cultivar"); it was calibrated in the flow's setup, so its phenology is no fair
