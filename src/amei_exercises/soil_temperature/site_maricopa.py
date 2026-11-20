@@ -15,7 +15,6 @@ from typing import Any
 import pandas as pd
 
 from amei_exercises.soil_temperature.st_monica import (
-    MARICOPA_DIR,
     SOIL_WATER_DEPTHS_CM,
     ST_DIR,
     Fertilization,
@@ -44,7 +43,7 @@ TEMPLATES = {
 # the parameters of calibrate.py --site maricopa (soil_temperature/calibration/calibrate.sh, FINDINGS.md): phenology,
 # water (StageKcFactor against the measured ET and soil water), growth and yield on top of it (steps 1, 4-6);
 # the calibration flow's cultivar was crops/cultivar_spring-wheat_with_1_calibrated_phenology.json
-PARAMS = MARICOPA_DIR / "params"
+PARAMS = ST_DIR / "params"
 # calibrate.py --site maricopa writes to <CALIBRATION_DIR>/maricopa_<step>
 CALIBRATION_DIR = ST_DIR / "calibration"
 CULTIVAR = "crops/cultivar_spring-wheat_maricopa_6_yield.json"

@@ -40,7 +40,7 @@ TEMPLATES = {
     "layers": DATA_DIR / "AMEI_template_Bushland_layers_output.txt",
 }
 # the ET study's parameters and its calibrated cultivar (evapotranspiration/FINDINGS.md, "Calibration")
-PARAMS = ET_DIR / "phase_1/params"
+PARAMS = ET_DIR / "params"
 CULTIVAR = "crops/cultivar_winter-wheat_bushland_2_growth.json"
 NO_OF_LAYERS = 48  # 2.4 m in 5 cm layers: the protocol's "48 layers ... 0 to 2.40 m", the whole profile
 NITROGEN_STRESS = True  # as in the ET study's runs with the calibrated cultivar

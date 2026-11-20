@@ -127,7 +127,7 @@ def main() -> int:
     ap.add_argument("--site", default="bushland", choices=("bushland", "avignon"), help="for et0")
     ap.add_argument("--treatment", default="TXBL1990F", help="for et0")
     ap.add_argument("--monica-run", type=Path, default=DEFAULT_MONICA_RUN, help="default: the Odin port")
-    ap.add_argument("--params", type=Path, default=ET_DIR / "phase_1/params")
+    ap.add_argument("--params", type=Path, default=ET_DIR / "params")
     args = ap.parse_args()
     if args.check in ("humidity", "all"):
         humidity()

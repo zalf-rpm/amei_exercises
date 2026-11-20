@@ -54,7 +54,7 @@ def main() -> int:
     ap.add_argument("--xlsx", type=Path, help="default: the site's workbook in evapotranspiration/")
     ap.add_argument("--treatments", nargs="*", help="only these")
     ap.add_argument("--monica-run", type=Path, default=DEFAULT_MONICA_RUN, help="default: the Odin port")
-    ap.add_argument("--params", type=Path, default=ET_DIR / "phase_1/params")
+    ap.add_argument("--params", type=Path, default=ET_DIR / "params")
     ap.add_argument("--cultivar", help="include path relative to --params; default: the site's")
     ap.add_argument("--species", help="include path relative to --params; default: crop.json's")
     ap.add_argument("--module-code", default="MOFAPM")

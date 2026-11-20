@@ -22,7 +22,7 @@ set -euo pipefail
 cd "$(dirname "$0")/../.."  # the repository
 
 CAL=evapotranspiration/calibration
-CROPS=evapotranspiration/phase_1/params/crops  # the study's PARAMS; includes are relative to its parent
+CROPS=evapotranspiration/params/crops  # the study's PARAMS; includes are relative to its parent
 F_TREATMENTS=(TXBL1990F TXBL1992F TXBL1993F)  # full irrigation: no water stress
 
 seed_check() {  # the same step with seed 1 into /tmp, only for comparison

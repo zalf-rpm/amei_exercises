@@ -58,7 +58,7 @@ MO and iMO give identical results (all 16 treatments), as in the old flow's setu
 - Irrigations (`Irrigation_events`) into the layer at IRADP (buried drip lines at 23 cm: layer 5,
   20-25 cm; the few at 0 cm at the surface). Sowing PDATE, harvest HADAT.
 - Cultivar `crops/cultivar_spring-wheat_maricopa_6_yield.json` and species
-  `crops/species_wheat_maricopa_5_growth.json` of `maricopa_wheat_face/params` (since 2026-11-20:
+  `crops/species_wheat_maricopa_5_growth.json` of `soil_temperature/params` (since 2026-11-20:
   calibration steps 1 and 4-6, see "Maricopa calibration"; 2026-11-18/19: steps 1-3,
   `..._3_yield.json` + `..._2_growth.json`; before: the flows' `cultivar_spring-wheat_with_1_calibrated_phenology.json`).
 - Odin's standing water fixes (`SOIL_MOISTURE` in site_maricopa.py), since 2026-11-18.
@@ -274,7 +274,7 @@ against ET, no crop parameters that change MONICA's crop ET0, two seeds per step
 study's (42 × 5 cm, N response on, FACE CO2, buried drip) plus the ponding/infiltration fixes
 (`SOIL_MOISTURE` in site_maricopa.py, also for the soil temperature runs, rerun with the calibrated cultivar on 2026-11-18).
 Results in `soil_temperature/calibration/maricopa_*`, parameters in
-`maricopa_wheat_face/params/crops/{cultivar_spring-wheat,species_wheat}_maricopa_*.json`.
+`soil_temperature/params/crops/{cultivar_spring-wheat,species_wheat}_maricopa_*.json`.
 
 - **Step 1, phenology** (all 16 treatments, emergence, ear emergence = start of stage 4, anthesis,
   maturity; 64 dates): emergence 186 °C d (80), stages 2-3 ×0.82, stage 4 49 °C d (180; ear

@@ -399,7 +399,7 @@ def main() -> int:
     ap.add_argument("--params-csv", type=Path, required=True, help="the parameters to calibrate")
     ap.add_argument("--xlsx", type=Path, help="default: the site's workbook")
     ap.add_argument("--treatments", nargs="*", help="only these")
-    ap.add_argument("--params", type=Path, help="default: the site's PARAMS, else evapotranspiration/phase_1/params")
+    ap.add_argument("--params", type=Path, help="default: the site's PARAMS, else evapotranspiration/params")
     ap.add_argument(
         "--cultivar",
         help="the cultivar to start from: a JSON file, or an include path relative to --params; default: the site's",
@@ -426,7 +426,7 @@ def main() -> int:
     logging.basicConfig(level=logging.INFO, format="%(levelname)-7s %(message)s")
 
     site = importlib.import_module(SITES[args.site])
-    params_dir: Path = args.params or getattr(site, "PARAMS", ET_DIR / "phase_1/params")
+    params_dir: Path = args.params or getattr(site, "PARAMS", ET_DIR / "params")
     out: Path = args.out or getattr(site, "CALIBRATION_DIR", ET_DIR / "calibration") / f"{args.site}_{args.step}"
     rows = read_rows(args.params_csv)
     free = [r for r in rows if r.derived is None and r.low is not None and r.high is not None]

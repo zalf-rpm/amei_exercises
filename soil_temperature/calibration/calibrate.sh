@@ -3,7 +3,7 @@
 #
 # - Maricopa: calibrated here, independently of the Maricopa flows (maricopa_wheat_face/), from the
 #   default spring wheat. Reruns exactly the adopted runs (same CSVs, seeds and repetitions), copies their
-#   results into maricopa_wheat_face/params/crops/, reruns the study and compares with the flows' cultivar.
+#   results into soil_temperature/params/crops/, reruns the study and compares with the flows' cultivar.
 #   Why each step looks like this: soil_temperature/FINDINGS.md, "Maricopa calibration".
 # - Bushland: not calibrated here; it uses the ET study's Bushland cultivar
 #   (evapotranspiration/calibration/calibrate.sh), in this study's setup (48 x 5 cm layers, this
@@ -26,7 +26,7 @@ set -euo pipefail
 cd "$(dirname "$0")/../.."  # the repository
 
 CAL=soil_temperature/calibration
-CROPS=maricopa_wheat_face/params/crops  # the site's PARAMS; includes are relative to its parent
+CROPS=soil_temperature/params/crops  # the site's PARAMS; includes are relative to its parent
 CONTROLS=(902 906 910 914)  # wet, high N, ambient CO2, one per season
 
 seed_check() {  # the same step with seed 7 into /tmp, only for comparison
