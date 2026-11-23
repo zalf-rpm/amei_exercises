@@ -78,8 +78,13 @@ MO and iMO give identical results (all 16 treatments), as in the old flow's setu
 - TSSAV: `soil_column.soil_surface_temperature`; TSAV: `soil_column.layers.soil_temperature`
   (both unrounded; the STemp/SurfTemp aliases round to 0.1 °C). SWLD: Mois. SNLD and NIAD: NO3 + NH4
   [kg N/ha] of the layer / the profile. RND: net radiation in W/m2 (daily mean).
-- GSTZD from MONICA's stage as in the old flow's consumer: 1 -> 0, 2 -> 9, 4 -> 51, 5 -> 65,
-  6 -> 89, stage 3 na.
+- GSTZD from MONICA's stage, **changed 2026-11-23**: interpolated within each stage by the stage's
+  temperature sum (`current_crop_module.current_temperature_sum` against the cultivar's
+  `StageTemperatureSum`), stage 1 0 -> 9, 2 9 -> 30, 3 30 -> 51, 4 51 -> 65, 5 65 -> 89, 6 89 -> 92
+  (`et_monica.zadoks`, also in the ET study's daily files, NA there before). Before: only the stage
+  starts as in the old flow's consumer (1 -> 0, 2 -> 9, 4 -> 51, 5 -> 65, 6 -> 89), so na through
+  all of stage 3 (stem elongation, e.g. 901: 1993-02-09..03-26). Zadoks 65 and 89 are still reached
+  on ADAT and MDAT; all other outputs unchanged (all four studies rerun and compared).
 - na: LNUM, LIPCD, GWGD, GNGD, NIMD, GHFD, LHFD, HHFD, TSSMX, TSSMN, TGAV/MX/MN, EPSAD, EPPAD;
   TSMX, TSMN; LnoSM, LIPCCM, HnoAM, GWGM, GNGM, WAVSSM, NIAVSSM, NIMCM, EPSCM, EPPCM.
 - Files in the templates' encoding (Windows-1252, for °C and m²/m²), template header kept, Model and
@@ -248,8 +253,8 @@ Deviation from the median of the 9 AMEI models, all treatments and days, mean (R
 ## MONICA against DSSAT and SiriusQuality (Maricopa, `compare-frameworks`, 2026-11-23)
 
 The other frameworks' submissions (downloaded into `out_maricopa_other_models/`: DSSAT 4.8.2
-`AMEI_Maricopa_wheat_FACE_sim_results_20260917/` (DC), SiriusQuality `CAN/` (daily) and `SOIL/`
-(layers) (SQ)) against our `out_maricopa` (MO), with `pixi run compare-frameworks` ->
+`AMEI_Maricopa_wheat_FACE_sim_results_20260917/` (DC), SiriusQuality `CAN/` (daily), `SOIL/`
+(layers) and `SUM/` (summary, all models in one file) (SQ)) against our `out_maricopa` (MO), with `pixi run compare-frameworks` ->
 `out_maricopa/framework_comparison/` (crop.csv, water.csv, soil_temperature*.csv, figures). Each
 framework has its own crop, water balance and layering (DSSAT: 10 layers, 0-5, 5-15, 15-30 ... 180-210
 cm; the 5 cm layers of the others are averaged onto them); compared on the days all three simulated
@@ -272,7 +277,9 @@ maybe not.
 4. **DSSAT starts very wet** (0.45-0.47 at 0-30 cm on day one, above the workbook's saturation
    0.42) and drains 125-350 mm in 1993 (MONICA 50-270 mm, see below).
 
-**Crop** (median of the 9 models; obs = Obs_crop_summary_means and the maximum of the daily biomass):
+**Crop** (median of the 9 models; obs = Obs_crop_summary_means and the maximum of the daily biomass;
+anthesis and maturity in crop.csv from the Summary files' ADAT/MDAT; SiriusQuality's are the
+first days of its daily Zadoks 65/89, biomass and yield its daily maxima):
 
 | | LAI max bias / RMSE | biomass max bias / RMSE t/ha | yield bias / RMSE t/ha |
 |---|---|---|---|
@@ -281,6 +288,10 @@ maybe not.
 | SiriusQuality | +1.9 / 2.0 | +1.9 / 2.8 | +3.2 / 3.4 |
 
 - DSSAT and SQ reach LAI 7-10 (observed 4-7), SQ yields 9-13 t/ha (observed 5-9).
+- **SiriusQuality's LAIX (summary) is only 0.56-0.63 of its daily LAI maximum** in every treatment
+  (901: 4.89 against 8.43); MONICA's and DSSAT's are equal to theirs. Probably two LAI definitions
+  (e.g. main stem or green only); with the summary's LAIX, SQ's LAI is -1.1 / 1.3 instead of
+  +1.9 / 2.0. Worth asking them which one is meant.
 - **Treatment responses** (biomass ratio; yield similar):
 
   | | obs | MONICA | DSSAT | SQ |
@@ -501,4 +512,5 @@ What the treatments that weren't calibrated show (ratios of final biomass / yiel
 5. The AMEI branch's crop stalling with a dry topsoil (MONICA change 2).
 6. Other frameworks ("MONICA against DSSAT and SiriusQuality"): tell them MO's BaseTemperature
    (TAV), SQ's initial water; ask the data providers about 904's IRADP 0 and the 317 mm germination
-   irrigation; MONICA's slow infiltration into a saturated topsoil.
+   irrigation; MONICA's slow infiltration into a saturated topsoil; SQ's LAIX (summary) against its
+   daily LAI.

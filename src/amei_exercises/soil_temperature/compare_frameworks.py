@@ -4,9 +4,9 @@ The same 9 soil temperature models run in three frameworks (MO = MONICA, DC = DS
 SiriusQuality), each with its own crop, water balance and layering. Neither is the reference: this shows
 where MONICA's drivers (crop, ET, soil water) and the resulting soil temperatures stand among them.
 
-    pixi run compare-frameworks [--dssat DIR] [--sq-daily DIR] [--sq-layers DIR] [--out DIR]
+    pixi run compare-frameworks [--dssat DIR] [--sq-daily DIR] [--sq-layers DIR] [--sq-summary DIR] [--out DIR]
 
-Defaults: soil_temperature/out_maricopa_other_models/{AMEI_Maricopa_wheat_FACE_sim_results_20260917,CAN,SOIL}
+Defaults: soil_temperature/out_maricopa_other_models/{AMEI_Maricopa_wheat_FACE_sim_results_20260917,CAN,SOIL,SUM}
 and soil_temperature/out_maricopa/results. Writes into <out> (default
 soil_temperature/out_maricopa/framework_comparison): crop.csv, water.csv, soil_temperature.csv,
 soil_temperature_spread.csv and figures.
@@ -62,6 +62,27 @@ def load_all(dirs: dict[str, tuple[Path, Path]], kind: str) -> pd.DataFrame:
     return pd.concat(frames, ignore_index=True)
 
 
+def load_summaries(summary_dirs: dict[str, Path]) -> dict[tuple[str, str, str], dict]:
+    """(framework, model, TREAT_ID) -> {ADAT, MDAT, LAIX} of the Summary files: one per model
+    (<model><fw>SummaryMaricopa.txt) or one for all (<fw>SummaryMaricopa.txt, by MODEL_ID)."""
+    out = {}
+    for fw, folder in summary_dirs.items():
+        for f in sorted(folder.glob(f"*{fw}SummaryMaricopa.txt")):
+            lines = f.read_text(encoding="cp1252").splitlines()
+            code_row = next(i for i, line in enumerate(lines) if line.startswith("FRAMEWORK_ID"))
+            df = pd.read_csv(f, sep="\t", skiprows=code_row, na_values=["na", "NA"], encoding="cp1252", dtype=str)
+            df.columns = [c.strip() for c in df.columns]
+            for r in df.to_dict("records"):
+                model = str(r["MODEL_ID"]).strip()
+                if model not in MODELS:
+                    continue
+                v = {c: pd.to_datetime(str(r.get(c)).strip(), errors="coerce") for c in ("ADAT", "MDAT")}
+                v = {c: None if pd.isna(d) else d for c, d in v.items()}
+                v["LAIX"] = pd.to_numeric(str(r.get("LAIX")).strip(), errors="coerce")
+                out[(fw, model, str(r["TREAT_ID"]).strip())] = v
+    return out
+
+
 def onto_layers(layers: pd.DataFrame, column: str) -> pd.DataFrame:
     """Thickness weighted means of `column` on LAYERS: framework, model, TREAT_ID, DATE, top, value."""
     out = []
@@ -98,18 +119,21 @@ def first_date(d: pd.DataFrame, zadoks: float) -> pd.Timestamp | None:
     return hit.min() if len(hit) else None
 
 
-def crop_table(daily: pd.DataFrame, setups: dict) -> pd.DataFrame:
+def crop_table(daily: pd.DataFrame, summaries: dict, setups: dict) -> pd.DataFrame:
     """Per treatment and framework: anthesis, maturity, LAI max, biomass max, yield, ET, drainage;
-    the median over the 9 models (they differ a little: soil temperature acts on the crop)."""
+    the median over the 9 models (they differ a little: soil temperature acts on the crop). Anthesis and
+    maturity from the Summary files (ADAT, MDAT), else the first day of Zadoks 65 and 89. LAI max from
+    the daily LAID, LAIX (Summary) as reported."""
     rows = []
     for (fw, tid), d in daily.groupby(["framework", "TREAT_ID"]):
         per_model = []
-        for _, dm in d.groupby("model"):
+        for model, dm in d.groupby("model"):
             dm = dm.sort_values("DATE")
-            a, m = first_date(dm, 65), first_date(dm, 87)
+            sm = summaries.get((fw, model, tid), {})
+            a, m = sm.get("ADAT") or first_date(dm, 65), sm.get("MDAT") or first_date(dm, 89)
             per_model.append({
                 "anthesis": a, "maturity": m,
-                "LAI max": dm["LAID"].max(), "biomass max": dm["CWAD"].max(), "yield": dm["GWAD"].max(),
+                "LAI max": dm["LAID"].max(), "LAIX (Summary)": sm.get("LAIX"), "biomass max": dm["CWAD"].max(), "yield": dm["GWAD"].max(),
                 "season days": len(dm), "first day": dm["DATE"].min(), "last day": dm["DATE"].max(),
             })  # fmt: skip
         pm = pd.DataFrame(per_model)
@@ -117,8 +141,8 @@ def crop_table(daily: pd.DataFrame, setups: dict) -> pd.DataFrame:
         for c in ["anthesis", "maturity", "first day", "last day"]:
             v = pm[c].dropna()
             row[c] = v.sort_values().iloc[len(v) // 2].date() if len(v) else None
-        for c in ["LAI max", "biomass max", "yield", "season days"]:
-            row[c] = round(pm[c].median(), 2 if c == "LAI max" else 0)
+        for c in ["LAI max", "LAIX (Summary)", "biomass max", "yield", "season days"]:
+            row[c] = round(pm[c].median(), 2 if c.startswith("LAI") else 0)
         rows.append(row)
     for tid, s in setups.items():
         o = s.obs
@@ -273,6 +297,7 @@ def main() -> int:
     ap.add_argument("--dssat", type=Path, default=OTHER / "AMEI_Maricopa_wheat_FACE_sim_results_20260917")
     ap.add_argument("--sq-daily", type=Path, default=OTHER / "CAN")
     ap.add_argument("--sq-layers", type=Path, default=OTHER / "SOIL")
+    ap.add_argument("--sq-summary", type=Path, default=OTHER / "SUM")
     ap.add_argument("--out", type=Path, default=ST_DIR / "out_maricopa" / "framework_comparison")
     args = ap.parse_args()
     logging.disable(logging.INFO)
@@ -285,7 +310,8 @@ def main() -> int:
     setups = {s.id: s for s in site_maricopa.load()}
     args.out.mkdir(parents=True, exist_ok=True)
 
-    crop = crop_table(daily, setups)
+    summaries = load_summaries({"MO": args.monica, "DC": args.dssat, "SQ": args.sq_summary})
+    crop = crop_table(daily, summaries, setups)
     crop.to_csv(args.out / "crop.csv", index=False)
     print("Crop (median over the 9 models), each framework's own season\n", crop.to_string(index=False))  # noqa: T201
 

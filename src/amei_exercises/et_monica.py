@@ -297,6 +297,31 @@ SEASON: dict[str, tuple[str, str]] = {
 DIGITS = 4  # what goes into the result files
 
 
+# MONICA's development stage -> Zadoks (GSTZD), interpolated within each stage by its temperature sum
+# (since 2026-11-23; before only the stage starts, stage 3 none): (Zadoks at the stage's start, at its
+# end). Wheat's stages: 1 sowing - emergence, 2 emergence - double ridge (tillering), 3 double ridge -
+# ear emergence (stem elongation, booting), 4 ear emergence - anthesis, 5 anthesis - maturity,
+# 6 maturity - harvest ripe.
+STAGE_ZADOKS = [(0, 9), (9, 30), (30, 51), (51, 65), (65, 89), (89, 92)]
+# the temperature sum reached in each stage and its target, per stage (columns <path>_1 .. _6)
+STAGE_SUM = "current_crop_module.current_temperature_sum"
+STAGE_SUM_TARGET = "current_crop_module.crop_params.cultivar_params.stage_temperature_sum"
+STAGE_SUM_OUTPUTS = [[STAGE_SUM, [1, len(STAGE_ZADOKS)]], [STAGE_SUM_TARGET, [1, len(STAGE_ZADOKS)]]]
+
+
+def zadoks(row: dict[str, Any]) -> float | None:
+    """GSTZD of a daily row with Stage and the STAGE_SUM_OUTPUTS columns; None without a crop."""
+    stage = number(row.get("Stage"))
+    if stage is None or not 1 <= int(stage) <= len(STAGE_ZADOKS):
+        return None
+    i = int(stage)
+    start, end = STAGE_ZADOKS[i - 1]
+    reached, target = number(row.get(f"{STAGE_SUM}_{i}")), number(row.get(f"{STAGE_SUM_TARGET}_{i}"))
+    if reached is None or not target:
+        return float(start)
+    return round(start + (end - start) * min(max(reached / target, 0.0), 1.0), 1)
+
+
 def out_spec(alias: str, spec: Any) -> Any:
     """'LAI', 'LAID' -> 'LAI|LAID'; ['Mois', [1, 42, 'AVG']], 'SWWPD' -> ['Mois|SWWPD', [1, 42, 'AVG']].
 
@@ -527,6 +552,8 @@ def worksteps(s: Setup, sowing_template: dict[str, Any]) -> list[dict[str, Any]]
 def output_events(daily: dict[str, Any]) -> list[Any]:
     """A "daily" section with the given outputs (code -> spec, None = skipped) and the EVENTS sections."""
     events: list[Any] = ["daily", ["Date|DATE"] + [out_spec(k, v) for k, v in daily.items() if v is not None]]
+    if "Stage" in daily:  # for GSTZD (zadoks)
+        events[1] += STAGE_SUM_OUTPUTS
     for event, outs in EVENTS.items():
         events += [event, [out_spec(code, spec) for code, spec in outs]]
     return events
@@ -683,6 +710,7 @@ def collect(run_dir: Path) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     """Daily rows (template codes) and the summary of one run."""
     daily, *event_sections = read_sections(run_dir / "monica_out.csv")
     for r in daily:
+        r["GSTZD"] = zadoks(r)
         for code, factor in DAILY_FACTORS.items():
             if (x := number(r.get(code))) is not None:
                 r[code] = round(x * factor, 2)

@@ -12,7 +12,7 @@
   },
   "debug?": false,
   "path-to-output": "./",
-  "include-file-base-path": "/home/berg/GitHub/amei_exercises/maricopa_wheat_face/params/",
+  "include-file-base-path": "/home/berg/GitHub/amei_exercises/soil_temperature/params/",
   "_include-file-base-path": "params/",
   "UseSecondaryYields": false,
   "NitrogenResponseOn": true,
@@ -122,6 +122,20 @@
         "Precip|Precip",
         "Tavg|Tavg",
         "ET0|ETO",
+        [
+          "current_crop_module.current_temperature_sum",
+          [
+            1,
+            6
+          ]
+        ],
+        [
+          "current_crop_module.crop_params.cultivar_params.stage_temperature_sum",
+          [
+            1,
+            6
+          ]
+        ],
         [
           "soil_column.layers.soil_temperature",
           [

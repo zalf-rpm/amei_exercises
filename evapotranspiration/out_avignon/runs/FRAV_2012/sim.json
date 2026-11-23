@@ -130,6 +130,20 @@
         [
           "OrgGreenBiom|WLVG",
           "Leaf"
+        ],
+        [
+          "current_crop_module.current_temperature_sum",
+          [
+            1,
+            6
+          ]
+        ],
+        [
+          "current_crop_module.crop_params.cultivar_params.stage_temperature_sum",
+          [
+            1,
+            6
+          ]
         ]
       ],
       "Sowing",

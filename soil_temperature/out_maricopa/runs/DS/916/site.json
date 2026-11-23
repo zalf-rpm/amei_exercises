@@ -54,7 +54,7 @@
         ],
         "SoilMoisturePercentFC": [
           75.833,
-          "% [0-100]"
+          "% [0-saturation]"
         ],
         "SoilNitrate": [
           0.005501999999999999,
@@ -106,7 +106,7 @@
         ],
         "SoilMoisturePercentFC": [
           75.833,
-          "% [0-100]"
+          "% [0-saturation]"
         ],
         "SoilNitrate": [
           0.005333999999999999,
@@ -158,7 +158,7 @@
         ],
         "SoilMoisturePercentFC": [
           75.833,
-          "% [0-100]"
+          "% [0-saturation]"
         ],
         "SoilNitrate": [
           0.005333999999999998,
@@ -210,7 +210,7 @@
         ],
         "SoilMoisturePercentFC": [
           75.833,
-          "% [0-100]"
+          "% [0-saturation]"
         ],
         "SoilNitrate": [
           0.0013335,
@@ -262,7 +262,7 @@
         ],
         "SoilMoisturePercentFC": [
           75.833,
-          "% [0-100]"
+          "% [0-saturation]"
         ],
         "SoilNitrate": [
           0.0013335,
@@ -314,7 +314,7 @@
         ],
         "SoilMoisturePercentFC": [
           75.833,
-          "% [0-100]"
+          "% [0-saturation]"
         ],
         "SoilNitrate": [
           0.001333500000000001,
@@ -366,7 +366,7 @@
         ],
         "SoilMoisturePercentFC": [
           86.25,
-          "% [0-100]"
+          "% [0-saturation]"
         ],
         "SoilNitrate": [
           0.0026389999999999994,
@@ -418,7 +418,7 @@
         ],
         "SoilMoisturePercentFC": [
           86.25,
-          "% [0-100]"
+          "% [0-saturation]"
         ],
         "SoilNitrate": [
           0.0026389999999999994,
@@ -470,7 +470,7 @@
         ],
         "SoilMoisturePercentFC": [
           86.25,
-          "% [0-100]"
+          "% [0-saturation]"
         ],
         "SoilNitrate": [
           0.0026389999999999994,
@@ -522,7 +522,7 @@
         ],
         "SoilMoisturePercentFC": [
           86.25,
-          "% [0-100]"
+          "% [0-saturation]"
         ],
         "SoilNitrate": [
           0.0026389999999999994,
@@ -574,7 +574,7 @@
         ],
         "SoilMoisturePercentFC": [
           87.0,
-          "% [0-100]"
+          "% [0-saturation]"
         ],
         "SoilNitrate": [
           0.001029,
@@ -626,7 +626,7 @@
         ],
         "SoilMoisturePercentFC": [
           87.0,
-          "% [0-100]"
+          "% [0-saturation]"
         ],
         "SoilNitrate": [
           0.001029,
@@ -678,7 +678,7 @@
         ],
         "SoilMoisturePercentFC": [
           84.828,
-          "% [0-100]"
+          "% [0-saturation]"
         ],
         "SoilNitrate": [
           0.0009701999999999998,
@@ -730,7 +730,7 @@
         ],
         "SoilMoisturePercentFC": [
           84.828,
-          "% [0-100]"
+          "% [0-saturation]"
         ],
         "SoilNitrate": [
           0.0009701999999999998,
@@ -782,7 +782,7 @@
         ],
         "SoilMoisturePercentFC": [
           77.407,
-          "% [0-100]"
+          "% [0-saturation]"
         ],
         "SoilNitrate": [
           0.0009733999999999999,
@@ -834,7 +834,7 @@
         ],
         "SoilMoisturePercentFC": [
           77.407,
-          "% [0-100]"
+          "% [0-saturation]"
         ],
         "SoilNitrate": [
           0.0009733999999999999,
@@ -886,7 +886,7 @@
         ],
         "SoilMoisturePercentFC": [
           77.407,
-          "% [0-100]"
+          "% [0-saturation]"
         ],
         "SoilNitrate": [
           0.0009733999999999999,
@@ -938,7 +938,7 @@
         ],
         "SoilMoisturePercentFC": [
           77.407,
-          "% [0-100]"
+          "% [0-saturation]"
         ],
         "SoilNitrate": [
           0.0009733999999999999,
@@ -990,7 +990,7 @@
         ],
         "SoilMoisturePercentFC": [
           77.2,
-          "% [0-100]"
+          "% [0-saturation]"
         ],
         "SoilNitrate": [
           0.0008320999999999999,
@@ -1042,7 +1042,7 @@
         ],
         "SoilMoisturePercentFC": [
           77.2,
-          "% [0-100]"
+          "% [0-saturation]"
         ],
         "SoilNitrate": [
           0.0008320999999999999,
@@ -1094,7 +1094,7 @@
         ],
         "SoilMoisturePercentFC": [
           77.2,
-          "% [0-100]"
+          "% [0-saturation]"
         ],
         "SoilNitrate": [
           0.0008320999999999999,
@@ -1146,7 +1146,7 @@
         ],
         "SoilMoisturePercentFC": [
           77.2,
-          "% [0-100]"
+          "% [0-saturation]"
         ],
         "SoilNitrate": [
           0.0008320999999999994,
@@ -1198,7 +1198,7 @@
         ],
         "SoilMoisturePercentFC": [
           72.4,
-          "% [0-100]"
+          "% [0-saturation]"
         ],
         "SoilNitrate": [
           0.0006907999999999999,
@@ -1250,7 +1250,7 @@
         ],
         "SoilMoisturePercentFC": [
           72.4,
-          "% [0-100]"
+          "% [0-saturation]"
         ],
         "SoilNitrate": [
           0.0006907999999999999,
@@ -1302,7 +1302,7 @@
         ],
         "SoilMoisturePercentFC": [
           68.0,
-          "% [0-100]"
+          "% [0-saturation]"
         ],
         "SoilNitrate": [
           0.0006907999999999999,
@@ -1354,7 +1354,7 @@
         ],
         "SoilMoisturePercentFC": [
           68.0,
-          "% [0-100]"
+          "% [0-saturation]"
         ],
         "SoilNitrate": [
           0.0006907999999999999,
@@ -1406,7 +1406,7 @@
         ],
         "SoilMoisturePercentFC": [
           68.0,
-          "% [0-100]"
+          "% [0-saturation]"
         ],
         "SoilNitrate": [
           0.0006907999999999999,
@@ -1458,7 +1458,7 @@
         ],
         "SoilMoisturePercentFC": [
           68.0,
-          "% [0-100]"
+          "% [0-saturation]"
         ],
         "SoilNitrate": [
           0.0006907999999999999,
@@ -1510,7 +1510,7 @@
         ],
         "SoilMoisturePercentFC": [
           68.0,
-          "% [0-100]"
+          "% [0-saturation]"
         ],
         "SoilNitrate": [
           0.0006907999999999999,
@@ -1562,7 +1562,7 @@
         ],
         "SoilMoisturePercentFC": [
           68.0,
-          "% [0-100]"
+          "% [0-saturation]"
         ],
         "SoilNitrate": [
           0.0006907999999999999,
@@ -1614,7 +1614,7 @@
         ],
         "SoilMoisturePercentFC": [
           74.4,
-          "% [0-100]"
+          "% [0-saturation]"
         ],
         "SoilNitrate": [
           0.0006907999999999999,
@@ -1666,7 +1666,7 @@
         ],
         "SoilMoisturePercentFC": [
           74.4,
-          "% [0-100]"
+          "% [0-saturation]"
         ],
         "SoilNitrate": [
           0.0006907999999999999,
@@ -1718,7 +1718,7 @@
         ],
         "SoilMoisturePercentFC": [
           74.4,
-          "% [0-100]"
+          "% [0-saturation]"
         ],
         "SoilNitrate": [
           0.0006907999999999999,
@@ -1770,7 +1770,7 @@
         ],
         "SoilMoisturePercentFC": [
           74.4,
-          "% [0-100]"
+          "% [0-saturation]"
         ],
         "SoilNitrate": [
           0.0006907999999999999,
@@ -1822,7 +1822,7 @@
         ],
         "SoilMoisturePercentFC": [
           68.4,
-          "% [0-100]"
+          "% [0-saturation]"
         ],
         "SoilNitrate": [
           0.0006907999999999999,
@@ -1874,7 +1874,7 @@
         ],
         "SoilMoisturePercentFC": [
           68.4,
-          "% [0-100]"
+          "% [0-saturation]"
         ],
         "SoilNitrate": [
           0.0006907999999999999,
@@ -1926,7 +1926,7 @@
         ],
         "SoilMoisturePercentFC": [
           68.4,
-          "% [0-100]"
+          "% [0-saturation]"
         ],
         "SoilNitrate": [
           0.0006907999999999999,
@@ -1978,7 +1978,7 @@
         ],
         "SoilMoisturePercentFC": [
           68.4,
-          "% [0-100]"
+          "% [0-saturation]"
         ],
         "SoilNitrate": [
           0.0006907999999999999,
@@ -2030,7 +2030,7 @@
         ],
         "SoilMoisturePercentFC": [
           72.0,
-          "% [0-100]"
+          "% [0-saturation]"
         ],
         "SoilNitrate": [
           0.0006907999999999999,
@@ -2082,7 +2082,7 @@
         ],
         "SoilMoisturePercentFC": [
           72.0,
-          "% [0-100]"
+          "% [0-saturation]"
         ],
         "SoilNitrate": [
           0.0006907999999999999,
@@ -2134,7 +2134,7 @@
         ],
         "SoilMoisturePercentFC": [
           72.0,
-          "% [0-100]"
+          "% [0-saturation]"
         ],
         "SoilNitrate": [
           0.0006907999999999999,
@@ -2186,7 +2186,7 @@
         ],
         "SoilMoisturePercentFC": [
           72.0,
-          "% [0-100]"
+          "% [0-saturation]"
         ],
         "SoilNitrate": [
           0.0006907999999999999,

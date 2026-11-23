@@ -118,6 +118,20 @@
         "Tavg|Tavg",
         "ET0|ETO",
         [
+          "current_crop_module.current_temperature_sum",
+          [
+            1,
+            6
+          ]
+        ],
+        [
+          "current_crop_module.crop_params.cultivar_params.stage_temperature_sum",
+          [
+            1,
+            6
+          ]
+        ],
+        [
           "soil_column.layers.soil_temperature",
           [
             1,

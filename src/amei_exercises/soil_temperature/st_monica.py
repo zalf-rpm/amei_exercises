@@ -36,6 +36,7 @@ from amei_exercises.et_monica import (
     to_date,
     write_checksums,
     write_result,
+    zadoks,
 )
 from amei_exercises.icasa import horizons, read_sheets, treatment_id_resolver, weather
 from amei_exercises.paths import ET_DIR, MARICOPA_DIR, ST_DIR
@@ -88,10 +89,6 @@ MODELS = {
 TEMPLATE_ENCODING = "cp1252"
 NA = "na"
 
-# MONICA's development stage -> Zadoks, as in the Maricopa flow's consumer (stage 3 has no single
-# Zadoks stage): sowing 0, emergence 9, (stem elongation), heading 51, anthesis 65, maturity 89
-STAGE_TO_ZADOKS = {1: 0, 2: 9, 4: 51, 5: 65, 6: 89}
-
 
 def model_options(code: str, base: Options, no_of_layers: int) -> Options:
     """`base` with the soil temperature model `code` and this study's outputs."""
@@ -111,7 +108,7 @@ def st_daily(no_of_layers: int) -> dict[str, Any]:
     d = daily_outputs(no_of_layers)
     return {
         "LNUM": None,
-        "GSTZD": None,  # from Stage, see collect
+        "GSTZD": None,  # from Stage and the stage's temperature sum (et_monica.zadoks), see collect
         **{c: d[c] for c in ("LAID", "LIPCD", "CWAD", "GWAD", "GWGD", "CNAD", "GNAD", "GNGD", "RDPD")},
         **{c: d[c] for c in ("SWWPD", "DRND", "ROFD")},
         "NIAD": None,  # the sum of the layers' NO3 + NH4, see collect
@@ -173,8 +170,7 @@ def collect(run_dir: Path, no_of_layers: int) -> tuple[list[dict[str, Any]], lis
             )
         if all(x is not None for x in n_kg_ha):
             r["NIAD"] = sum(n_kg_ha)  # type: ignore[arg-type]
-        stage = number(r.get("Stage"))
-        r["GSTZD"] = None if stage is None else STAGE_TO_ZADOKS.get(int(stage))
+        r["GSTZD"] = zadoks(r)
         if (x := number(r.get("RND"))) is not None:
             r["RND"] = x * 1e6 / 86400  # MJ m-2 d-1 -> W m-2 (daily mean)
 

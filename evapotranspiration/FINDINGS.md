@@ -367,7 +367,8 @@ vernalisation 11 d (50), daylength requirement 18.3 h (20). The vernalisation we
 bound (10); with the bound at 0 it ends at 13 d with the same RMSE and 181 °C d for emergence:
 **the dates don't determine the parameters** (vernalisation, daylength and the temperature sums
 trade off). The daily Zadoks stages (9-13 per treatment) could pin them down better; MONICA's
-stages map to Zadoks only at the stage boundaries.
+stages map to Zadoks only at the stage boundaries (the GSTZD output interpolates within the stages
+since 2026-11-23, see soil_temperature/FINDINGS.md "Outputs"; an approximation, not a calibration target).
 
 With that cultivar (`crops/cultivar_winter-wheat_bushland_1_phenology.json`, 10 cm): all
 treatments reach maturity, LAI max 6.2-7.9 (obs 2.4-7.1, before 10.7-13.2), ET RMSE 1.35-1.96
