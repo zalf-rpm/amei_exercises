@@ -51,9 +51,14 @@ MO and iMO give identical results (all 16 treatments), as in the old flow's setu
 - CO2 per day in climate.csv (`co2` column): the station's CO2Y (370 ppm), changed on EMDATE by
   `Env_modifications` (1993/94: 550 ppm from Jan 1 or emergence to mid May; 1996/97: +185 ppm).
 - TAV 21 °C, TAMP 11.1 °C of `Weather_stations` in `climate.csv-options` (new in Odin, see below).
-- MONICA's own soil temperature (MO, iMO): `BaseTemperature` (its lower boundary, default 9.5 °C
-  for Germany) = TAV. The same site input the other models get as TAV; with 9.5 °C MO's 205 cm
-  layer started at 9.5 °C instead of about 20 °C.
+- MONICA's own soil temperature (MO, iMO): `BaseTemperature` (its lower boundary) MONICA's default
+  9.5 °C (for Germany), not TAV, since 2026-11-23: DSSAT and SiriusQuality run MO with 9.5 °C, and so
+  did the sensitivity analysis, so ours stay comparable. MO's 205 cm layer starts at 9.5 °C instead
+  of about 20 °C (Maricopa's TAV 21 °C). The switch `BASE_TEMPERATURE_FROM_TAV` in st_monica.py
+  gives BaseTemperature = TAV (the same site input the other models get); from 2026-11-17 to
+  2026-11-23 the runs had it on. Turning it off changed only MO and iMO: Maricopa at 100 cm from
+  -0.3 to -2.5 °C against the median, Bushland (TAV 11.4 °C) by at most 0.3 °C; their crop a little
+  (anthesis/maturity ±1 day in a few treatments, final biomass and yield <0.5 %).
 - Fertilizers (`Fertilizer_events`, FEAMN > 0) as mineral fertilization with the NO3/NH4/urea
   shares of FENO3/FENH4/FEUREA, including the N in the irrigation water.
 - Irrigations (`Irrigation_events`) into the layer at IRADP (buried drip lines at 23 cm: layer 5,
@@ -227,22 +232,24 @@ against the observations).
 ## The models against each other (`evaluate-st`, 2026-11-19)
 
 Deviation from the median of the 9 AMEI models, all treatments and days, mean (RMSD) in °C
-(Maricopa since 2026-11-20: calibration steps 1 and 4-6, with the residue):
+(Maricopa since 2026-11-20: calibration steps 1 and 4-6, with the residue; since 2026-11-23 MO's
+lower boundary 9.5 °C, "Inputs"):
 
 | | Maricopa 5 cm | 20 cm | 50 cm | 100 cm | Bushland 5 cm | 20 cm | 50 cm | 100 cm |
 |---|---|---|---|---|---|---|---|---|
-| AP | +1.4 (1.9) | +0.2 (0.6) | -1.1 (1.6) | -1.3 (2.2) | +1.0 (1.9) | +1.5 (2.2) | +2.3 (4.2) | +3.5 (5.2) |
-| PS | -0.5 (0.9) | +0.4 (1.0) | +1.7 (2.3) | +2.2 (2.6) | -0.8 (1.4) | -0.5 (1.1) | -0.4 (1.2) | -0.3 (1.3) |
-| SW | -1.7 (3.0) | -0.6 (2.5) | +1.1 (2.8) | +1.7 (2.8) | -2.5 (4.3) | -1.9 (3.5) | -1.5 (2.9) | -0.9 (2.1) |
-| DE | +1.4 (2.1) | +1.7 (2.2) | +2.4 (2.9) | +2.9 (3.4) | +1.0 (2.7) | +1.0 (2.6) | +0.8 (2.3) | +0.5 (1.8) |
-| DS | -0.3 (1.0) | -0.6 (1.1) | -0.5 (1.4) | 0.0 (1.5) | -0.5 (1.6) | -0.4 (1.4) | -0.5 (1.6) | -0.7 (2.0) |
-| MO | +3.2 (3.8) | +2.1 (2.7) | +0.7 (1.3) | -0.3 (0.9) | +2.2 (3.2) | +1.8 (2.4) | +1.0 (2.5) | +0.1 (2.6) |
-| SA | +0.1 (1.7) | -0.2 (2.0) | -0.2 (2.3) | +0.1 (2.4) | +0.3 (1.8) | +0.4 (1.9) | +0.3 (2.5) | -0.1 (3.4) |
-| SQ | -1.2 (1.8) | -1.8 (2.4) | -2.4 (3.2) | -2.9 (4.0) | -0.7 (2.2) | -0.6 (2.4) | -0.7 (2.8) | -1.0 (4.0) |
-| ST | -0.4 (1.2) | -1.5 (1.6) | -2.3 (2.5) | -2.8 (3.5) | -0.5 (2.0) | -0.4 (1.0) | -0.5 (1.9) | -0.8 (3.6) |
+| AP | +1.4 (1.9) | +0.2 (0.6) | -0.7 (1.7) | -0.9 (2.2) | +1.0 (1.9) | +1.5 (2.2) | +2.4 (4.2) | +3.5 (5.2) |
+| PS | -0.5 (0.9) | +0.5 (1.0) | +2.1 (2.8) | +2.5 (2.9) | -0.8 (1.4) | -0.5 (1.1) | -0.4 (1.2) | -0.2 (1.3) |
+| SW | -1.7 (3.0) | -0.5 (2.5) | +1.5 (3.1) | +2.0 (3.0) | -2.5 (4.3) | -1.9 (3.5) | -1.4 (2.9) | -0.8 (2.0) |
+| DE | +1.4 (2.1) | +1.8 (2.3) | +2.8 (3.4) | +3.2 (3.6) | +1.0 (2.7) | +1.1 (2.6) | +0.8 (2.3) | +0.5 (1.8) |
+| DS | -0.3 (1.0) | -0.5 (1.0) | -0.1 (1.3) | +0.3 (1.3) | -0.5 (1.6) | -0.4 (1.4) | -0.5 (1.6) | -0.6 (1.9) |
+| MO | +3.2 (3.7) | +1.6 (2.5) | -0.3 (1.6) | -2.5 (3.1) | +2.2 (3.1) | +1.7 (2.4) | +0.8 (2.4) | -0.2 (2.6) |
+| SA | +0.1 (1.7) | -0.1 (1.9) | +0.2 (2.0) | +0.4 (2.3) | +0.2 (1.8) | +0.4 (1.9) | +0.3 (2.5) | 0.0 (3.4) |
+| SQ | -1.2 (1.8) | -1.7 (2.4) | -1.9 (2.8) | -2.5 (3.7) | -0.7 (2.2) | -0.6 (2.4) | -0.7 (2.8) | -1.0 (3.9) |
+| ST | -0.4 (1.2) | -1.4 (1.6) | -1.9 (2.1) | -2.5 (3.2) | -0.5 (2.0) | -0.4 (1.0) | -0.5 (1.9) | -0.8 (3.5) |
 
 - **MO is the warmest model near the surface** (+2-3 °C at 5 cm, up to 9 °C (Maricopa) and 10 °C (Bushland) above the median in
-  May/June), close to the median at 100 cm. iMO (MONICA's own implementation) is identical to MO
+  May/June); at 100 cm close to the median at Bushland, at Maricopa with its 9.5 °C lower boundary
+  (TAV 21 °C) among the coldest (-2.5 °C, as SQ and ST). iMO (MONICA's own implementation) is identical to MO
   everywhere (max difference 0.0 °C), so the Crop2ML port reproduces MONICA exactly.
 - The band's smooth lower edge from March on is **SW** (model note 5): at Bushland its 5 cm
   temperature in June is ~13 °C, the others 26-34 °C, almost its own 50 cm value.
@@ -265,10 +272,11 @@ maybe not.
 
 **Their setups differ from ours:**
 
-1. **MO in DSSAT and SiriusQuality runs with its default lower boundary** (`BaseTemperature` 9.5 °C,
-   not the site's TAV 21 °C, see "Inputs"): its 210 cm layer starts at 9.5 °C in both, stays there in
-   SQ, and MO is 4-7 °C colder than ours at depth (DC -4.1, SQ -6.7 °C at 180-210 cm). Worth telling
-   them; MO is left out of the comparison's medians and spreads.
+1. **MO with its default lower boundary** (`BaseTemperature` 9.5 °C, not the site's TAV 21 °C): in
+   DSSAT and SiriusQuality, and in ours since 2026-11-23 ("Inputs"; before, with TAV, MO was 4-7 °C
+   warmer than theirs at depth and was left out of the medians). Now DSSAT's MO is within 0.5 °C of
+   ours, but **SiriusQuality's MO is still 2.4-3.7 °C colder below 15 cm** (its 210 cm layer stays at
+   ~9.5 °C all season, ours warms to ~19 °C by May): something else in how SQ runs MO.
 2. **Planting dates:** DSSAT plants 6-13 days later than the workbook's PDATE (1992-12-26,
    1993-12-13, 1995-12-21, 1996-12-28 against 12-15, 12-07, 12-15, 12-15), on the day of the first
    (germination) irrigation; emergence is within a few days of the observed in all three anyway.
@@ -333,18 +341,18 @@ its soil is warmer in winter (15-30 cm, figure). Two things: ask the data provid
 (DSSAT and SQ infiltrate it); MONICA's infiltration into a saturated topsoil (percolation from the top
 layers ~1 mm/d on this soil) is worth a look.
 
-**Soil temperature** (8 models without MO):
+**Soil temperature** (the 9 models; MO with 9.5 °C in all three since 2026-11-23):
 
 | layer cm | 0-5 | 5-15 | 15-30 | 30-45 | 60-90 | 90-120 | 150-180 |
 |---|---|---|---|---|---|---|---|
-| median DSSAT - MONICA °C | 0.0 | -0.2 | -0.4 | -0.4 | -0.5 | -0.6 | -0.7 |
-| median SQ - MONICA °C | 0.0 | -0.2 | -0.3 | -0.2 | -0.4 | -0.5 | -0.7 |
-| SD between the models (in each framework) | 1.4-1.7 | 1.6 | 1.8 | 1.9-2.2 | 2.4-2.6 | 2.6-2.9 | 2.9-3.2 |
-| SD between the frameworks (same model) | 0.6 | 0.8 | 0.8 | 0.8 | 0.7 | 0.7 | 0.7 |
+| median DSSAT - MONICA °C | 0.0 | -0.3 | -0.3 | -0.1 | -0.2 | -0.4 | -0.7 |
+| median SQ - MONICA °C | 0.0 | -0.3 | -0.5 | -0.5 | -0.4 | -0.5 | -0.7 |
+| SD between the models (in each framework) | 1.8-1.9 | 1.6-1.9 | 1.7-1.9 | 2.0-2.1 | 2.5-2.9 | 2.8-3.3 | 3.4-3.8 |
+| SD between the frameworks (same model) | 0.6 | 0.8 | 0.9 | 0.9 | 0.9 | 0.9 | 0.8 |
 
 - **The models differ 2-4 times more from each other than the frameworks do**: MONICA's soil
-  temperatures sit within the other two; the 8 models' median in MONICA is the same at the surface
-  and 0.2-0.7 °C warmer below (consistent with its lower LAI: less shading).
+  temperatures sit within the other two; the 9 models' median in MONICA is the same at the surface
+  and 0.1-0.8 °C warmer below (consistent with its lower LAI: less shading).
 - Per model (same model, other framework minus MONICA): ST identical in all three (only air
   temperature), SQ a constant +0.2/+0.4 °C (one temperature for all layers). Framework sensitive:
   AP (MONICA 1.7-2.2 °C warmer at 0-15 cm), SW (MONICA 0.8-1.6 °C cooler at 0-15 cm; MONICA gives
@@ -366,7 +374,8 @@ evenly, residue sheet (all 0 kg/ha).
   water and N stress on, Odin's standing water fixes (`SOIL_MOISTURE`), the anhydrous ammonia at FEDEP
   (17.25 cm). Not as in the ET study: 48 × 5 cm layers (24 × 10 cm there), this workbook's initial N
   per layer (spread by SOC there).
-- TAV 11.4, TAMP 17 °C, CO2 355 ppm from `Weather_stations`; MONICA's BaseTemperature = TAV.
+- TAV 11.4, TAMP 17 °C, CO2 355 ppm from `Weather_stations`; MONICA's BaseTemperature 9.5 °C (its
+  default, as at Maricopa, "Inputs"; TAV from 2026-11-17 to 2026-11-23).
 - Sprinkler irrigation at the surface; RH from VPRSD as in the ET study.
 - MO == iMO in all 6 treatments.
 
@@ -447,14 +456,14 @@ observations at Bushland.
   100-150 mm above the last measurements: irrigation it doesn't evaporate, the ET cap again).
   Drainage: SQ 0 mm, MONICA 0-99 mm.
 
-**Soil temperature** (8 models without MO; MO in SQ again has its default 9.5 °C lower boundary,
-170 cm at ~9.7 °C, TAV 11.4 °C, so the difference is smaller than at Maricopa):
+**Soil temperature** (the 9 models; MO with its default 9.5 °C lower boundary in both, within
+±0.5 °C of each other):
 
 | layer cm | 0-5 | 15-30 | 60-90 | 90-120 | 150-180 |
 |---|---|---|---|---|---|
-| median SQ - MONICA °C | +0.5 | +0.5 | +0.6 | +0.6 | +0.5 |
-| SD between the models, MONICA / SQ | 2.1 / 2.4 | 2.0 / 2.8 | 2.8 / 4.3 | 3.1 / 5.1 | 3.4 / 6.2 |
-| SD between the frameworks (same model) | 1.0 | 1.0 | 1.3 | 1.4 | 1.7 |
+| median SQ - MONICA °C | +0.6 | +0.3 | +0.5 | +0.6 | +0.4 |
+| SD between the models, MONICA / SQ | 2.2 / 2.4 | 2.0 / 2.8 | 2.7 / 4.3 | 3.0 / 5.0 | 3.4 / 5.9 |
+| SD between the frameworks (same model) | 1.0 | 1.1 | 1.4 | 1.5 | 1.6 |
 
 - As at Maricopa, the models differ more from each other than the frameworks do; the surface
   temperatures of the two frameworks are almost identical (figure 0-5 cm).
@@ -574,8 +583,8 @@ What the treatments that weren't calibrated show (ratios of final biomass / yiel
 4. Bushland: the data questions above (1 now matters: N stress on).
    Avignon once its data are clear.
 5. The AMEI branch's crop stalling with a dry topsoil (MONICA change 2).
-6. Other frameworks ("MONICA against DSSAT and SiriusQuality"): tell them MO's BaseTemperature
-   (TAV), SQ's initial water; ask the data providers about 904's IRADP 0 and the 317 mm germination
+6. Other frameworks ("MONICA against DSSAT and SiriusQuality"): SQ's MO at Maricopa (2.4-3.7 °C
+   colder at depth than DSSAT's and ours with the same 9.5 °C), SQ's initial water; ask the data providers about 904's IRADP 0 and the 317 mm germination
    irrigation; MONICA's slow infiltration into a saturated topsoil; SQ's LAIX (summary) against its
    daily LAI. Bushland ("MONICA against SiriusQuality"): SQ's AP deep layers (~24-29 °C), its 1992
    crop collapse and its initial water.

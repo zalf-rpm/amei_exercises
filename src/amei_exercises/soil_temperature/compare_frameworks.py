@@ -41,9 +41,10 @@ from amei_exercises.soil_temperature.evaluate_st import read_layers
 FRAMEWORKS = {"MO": "MONICA", "DC": "DSSAT", "SQ": "SiriusQuality"}
 FOLDER_FRAMEWORK = {name: fw for fw, name in FRAMEWORKS.items()}  # the other frameworks' folder names
 MODELS = ["AP", "DE", "DS", "MO", "PS", "SA", "SQ", "ST", "SW"]  # the 9 AMEI models (not MONICA's iMO)
-# DSSAT and SiriusQuality ran MO with its default lower boundary (BaseTemperature 9.5 °C instead of the
-# site's TAV): left out of the soil temperature ensembles (medians, spreads, figures)
-ENSEMBLE = [m for m in MODELS if m != "MO"]
+# the soil temperature ensembles (medians, spreads, figures): all 9, MO with MONICA's default lower
+# boundary (BaseTemperature 9.5 °C) in all frameworks (st_monica.BASE_TEMPERATURE_FROM_TAV off; with the
+# site's TAV leave MO out here)
+ENSEMBLE = MODELS
 # DSSAT's layers, the coarsest: the others' 5 cm layers are averaged onto them
 LAYERS = [(0, 5), (5, 15), (15, 30), (30, 45), (45, 60), (60, 90), (90, 120), (120, 150), (150, 180), (180, 210)]
 
@@ -290,7 +291,7 @@ def temperature_tables(t: pd.DataFrame, frameworks: list[str]) -> tuple[pd.DataF
     spread = []
     wide = wide[wide["model"].isin(ENSEMBLE)]
     for (top, bottom), d in wide.groupby(["top", "bottom"]):
-        # between models: SD over the 8 models per framework, treatment, day; mean over all
+        # between models: SD over the ENSEMBLE models per framework, treatment, day; mean over all
         between_models = {fw: d.groupby(["TREAT_ID", "DATE"])[fw].std().mean() for fw in frameworks}
         between_fw = d[frameworks].std(axis=1).mean()
         med = d.groupby(["TREAT_ID", "DATE"])[frameworks].median()
@@ -368,8 +369,8 @@ def plot_temperature(t: pd.DataFrame, site: str, top: int, bottom: int, path: Pa
     d = common_dates(t[(t["top"] == top) & (t["bottom"] == bottom) & t["model"].isin(ENSEMBLE)])
     tids = sorted(d["TREAT_ID"].unique())
     fig, axes = panels(
-        f"{site}: soil temperature {top}-{bottom} cm, daily mean, median (line) and range (band) of 8 models"
-        " per framework (without MO)", len(tids),
+        f"{site}: soil temperature {top}-{bottom} cm, daily mean, median (line) and range (band) of the"
+        f" {len(ENSEMBLE)} models per framework", len(tids),
     )  # fmt: skip
     for ax, tid in zip(axes, tids, strict=True):
         style(ax)

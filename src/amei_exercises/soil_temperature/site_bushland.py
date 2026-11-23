@@ -23,6 +23,7 @@ from amei_exercises.soil_temperature.st_monica import (
     horizons,
     nan_to_none,
     read_sheets,
+    soil_temperature_params,
     to_date,
     treatment_id_resolver,
     weather,
@@ -129,9 +130,9 @@ def load(xlsx: Path = XLSX) -> list[Setup]:
                 co2=nan_to_none(st.get("CO2Y")),
                 tav=float(st["TAV"]),
                 tamp=float(st["TAMP"]),
-                # MONICA's own soil temperature: the lower boundary, its TAV (default 9.5 °C, Germany)
+                # MONICA's own soil temperature: its lower boundary 9.5 °C or TAV (st_monica.BASE_TEMPERATURE_FROM_TAV)
                 site_params={
-                    "SoilTemperatureParameters": {"BaseTemperature": float(st["TAV"])},
+                    **soil_temperature_params(float(st["TAV"])),
                     "SoilMoistureParameters": dict(SOIL_MOISTURE),
                 },
                 albedo=nan_to_none(soil_meta.loc[soil_id].get("SALB")),

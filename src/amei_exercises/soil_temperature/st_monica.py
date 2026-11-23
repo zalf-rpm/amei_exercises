@@ -42,6 +42,7 @@ from amei_exercises.icasa import horizons, read_sheets, treatment_id_resolver, w
 from amei_exercises.paths import ET_DIR, MARICOPA_DIR, ST_DIR
 
 __all__ = [
+    "soil_temperature_params",
     "daily_obs",
     "DEFAULT_MONICA_RUN",
     "ET_DIR",
@@ -84,6 +85,17 @@ MODELS = {
     # not part of the protocol: MONICA's own implementation, to compare MO with
     "iMO": "internal",
 }
+
+# MONICA's own soil temperature (MO, iMO): its lower boundary BaseTemperature the site's TAV (True) or
+# MONICA's default 9.5 °C (False). Off: DSSAT and SiriusQuality run MO with 9.5 °C, as did the sensitivity
+# analysis, so the results stay comparable to theirs (FINDINGS.md, "Inputs")
+BASE_TEMPERATURE_FROM_TAV = False
+
+
+def soil_temperature_params(tav: float) -> dict[str, Any]:
+    """The site parameters' SoilTemperatureParameters: BaseTemperature = TAV if BASE_TEMPERATURE_FROM_TAV."""
+    return {"SoilTemperatureParameters": {"BaseTemperature": tav}} if BASE_TEMPERATURE_FROM_TAV else {}
+
 
 # the AMEI templates are Windows-1252 (°C, m²/m²) and want "na" for what a model doesn't simulate
 TEMPLATE_ENCODING = "cp1252"
