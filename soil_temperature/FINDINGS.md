@@ -252,9 +252,10 @@ Deviation from the median of the 9 AMEI models, all treatments and days, mean (R
 
 ## MONICA against DSSAT and SiriusQuality (Maricopa, `compare-frameworks`, 2026-11-23)
 
-The other frameworks' submissions (downloaded into `out_maricopa_other_models/`: DSSAT 4.8.2
-`AMEI_Maricopa_wheat_FACE_sim_results_20260917/` (DC), SiriusQuality `CAN/` (daily), `SOIL/`
-(layers) and `SUM/` (summary, all models in one file) (SQ)) against our `out_maricopa` (MO), with `pixi run compare-frameworks` ->
+The other frameworks' submissions (downloaded into `out_maricopa_other_models/`, one folder per
+framework like our results: DSSAT 4.8.2 `DSSAT_2026-09-17/` (DC), SiriusQuality
+`SiriusQuality_2026-03-12/` (SQ, the summary of all models in one file)) against our `out_maricopa`
+(MO), with `pixi run compare-frameworks` ->
 `out_maricopa/framework_comparison/` (crop.csv, water.csv, soil_temperature*.csv, figures). Each
 framework has its own crop, water balance and layering (DSSAT: 10 layers, 0-5, 5-15, 15-30 ... 180-210
 cm; the 5 cm layers of the others are averaged onto them); compared on the days all three simulated
@@ -392,14 +393,77 @@ Data questions (for Thiago Berton Ferreira):
    temperature themselves, not used.
 7. Anhydrous ammonia injected at 17.25 cm: applied at that depth since 2026-11-18 (Odin's
    MineralFertilization `depth`), at the surface before.
+8. **Observed 1993 yields differ from the ET study's workbook**: HWAM TXBL1993F 4632, TXBL1993P
+   3463 kg/ha here, 6422 and 5031 there (LAIX, the other years the same). Which is right?
 
 Model state with the calibrated cultivar (2026-11-18): close to the ET study's runs. Anthesis
 1990-05-16/19, 1992-05-06, 1993-05-14/15; all treatments mature; LAI max 3.3-4.6.
-Yields (t/ha, MO, obs F 4.5/5.8/6.4, P 1.9/3.2/5.0): F 4.5/5.0/4.5, P 1.1/5.0/3.0 (ET study F
+Yields (t/ha, MO, obs F 4.5/5.8/6.4, P 1.9/3.2/5.0 in the ET study's workbook, 1993 4.6/3.5 in this one, data question 8): F 4.5/5.0/4.5, P 1.1/5.0/3.0 (ET study F
 4.3/4.4/4.4, P 1.0/4.3/3.1). With the workbook's original 1993 fertilization (data question 1:
 F 50 kg N, P none) 1993 was F 3.3, P 2.1 t/ha; the correction changes only 1993's soil temperatures,
 by 0-0.07 °C on average (SW: 0.06/0.45 °C, 0-20 cm in P 1.0 °C, max 4.8 °C). Before (uncalibrated):
 LAI max 11-13, maturity 2-4 weeks late, not reached in TXBL1990F and 1993.
+
+## MONICA against SiriusQuality (Bushland, `compare-frameworks --site bushland`, 2026-11-23)
+
+SiriusQuality's submission (`out_bushland_other_models/SiriusQuality_2026-03-12/`, no DSSAT yet)
+against our `out_bushland`, as for Maricopa -> `out_bushland/framework_comparison/` (also `et.png`).
+SQ numbers the treatments 501-506: the Treatments sheet's order (TXBL1990F, 1990P, 1992F, 1992P,
+1993F, 1993P; the seasons' years and F > P in ET confirm it). SQ runs from its sowing (1993: 09-26,
+3 days before PDATE) to a day after maturity, MONICA from SDAT to ENDAT; compared on the common days.
+Observations from this study's workbook: daily ET (lysimeters), daily LAI and biomass, soil water
+20-180 cm from the lysimeters' neutron probe (10-170 cm every 20 cm, the deepest it has; Maricopa:
+20-200 cm), anthesis of TXBL1992P from the daily Zadoks stages (no ADAT). No soil temperature
+observations at Bushland.
+
+**Crop** (median over the 9 models; t/ha, obs yield see data question 8):
+
+| | anthesis | maturity | LAI max | yield F 90/92/93 | yield P 90/92/93 |
+|---|---|---|---|---|---|
+| obs | 05-25/22, 05-08/04-30, 05-15/18 | 06-06 to 06-21 | 2.4-7.1 | 4.5/5.8/4.6 | 1.9/3.2/3.5 |
+| MONICA | 05-17/20, 05-05, 05-14/15 | 06-08 to 06-23 | 3.3-4.7 | 4.5/5.0/4.5 | 1.1/5.0/2.9 |
+| SQ | 05-19, 05-10/11, 05-13/15 | 05-22 to 06-08 | 1.4-7.3 | 4.0/1.9/3.9 | 0.7/1.0/1.4 |
+
+- **SQ's 1992 crop collapses**: LAI from 7.3 (F, as observed) to 0 in ~20 days after anthesis,
+  the run ends at Zadoks 75 (maturity 05-24/22), two weeks before the observed maturity: 1.9/1.0 t/ha
+  against 5.8/3.2. Its P treatments stay small all season (LAI max 1.4/4.2/1.7 against 2.4/5.9/4.0).
+- MONICA is closer in yield except 1992P (5.0 against 3.2: MONICA's P differs little from F that
+  year); its LAI is too low in 1992 (4.7 against 7.1/5.9) and too high in 1990P.
+- SQ's LAIX (summary) is again below its daily LAI maximum (0.61-0.91 of it), as at Maricopa.
+
+**Water** (median over the 9 models, days both simulated):
+
+| | ET bias mm/d | ET RMSE mm/d (daily) | soil water 20-180 cm bias mm |
+|---|---|---|---|
+| MONICA | -0.04 to -0.96 | 1.3-1.8 | +14 to +74 |
+| SQ | -0.50 to -1.01 | 1.2-2.0 | -31 to -110 |
+
+- Both underestimate the lysimeter ET. MONICA's peak ET is flat at ~6.5 mm/d in the F treatments
+  (the ET cap, "MONICA changes" 5) while the lysimeters measure 10-12 mm/d; SQ reaches those peaks
+  on single days but drops early in 1992 (the collapse).
+- **SQ starts 60-130 mm drier** in 20-180 cm than the first measurements (initial SWLD ~0.2-0.26,
+  the workbook has up to 0.35 in 1993) and stays below most of them; MONICA starts within ~25 mm of
+  the first measurement but gets too wet in the F treatments' last weeks (1990F, 1993F up to
+  100-150 mm above the last measurements: irrigation it doesn't evaporate, the ET cap again).
+  Drainage: SQ 0 mm, MONICA 0-99 mm.
+
+**Soil temperature** (8 models without MO; MO in SQ again has its default 9.5 °C lower boundary,
+170 cm at ~9.7 °C, TAV 11.4 °C, so the difference is smaller than at Maricopa):
+
+| layer cm | 0-5 | 15-30 | 60-90 | 90-120 | 150-180 |
+|---|---|---|---|---|---|
+| median SQ - MONICA °C | +0.5 | +0.5 | +0.6 | +0.6 | +0.5 |
+| SD between the models, MONICA / SQ | 2.1 / 2.4 | 2.0 / 2.8 | 2.8 / 4.3 | 3.1 / 5.1 | 3.4 / 6.2 |
+| SD between the frameworks (same model) | 1.0 | 1.0 | 1.3 | 1.4 | 1.7 |
+
+- As at Maricopa, the models differ more from each other than the frameworks do; the surface
+  temperatures of the two frameworks are almost identical (figure 0-5 cm).
+- Per model (SQ minus MONICA): ST +0.05, DS ±0.2, PS ±0.2, DE -0.1 to -0.4, SA 0 to -0.7 °C (deeper
+  colder), SW +1.7 °C at 0-5 cm to 0 at 180 cm, SQ a constant +1.6 °C (one temperature for all
+  layers). **AP in SQ is +2.4 °C at the surface to +8.2 °C at 180 cm**: its deep layers start at
+  ~29 °C (TXBL1993F, 170 cm) and stay at ~24 °C on average against TAV 11.4 °C (MONICA's AP 15.5 °C):
+  an initialization or lower boundary problem in SQ's AP, which also makes SQ's between-model SD
+  at depth almost twice MONICA's.
 
 ## Maricopa calibration (`calibrate.py --site maricopa`, 2026-11-18; `calibration/calibrate.sh`)
 
@@ -513,4 +577,5 @@ What the treatments that weren't calibrated show (ratios of final biomass / yiel
 6. Other frameworks ("MONICA against DSSAT and SiriusQuality"): tell them MO's BaseTemperature
    (TAV), SQ's initial water; ask the data providers about 904's IRADP 0 and the 317 mm germination
    irrigation; MONICA's slow infiltration into a saturated topsoil; SQ's LAIX (summary) against its
-   daily LAI.
+   daily LAI. Bushland ("MONICA against SiriusQuality"): SQ's AP deep layers (~24-29 °C), its 1992
+   crop collapse and its initial water.
