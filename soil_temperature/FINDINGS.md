@@ -374,6 +374,10 @@ evenly, residue sheet (all 0 kg/ha).
   water and N stress on, Odin's standing water fixes (`SOIL_MOISTURE`), the anhydrous ammonia at FEDEP
   (17.25 cm). Not as in the ET study: 48 × 5 cm layers (24 × 10 cm there), this workbook's initial N
   per layer (spread by SOC there).
+- Calibrated parameters other than phenology (the protocol asks for them):
+  `out_bushland/results/MO_Parameters for Bushland.xlsx` (from `Bushland/XX_Parameters for
+  Bushland.xlsx`): MaxAssimilationRate, SpecificLeafArea (stages 1-4, one factor), the leaves'
+  OrganSenescenceRate (stage 4, from anthesis), all cultivar; phenology in the notes below the table.
 - TAV 11.4, TAMP 17 °C, CO2 355 ppm from `Weather_stations`; MONICA's BaseTemperature 9.5 °C (its
   default, as at Maricopa, "Inputs"; TAV from 2026-11-17 to 2026-11-23).
 - Sprinkler irrigation at the surface; RH from VPRSD as in the ET study.
@@ -482,7 +486,11 @@ against ET, no crop parameters that change MONICA's crop ET0, two seeds per step
 study's (42 × 5 cm, N response on, FACE CO2, buried drip) plus the ponding/infiltration fixes
 (`SOIL_MOISTURE` in site_maricopa.py, also for the soil temperature runs, rerun with the calibrated cultivar on 2026-11-18).
 Results in `soil_temperature/calibration/maricopa_*`, parameters in
-`soil_temperature/params/crops/{cultivar_spring-wheat,species_wheat}_maricopa_*.json`.
+`soil_temperature/params/crops/{cultivar_spring-wheat,species_wheat}_maricopa_*.json`. The calibrated
+parameters other than phenology (the protocol asks for them), the study's (steps 1, 4-6):
+`out_maricopa/results/MO_Parameters for Maricopa FACE.xlsx` (from `Maricopa wheat FACE/XX_Parameters
+for Maricopa FACE.xlsx`; 17 cultivar values and the species' InitialOrganBiomass, phenology in the
+notes below the table).
 
 - **Step 1, phenology** (all 16 treatments, emergence, ear emergence = start of stage 4, anthesis,
   maturity; 64 dates): emergence 186 °C d (80), stages 2-3 ×0.82, stage 4 49 °C d (180; ear
