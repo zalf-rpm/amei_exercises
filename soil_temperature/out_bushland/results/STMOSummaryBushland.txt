@@ -1,5 +1,5 @@
 Bushland, TX
-Model:	MONICA (Stics_soil_temperature, monica_odin simplify_copilot@6fa7f9a8)
+Model:	MONICA (Stics_soil_temperature, monica_odin simplify_copilot@790ce3ca)
 Modeler_name:	Michael Berg-Mohnicke
 
 framework_ID	model_ID	treatment_ID	planting_date	emergence_date	anthesis_date	physiologic_maturity_dat	leaf_no_per_stem_matur	leaf_area_index_maximum	PAR_interception_over_season	tops_dry_weight_anthesis	tops_dry_weight_maturity	grain_dry_wt_at_mat	harvest_no_at_maturity	grain_unit_dry_wt_matur	tops_N_at_anthesis	tops_N_at_maturity	grain_N_at_maturity	grain_unit_N_matur	root_depth_maximum	avail_water_soil_profile_sow_mat	drainage_over_season	runoff_over_season	avail_N_inorganic_soil_profile_over_season	N_leached_during_season	N_mineralization_during_season	N2O_emissions__over_season	N_immobilization_cumul	N_denitrification_over_season	potential_evapotrans_over_season	evapotrans_over_season	potential_soil_evaporation_over_season	soil_evap_over_season	potential_transpiration_over_season	transpiration_over_season
@@ -7,7 +7,7 @@ text	text	text	date	date	date	date	leaf\mainstem	m /m 	%	kg[DM]/ha	kg[DM]/ha	kg[
 FRAMEWORK_ID	MODEL_ID	TREAT_ID	PDATE	PLDAE	ADAT	MDAT	LnoSM	LAIX	LIPCCM	CWAA	CWAM	GWAM	HnoAM	GWGM	CNAA	CNAM	GNAM	GNGM	RDPM	WAVSSM	DRCM	ROCM	NIAVSSM	NLCM	NMNCM	N2OECM	NIMCM	NDNCM	EOCM	ETCM	EPSCM	ESCM	EPPCM	EPCM
 MO	ST	TXBL1990F	1989-10-11	1989-10-22	1990-05-20	1990-06-20	na	3.7819	na	12085.1	14260.7	4410.3	na	na	151.4	157.3	74.2969	na	3.9	na	0	0	na	0	16.5616	0.6759	na	0.0989	838.5	633.2	na	207.8	375.7	375.3
 MO	ST	TXBL1990P	1989-10-11	1989-10-22	1990-05-17	1990-06-08	na	3.5459	na	9890.3	9862.5	1139.8	na	na	93.3	96.6	20.0251	na	4	na	0	0	na	0	21.5502	0.4009	na	0.0013	701.1	435.5	na	170.9	333.6	245.5
-MO	ST	TXBL1992F	1991-09-27	1991-10-06	1992-05-05	1992-06-22	na	4.6483	na	13206.9	15969.9	4991.3	na	na	130	141.2	67.2562	na	3.9	na	87.0651	0	na	6.125	19.9323	1.3314	na	0.072	769.1	687.4	na	230	392.2	392.2
-MO	ST	TXBL1992P	1991-09-27	1991-10-06	1992-05-05	1992-06-23	na	4.6573	na	13262.1	16047.6	5045.4	na	na	135	148.9	71.2426	na	3.9	na	63.7209	0	na	4.683	31.5267	1.4079	na	0.0161	772.9	677.7	na	231.2	392.7	392.7
-MO	ST	TXBL1993F	1992-09-29	1992-10-08	1993-05-15	1993-06-22	na	3.8881	na	11365.7	13736.5	4434.3	na	na	109.3	118.8	57.9726	na	3.9	na	5.8506	0	na	1.026	16.3755	0.318	na	0.0679	845	684.5	na	240.5	397.6	397.6
-MO	ST	TXBL1993P	1992-09-29	1992-10-08	1993-05-14	1993-06-15	na	3.2837	na	8641.7	10026	2847	na	na	61.9	70.4	31.1377	na	3.9	na	8.1647	0	na	1.094	28.0176	0.2491	na	0.008	791.6	618.5	na	223.8	362.3	362.3
+MO	ST	TXBL1992F	1991-09-27	1991-10-06	1992-05-05	1992-06-22	na	4.6479	na	13204.3	15962.9	4986	na	na	129.8	140.9	67.0798	na	3.9	na	100.032	0	na	5.937	19.932	1.3314	na	0.072	769.1	687.4	na	229.9	392.1	392.1
+MO	ST	TXBL1992P	1991-09-27	1991-10-06	1992-05-05	1992-06-23	na	4.6569	na	13259.2	16038.5	5038.2	na	na	134.6	147.7	70.6203	na	3.9	na	76.6876	0	na	4.512	31.5255	1.4079	na	0.0162	772.9	677.7	na	231.2	392.7	392.7
+MO	ST	TXBL1993F	1992-09-29	1992-10-08	1993-05-15	1993-06-22	na	3.88	na	11332.9	13695.2	4421.6	na	na	108.6	118.1	57.6476	na	3.9	na	11.2103	0	na	1.379	16.3189	0.3175	na	0.0683	844.9	684.3	na	240.7	397.2	397.2
+MO	ST	TXBL1993P	1992-09-29	1992-10-08	1993-05-14	1993-06-15	na	3.2796	na	8623.1	9999.3	2836	na	na	61.6	70.2	31.0161	na	3.9	na	13.5243	0	na	1.449	27.9612	0.2486	na	0.0083	791.4	618.5	na	223.8	362.1	362.1

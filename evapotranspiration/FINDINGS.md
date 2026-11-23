@@ -253,7 +253,9 @@ against the other humidity columns.
   10 cm** = the whole 2.4 m profile (2026-11-17: 21 x 10 cm = 2.1 m, before 42 x 5 cm, no reason
   recorded for leaving out the bottom 30 cm), see "10 cm layers" below. 2.1 -> 2.4 m changes the
   season ETa by at most 0.2 mm (default cultivar).
-- Initial moisture above FC in 1992 (deep layers) and 1993 (5-70 cm): set to FC.
+- Initial moisture above FC in 1992 (deep layers) and 1993 (5-70 cm): kept since 2026-11-23 (MONICA
+  accepts up to saturation since monica_odin 790ce3ca; set to FC before). The excess drains; yields
+  -0…-12 kg/ha, ET unchanged.
 - Initial N: only `ICIN` = 25 kg N/ha, spread evenly over the profile. Nitrogen response is off.
 - Anhydrous ammonia as 100 % NH4. Harvest on the given dates.
 - `WaterDeficitResponseOn` is **true**; `sim_full_run.json` has it false, which would make the
@@ -275,7 +277,8 @@ against the other humidity columns.
 - Soil: 4 horizons to 190 cm (the last one extended from 160 cm by the providers); 38 layers.
   No pH, stones or C/N: MONICA defaults. Initial N from `NOSLD_kgperha`/`NHSLD_kgperha` per
   horizon.
-- Initial moisture slightly above FC in a few layers (2004, 2010, 2012): set to FC. 2012 has
+- Initial moisture slightly above FC in a few layers (2004, 2010, 2012): kept since 2026-11-23 (set
+  to FC before; results unchanged). 2012 has
   only 4 initial moisture layers, simulated by the providers (SIMPLACE Lintul-5).
 - Fertilizer FE001 (ammonium nitrate) as 50 % NH4 / 50 % NO3; the P/K applications (FE009)
   are skipped. Previous crop residues (ICRAG) and tillage are not used.
@@ -471,9 +474,9 @@ out_bushland ("Orig") rerun with it. Step 3 checked again: RMSE 0.6 -> 0.5 t/ha 
 | TXBL1990F | -0.75 | 1.82 | 3.6 / 3.8 | 4475 / 4308 |
 | TXBL1990P | 0.02 | 1.38 | 2.4 / 3.4 | 1898 / 977 |
 | TXBL1992F | -0.80 | 1.64 | 7.1 / 4.5 | 5847 / 4371 |
-| TXBL1992P | -0.15 | 1.61 | 5.9 / 4.5 | 3197 / 4303 |
-| TXBL1993F | -0.73 | 1.68 | 4.1 / 4.1 | 6422 / 4377 |
-| TXBL1993P | -0.50 | 1.36 | 4.0 / 3.8 | 5031 / 3094 |
+| TXBL1992P | -0.15 | 1.61 | 5.9 / 4.5 | 3197 / 4302 |
+| TXBL1993F | -0.73 | 1.68 | 4.1 / 4.1 | 6422 / 4365 |
+| TXBL1993P | -0.50 | 1.36 | 4.0 / 3.8 | 5031 / 3086 |
 
 Phenology: emergence -3…+2 d, anthesis -5…+4 d, maturity -2…+12 d (TXBL1992P). Open, none of them
 for the calibration: N (F yields 1992/1993, data providers), FC at 80-140 cm (data providers),

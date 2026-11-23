@@ -89,8 +89,8 @@ MO and iMO give identical results (all 16 treatments), as in the old flow's setu
 ## MONICA changes (monica_odin and monica_amei)
 
 All committed and pushed: monica_odin branch `simplify_copilot`, monica_amei branch `amei`. The
-current results were made with Odin 6fa7f9a8. Odin e6812106 (2026-11-20, units and names only) gives
-the same results.
+Maricopa results were made with Odin 6fa7f9a8, Bushland's (and the ET study's) with 790ce3ca (change 6,
+2026-11-23). The commits between them (units and names only) give the same results.
 
 1. **TAV/TAMP could not be passed** (Odin 1c1f3e76). Odin always calculated them from the climate data, which
    averages over all 12 months with a month without data counting as 0 °C (and drops the last
@@ -126,6 +126,13 @@ the same results.
    `MaxPotentialEvapotranspiration` in the SoilMoistureParameters, default 6.5 as before. Not changed
    here: Maricopa's dry season and Bushland's irrigated seasons still hit it
    (evapotranspiration/FINDINGS.md, model issue 1).
+
+6. **Initial soil moisture up to saturation** (2026-11-23; Odin 790ce3ca, mas_cpp_misc dc7020f on
+   main for the C++ master (monica fcf7540d), a26db15 on mas_cpp_misc's branch `amei` for the AMEI
+   branch (monica_amei 07cbfd47), cherry-picked onto its pinned 96be5bc). `SoilMoisturePercentFC`
+   was an error above 100 % of FC; now above PoreVolume / FC × 100. Measured initial moisture above
+   FC (Bushland, a few Avignon layers) is used as given (`et_monica.py`, capped at saturation), the
+   soil water model drains the excess. Inputs valid before: unchanged.
 
 Not a change: the previous crop's residue (since 2026-11-19, "Inputs (Maricopa)") uses
 OrganicFertilization's existing `incorporateIntoLayerNo` and `incorporation`.
@@ -270,7 +277,10 @@ Data questions (for Thiago Berton Ferreira):
 3. Initial water and N end at 220 cm: layers 45-48 get MONICA's defaults (water: the default,
    N: 2.75 kg N/ha per layer).
 4. Initial water above field capacity (TXBL1992 140-220 cm: 0.32-0.35 vs FC 0.30; TXBL1993
-   25-70 cm) is set to FC, MONICA's maximum.
+   25-70 cm): set to FC until 2026-11-23, MONICA's maximum then. Since MONICA accepts up to
+   saturation (0.46-0.47 here; "MONICA changes" 6), the measured values are used and the excess
+   drains (TXBL1992F +25 mm, TXBL1993F +5 mm drainage over the season). Soil temperature: at most
+   0.2 °C on single days (SA), the deviation table changes by 0.01 °C at most.
 5. The comments say RAIN_FULL for F and RAIN_PART for P, the sheet has a single RAIN column.
 6. ICLST (initial soil temperature per layer, 1990/1992): MONICA and the modules start their soil
    temperature themselves, not used.

@@ -12,7 +12,7 @@
   },
   "debug?": false,
   "path-to-output": "./",
-  "include-file-base-path": "/home/berg/GitHub/amei_exercises/evapotranspiration/phase_1/params/",
+  "include-file-base-path": "/home/berg/GitHub/amei_exercises/evapotranspiration/params/",
   "_include-file-base-path": "params/",
   "UseSecondaryYields": false,
   "NitrogenResponseOn": true,

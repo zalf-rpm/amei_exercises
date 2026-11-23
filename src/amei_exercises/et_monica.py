@@ -392,7 +392,7 @@ def soil_layers(s: Setup) -> tuple[list[dict[str, Any]], list[str]]:
             f"profile ends at {s.horizons[-1].bottom_cm} cm, last horizon extended to {profile_depth * 100:g} cm"
         )
 
-    layers, above_fc = [], []
+    layers, above_fc, above_sat = [], [], []
     for i in range(s.no_of_layers):
         top_cm, bottom_cm = i * dz * 100, (i + 1) * dz * 100
         h = horizon_at(i)
@@ -414,11 +414,15 @@ def soil_layers(s: Setup) -> tuple[list[dict[str, Any]], list[str]]:
             layer["Sceleton"] = [h.stones / 100, "m3 m-3"]
         theta = depth_weighted(s.initial_moisture, top_cm, bottom_cm)
         if theta is not None:
+            # MONICA accepts up to saturation (monica_odin 790ce3ca, before: up to FC); above FC drains
             percent_fc = theta / h.fc * 100
+            max_percent_fc = math.floor(h.sat / h.fc * 100 * 1000) / 1000
             if percent_fc > 100:
                 above_fc.append(f"{i + 1} ({theta:.3f} > {h.fc})")
-                percent_fc = 100.0  # MONICA accepts at most 100 % of FC
-            layer["SoilMoisturePercentFC"] = [round(percent_fc, 3), "% [0-100]"]
+            if percent_fc > max_percent_fc:
+                above_sat.append(f"{i + 1} ({theta:.3f} > {h.sat})")
+                percent_fc = max_percent_fc
+            layer["SoilMoisturePercentFC"] = [round(percent_fc, 3), "% [0-saturation]"]
         horizon_m = (h.bottom_cm - h.top_cm) / 100
         if s.initial_n:
             no3 = depth_weighted(no3_conc, top_cm, bottom_cm)
@@ -437,7 +441,9 @@ def soil_layers(s: Setup) -> tuple[list[dict[str, Any]], list[str]]:
             layer["SoilAmmonium"] = [h.ammonium_kg_ha / 10000.0 / horizon_m, "kg NH4-N m-3"]
         layers.append(layer)
     if above_fc:
-        notes.append(f"initial moisture above field capacity, set to FC, in layer(s) {', '.join(above_fc)}")
+        notes.append(f"initial moisture above field capacity (kept, drains) in layer(s) {', '.join(above_fc)}")
+    if above_sat:
+        notes.append(f"initial moisture above saturation, set to saturation, in layer(s) {', '.join(above_sat)}")
     if not s.initial_moisture:
         notes.append("no initial moisture given, MONICA's default used")
     if no_n:
