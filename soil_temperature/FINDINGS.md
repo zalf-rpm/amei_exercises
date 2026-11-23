@@ -86,9 +86,13 @@ MO and iMO give identical results (all 16 treatments), as in the old flow's setu
   "Maricopa Wheat FACE"), and an empty 4th line added where a template has none (Maricopa's summary,
   Bushland's daily), so the data start on line 8 as the checklist wants.
 
-## MONICA changes (monica_odin and monica_amei, uncommitted)
+## MONICA changes (monica_odin and monica_amei)
 
-1. **TAV/TAMP could not be passed.** Odin always calculated them from the climate data, which
+All committed and pushed: monica_odin branch `simplify_copilot`, monica_amei branch `amei`. The
+current results were made with Odin 6fa7f9a8. Odin e6812106 (2026-11-20, units and names only) gives
+the same results.
+
+1. **TAV/TAMP could not be passed** (Odin 1c1f3e76). Odin always calculated them from the climate data, which
    averages over all 12 months with a month without data counting as 0 °C (and drops the last
    month). A December-May season: TAV 5.4 °C, TAMP 18 °C instead of 21 and 11.1 °C. With these,
    the deep layers of AP, PS, SW, DE, DS, SA stayed at 5-9 °C instead of about 20 °C.
@@ -97,7 +101,8 @@ MO and iMO give identical results (all 16 treatments), as in the old flow's setu
    one (`NOTE(deviation)`: only the modules use it). Runs without modules: byte-identical (Bushland and
    Avignon ET runs checked). `pixi run test` (100) and `tests/check_drivers.py` pass.
    The C++ AMEI branch has the same calculation bug (mas_cpp_misc `calcTAMPandTAV`), not changed.
-2. **Subsurface irrigation.** The AMEI branch's Irrigation `"atLayer"` (51c4fb12) never took effect:
+2. **Subsurface irrigation** (Odin 1c1f3e76; AMEI branch e18a0b2b, also on the C++ master as
+   1fa67c48). The AMEI branch's Irrigation `"atLayer"` (51c4fb12) never took effect:
    `Irrigation::apply` passed the layer as `applyIrrigation`'s third argument, the unused sulfate
    concentration, and even `SoilColumn::applyIrrigation(..., atLayer)` moved only the nitrate there,
    the water always went to the surface water storage. (The flow component's `int(IRADP / 5)` also
@@ -110,6 +115,20 @@ MO and iMO give identical results (all 16 treatments), as in the old flow's setu
    The AMEI branch's crop, though, stalls for 6 weeks after emergence in 901 with the topsoil dry
    (biomass 100 kg/ha, no transpiration) where Odin's grows: a difference of the two crop codes on
    the same soil water (with surface irrigation they agree within 1 %), not looked into.
+3. **Placed mineral fertiliser** (Odin 6fa7f9a8): MineralFertilization takes `"atLayer"` (1-based)
+   or `"depth"` [m] and puts the N into that layer instead of the top layer. Used for Bushland's
+   anhydrous ammonia at FEDEP 17.25 cm. Without them: as before.
+4. **Standing water switches** (Odin f01a03be, both off by default, then identical to the C++;
+   evapotranspiration/FINDINGS.md, model issues 4 and 5): `PondEvaporationByCoverage` and
+   `InfiltrationByDepth` in the SoilMoistureParameters. Both on in all runs here (`SOIL_MOISTURE`
+   in site_maricopa.py and site_bushland.py), as in the ET study.
+5. **The 6.5 mm/d ET cap as a parameter** (Odin d343fb82, AMEI branch 6f45f395):
+   `MaxPotentialEvapotranspiration` in the SoilMoistureParameters, default 6.5 as before. Not changed
+   here: Maricopa's dry season and Bushland's irrigated seasons still hit it
+   (evapotranspiration/FINDINGS.md, model issue 1).
+
+Not a change: the previous crop's residue (since 2026-11-19, "Inputs (Maricopa)") uses
+OrganicFertilization's existing `incorporateIntoLayerNo` and `incorporation`.
 
 ## Things MONICA can't represent (questions for the data providers)
 
