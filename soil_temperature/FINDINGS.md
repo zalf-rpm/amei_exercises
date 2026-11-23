@@ -10,6 +10,7 @@ no FBP flow. Shares the ET study's MONICA input code (`et_monica.py`) and its IC
     soil_temperature/calibration/calibrate.sh   # the Maricopa calibration, step by step
     pixi run evaluate-maricopa --cultivar ... --out ...   # all 16 Maricopa treatments vs observed
     pixi run evaluate-st --site maricopa|bushland   # the models against each other, plots per depth
+    pixi run compare-frameworks   # Maricopa: MONICA against DSSAT's and SiriusQuality's submissions
 
 - `site_maricopa.py`, `site_bushland.py`: the site's workbook -> one `Setup` per treatment
 - `st_monica.py`: the soil temperature models, the outputs, the three result files
@@ -244,6 +245,100 @@ Deviation from the median of the 9 AMEI models, all treatments and days, mean (R
   all layers (model note 3). In Maricopa's winter SQ, ST and AP form the band's lower edge at 1 m
   (~7-10 °C against ~15 °C for MO/median), DE and SA the upper one.
 
+## MONICA against DSSAT and SiriusQuality (Maricopa, `compare-frameworks`, 2026-11-23)
+
+The other frameworks' submissions (downloaded into `out_maricopa_other_models/`: DSSAT 4.8.2
+`AMEI_Maricopa_wheat_FACE_sim_results_20260917/` (DC), SiriusQuality `CAN/` (daily) and `SOIL/`
+(layers) (SQ)) against our `out_maricopa` (MO), with `pixi run compare-frameworks` ->
+`out_maricopa/framework_comparison/` (crop.csv, water.csv, soil_temperature*.csv, figures). Each
+framework has its own crop, water balance and layering (DSSAT: 10 layers, 0-5, 5-15, 15-30 ... 180-210
+cm; the 5 cm layers of the others are averaged onto them); compared on the days all three simulated
+(DSSAT starts at its planting date, SQ ends a day after maturity, about 3 weeks before harvest).
+Neither is a reference, and MONICA is calibrated against these observations (steps 1, 4-6), the others
+maybe not.
+
+**Their setups differ from ours:**
+
+1. **MO in DSSAT and SiriusQuality runs with its default lower boundary** (`BaseTemperature` 9.5 °C,
+   not the site's TAV 21 °C, see "Inputs"): its 210 cm layer starts at 9.5 °C in both, stays there in
+   SQ, and MO is 4-7 °C colder than ours at depth (DC -4.1, SQ -6.7 °C at 180-210 cm). Worth telling
+   them; MO is left out of the comparison's medians and spreads.
+2. **Planting dates:** DSSAT plants 6-13 days later than the workbook's PDATE (1992-12-26,
+   1993-12-13, 1995-12-21, 1996-12-28 against 12-15, 12-07, 12-15, 12-15), on the day of the first
+   (germination) irrigation; emergence is within a few days of the observed in all three anyway.
+3. **SiriusQuality's initial soil water is the same in all years** (0.22/0.24/0.24/0.24/0.22/0.20/0.16
+   at 5/15/30/60/90/120/210 cm), not the workbook's per-season values, and it has no drainage (0 mm
+   in all treatments).
+4. **DSSAT starts very wet** (0.45-0.47 at 0-30 cm on day one, above the workbook's saturation
+   0.42) and drains 125-350 mm in 1993 (MONICA 50-270 mm, see below).
+
+**Crop** (median of the 9 models; obs = Obs_crop_summary_means and the maximum of the daily biomass):
+
+| | LAI max bias / RMSE | biomass max bias / RMSE t/ha | yield bias / RMSE t/ha |
+|---|---|---|---|
+| MONICA | +0.3 / 0.9 | -1.7 / 2.9 | +0.1 / 1.3 |
+| DSSAT | +1.0 / 2.0 | -1.2 / 3.2 | -0.2 / 1.5 |
+| SiriusQuality | +1.9 / 2.0 | +1.9 / 2.8 | +3.2 / 3.4 |
+
+- DSSAT and SQ reach LAI 7-10 (observed 4-7), SQ yields 9-13 t/ha (observed 5-9).
+- **Treatment responses** (biomass ratio; yield similar):
+
+  | | obs | MONICA | DSSAT | SQ |
+  |---|---|---|---|---|
+  | dry/wet 1993 ambient / FACE | 0.77 / 0.95 | 0.94 / 0.94 | 0.93 / 0.96 | 0.93 / 0.85 |
+  | dry/wet 1994 ambient / FACE | 0.72 / 0.75 | 0.75 / 0.66 | 0.80 / 0.70 | 0.85 / 0.89 |
+  | FACE/ambient (wet or high N), 1993 / 94 / 96 / 97 | 1.09 / 1.14 / 1.15 / 1.22 | 1.17 / 1.14 / 1.22 / 1.17 | 1.10 / 1.14 / 0.94 / 1.20 | 1.12 / 1.13 / 1.12 / 1.17 |
+  | low/high N 1996 ambient / FACE | 0.78 / 0.79 | 0.97 / 0.94 | 0.83 / 0.95 | 0.70 / 0.67 |
+  | low/high N 1997 ambient / FACE | 0.86 / 0.80 | 0.42 / 0.43 | 0.35 / 0.47 | 0.70 / 0.69 |
+
+  **No framework gets the 1993 dry stress** (ambient 0.93-0.94 against 0.77), and **DSSAT's 1997 low
+  N is as strong as MONICA's or stronger** (0.35/0.47; DSSAT's 1997 high N is N limited too: LAI 2.8
+  against 4.5). Both point at the inputs (1993: the 317 mm germination irrigation and the deep soil
+  water; 1997: the initial N) rather than at MONICA (model issue 2).
+
+**Water** (median of the 9 models; ET against the measured period means wholly within the common
+days, soil water 20-200 cm against the probes):
+
+| | ET bias / RMSE mm/d | soil water bias mm (mean abs.) | drainage 1993 / later mm |
+|---|---|---|---|
+| MONICA | -0.04 / 1.60 | +22 (31) | 165 / 0-6 |
+| DSSAT | -0.82 / 1.41 | +60 (60) | 244 / 19 |
+| SiriusQuality | -0.27 / 1.22 | +22 (28) | 0 / 0 |
+
+- MONICA's ET is the highest in 1993/94 (Kc step 4; SQ's in 1996/97) and its bias the smallest, but its
+  day-to-day error the largest (1994: 2.1 mm/d against 1.3-1.4).
+- 1993: MONICA and DSSAT start at 600-640 mm (the 317 mm germination irrigation), the probes say
+  ~475 mm; SQ, without the per-season initial water, comes closest.
+- 1996/97: MONICA and DSSAT rise to 500-540 mm in May (irrigation going on while the crop ripens),
+  the probes stay at ~400 mm; SQ in between.
+
+**904's germination irrigation at the surface:** 904's 317 mm on 1992-12-26 has IRADP 0 in the
+workbook, 901-903's 23 cm (all later surface irrigations are 13-35 mm), probably a typo. MONICA puts it
+on the surface, where ~300 mm stand for the whole season (150 days, still 216 mm in April):
+infiltration only ~1 mm/d once the top layers are saturated, with and without `InfiltrationByDepth`.
+So 904 is MONICA's driest 1993 treatment (soil water 290-340 mm until March, 901-903 450-550 mm) and
+its soil is warmer in winter (15-30 cm, figure). Two things: ask the data providers about IRADP
+(DSSAT and SQ infiltrate it); MONICA's infiltration into a saturated topsoil (percolation from the top
+layers ~1 mm/d on this soil) is worth a look.
+
+**Soil temperature** (8 models without MO):
+
+| layer cm | 0-5 | 5-15 | 15-30 | 30-45 | 60-90 | 90-120 | 150-180 |
+|---|---|---|---|---|---|---|---|
+| median DSSAT - MONICA °C | 0.0 | -0.2 | -0.4 | -0.4 | -0.5 | -0.6 | -0.7 |
+| median SQ - MONICA °C | 0.0 | -0.2 | -0.3 | -0.2 | -0.4 | -0.5 | -0.7 |
+| SD between the models (in each framework) | 1.4-1.7 | 1.6 | 1.8 | 1.9-2.2 | 2.4-2.6 | 2.6-2.9 | 2.9-3.2 |
+| SD between the frameworks (same model) | 0.6 | 0.8 | 0.8 | 0.8 | 0.7 | 0.7 | 0.7 |
+
+- **The models differ 2-4 times more from each other than the frameworks do**: MONICA's soil
+  temperatures sit within the other two; the 8 models' median in MONICA is the same at the surface
+  and 0.2-0.7 °C warmer below (consistent with its lower LAI: less shading).
+- Per model (same model, other framework minus MONICA): ST identical in all three (only air
+  temperature), SQ a constant +0.2/+0.4 °C (one temperature for all layers). Framework sensitive:
+  AP (MONICA 1.7-2.2 °C warmer at 0-15 cm), SW (MONICA 0.8-1.6 °C cooler at 0-15 cm; MONICA gives
+  SWAT the crop's above ground biomass as cover, no residue), PS (MONICA ~1 °C warmer at 15-60 cm),
+  DS, DE 0-1 °C, SA 0.6-0.9 °C (SQ) and up to 2.7 °C (DSSAT, deep layers) colder than in MONICA.
+
 ## Bushland
 
 Workbook `Bushland/BUSHLAND_data_2026-10-03 (...)(noSoilT).xlsx`, 6 treatments, 9 + iMO models,
@@ -404,3 +499,6 @@ What the treatments that weren't calibrated show (ratios of final biomass / yiel
 4. Bushland: the data questions above (1 now matters: N stress on).
    Avignon once its data are clear.
 5. The AMEI branch's crop stalling with a dry topsoil (MONICA change 2).
+6. Other frameworks ("MONICA against DSSAT and SiriusQuality"): tell them MO's BaseTemperature
+   (TAV), SQ's initial water; ask the data providers about 904's IRADP 0 and the 317 mm germination
+   irrigation; MONICA's slow infiltration into a saturated topsoil.

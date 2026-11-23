@@ -27,3 +27,6 @@ soil_temperature/out_*/results/*Layers*.txt
 # calibrate.py: the MONICA run folders of the evaluations
 evapotranspiration/calibration/*/work/
 soil_temperature/calibration/*/work/
+
+# other frameworks' AMEI submissions (downloaded, not ours)
+soil_temperature/out_maricopa_other_models/
