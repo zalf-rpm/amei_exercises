@@ -582,23 +582,34 @@ treatment, the FAO stomata resistance 100 s/m. `ETstudyOSAstand...` = MONICA's o
 latitude from `soil_temperature/sensitivity_analysis/input_data/WeatherMetadata_corr.csv`, the
 elevation NASA POWER's grid cell (25 / 54 / 794 / 128 / 434 / 86 / 332 m; the metadata have none;
 fitting the standardized NETRAD gives COCA 790, USMA 430 m, the others are poorly determined),
-ALBEDO as MONICA's reference albedo, lambda and PSYCON from the treatment. `ETstudySAactual...` =
-MONICA's own ET0; the Crop2ML package and the internal module as drivers give the same on every day.
+ALBEDO as MONICA's reference albedo, lambda from the treatment, the psychrometric constant
+calculated by MONICA from the elevation and lambda (an intermediate, like the net radiation).
+`ETstudySAactual...` = MONICA's own ET0; the Crop2ML package and the internal module as drivers
+give the same on every day.
+
+*PSYCON (2026-11-27, rerun):* the first actual-weather run also took the treatment's PSYCON. Its
+three values (0.0648 / 0.0637 / 0.0653) all belong to one air pressure, 97.4 kPa, i.e. CAQC's
+332 m, for all seven sites. MONICA's own γ at lambda 2.45: USGA 0.0671, DEMU 0.0669, FRMO 0.0667,
+FRLU 0.0663, CAQC 0.0648, USMA 0.0640, COCA 0.0613 kPa/°C (-5 to +4 % against PSYCON). ET0
+changed by COCA +1.1-1.2 %, USGA -0.7-0.8 %, the others -0.5-0 %, CAQC 0. The standardized runs
+keep PSYCON (a given input there).
 
 Mean annual ET0 (mm/a):
 
 | | CAQC | DEMU | FRLU | FRMO | USGA | COCA | USMA |
 |---|---|---|---|---|---|---|---|
 | standardized, lambda 2.45 | 545 | 752 | 827 | 1153 | 1204 | 1240 | 1998 |
-| actual, albedo 0.23, lambda 2.45 | 535 | 696 | 762 | 1087 | 1166 | 1148 | 1958 |
-| actual, albedo 0.12 / 0.19 | 626 / 568 | 774 / 724 | 860 / 797 | 1206 / 1130 | 1349 / 1233 | 1307 / 1206 | 2171 / 2035 |
+| actual, albedo 0.23, lambda 2.45 | 535 | 694 | 759 | 1086 | 1159 | 1161 | 1954 |
+| actual, albedo 0.12 / 0.19 | 626 / 568 | 771 / 722 | 856 / 794 | 1203 / 1129 | 1339 / 1224 | 1323 / 1220 | 2168 / 2032 |
 
 - **ALPHA has no effect** (Priestley-Taylor only), **ALBEDO only with actual weather** (the
   standardized NETRAD is given; it was calculated with 0.23): 0.12 instead of 0.23 +11-16 %.
-  **lambda** 2.43 / 2.49 instead of 2.45: +0.4-0.6 % / -0.8-1.2 % (both 1/lambda and PSYCON).
+  **lambda** 2.43 / 2.49 instead of 2.45: +0.4-0.6 % / -0.8-1.2 % (through 1/lambda and the
+  psychrometric constant: PSYCON resp. MONICA's γ ~ 1/lambda).
   PHTD and LAID aren't used (reference grass).
-- **MONICA's own intermediates give 1-7 % less ET0** than the standardized ones at the same
-  settings (CAQC -10, COCA -92 mm/a). Mostly the vapour pressure: MONICA takes RH × the mean
+- **MONICA's own intermediates give 2-8 % less ET0** than the standardized ones at the same
+  settings (CAQC -10, USMA -44, COCA -79, FRLU -68 mm/a; the psychrometric constant included, at
+  CAQC the same as PSYCON, at COCA 5 % lower, i.e. +1 % ET0). Mostly the vapour pressure: MONICA takes RH × the mean
   saturation vapour pressure (RH2M), the standardized VPRSD comes from TDEW (FAO-56 eq. 14); COCA:
   2.48 vs 2.28 kPa, VPD 0.44 vs 0.64 kPa. Net radiation +0.16 MJ/m² (COCA), the slope -0.007 kPa/°C
   (the standardized SLOPE is not from TAVD alone).

@@ -13,8 +13,10 @@ runs the ET0 equation alone, twice on the same input -
     fao56_penman_monteith as a module),
   - ETstudyCSAstand...: the Crop2ML package Monica_Reference_Evapotranspiration.
 actual (step 7, `WeatherData_actual/`): MONICA without a crop calculates the intermediates itself
-(net radiation with the treatment's ALBEDO as its reference albedo, vapour pressures from RH2M, slope),
-with the treatment's lambda and PSYCON; the Crop2ML package runs alongside as a driver.
+(net radiation with the treatment's ALBEDO as its reference albedo, vapour pressures from RH2M, slope,
+the psychrometric constant from the station's elevation and the treatment's lambda - not the
+treatment's PSYCON, which is CAQC's, 332 m, for all sites), with the treatment's lambda; the Crop2ML
+package runs alongside as a driver.
   - ETstudySAactual...: MONICA's own ET0 (soil moisture's, the FAO stomata resistance 100 s m-1).
 
 MONICA's FAO-56 PM has no ALPHA (Priestley-Taylor), so the three ALPHA levels are identical; ALBEDO
@@ -157,13 +159,14 @@ def actual(site: str, st: dict[str, float], trts: pd.DataFrame, runs: Path, moni
     sim_base = json.loads((ET_DIR / "sim_full_run.json").read_text())
 
     out = {}
-    for (albedo, lam, psy), group in trts.groupby(["ALBEDO", "lambda", "PSYCON"]):
+    for (albedo, lam), group in trts.groupby(["ALBEDO", "lambda"]):
         alb_lam = "_".join(group.TREAT_ID.iloc[0].split("_")[1:])
         run_dir = runs / f"{site}_{alb_lam}"
         run_dir.mkdir(parents=True, exist_ok=True)
         crop = {
             "CropParameters": crop_params
-            | {"ReferenceAlbedo": albedo, "LatentHeatOfVaporization": lam, "PsychrometricConstant": psy},
+            # no PsychrometricConstant: MONICA calculates it (from HeightNN and lambda)
+            | {"ReferenceAlbedo": albedo, "LatentHeatOfVaporization": lam},
             "cropRotation": [{"worksteps": []}],
         }
         site_json = json.loads(json.dumps(site_base))
