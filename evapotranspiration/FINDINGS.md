@@ -558,20 +558,20 @@ FRLU, USMA, FRMO, CAQC; 1991-2020, NASA POWER), result files in the template
 mean annual ET0 per site and treatment). ETOS, ETRS, ETP: NA (MONICA has only the FAO-56 grass
 reference). Script: `src/amei_exercises/evapotranspiration/sensitivity.py`.
 
-**MONICA build: monica_odin branch `amei-et-sensitivity`** (local, off `simplify_copilot`; for the
+**MONICA build: monica_odin branch `amei-et-sensitivity`** (on top of `simplify_copilot`; for the
 exercise, not the main line):
-- `fao56_et0` split into the intermediates and `fao56_penman_monteith` (the equation itself).
-  lambda (`LatentHeatOfVaporization`) and the psychrometric constant (`PsychrometricConstant`)
-  are crop module parameters next to `ReferenceAlbedo`; 0 (the default) = MONICA's constants
-  (0.408 = 1/2.45, 0.000665 × pressure), so MONICA's results are unchanged (Odin tests pass).
-  FAO-56's 2.45 MJ/kg is lambda at ~20 °C (eq. 3-1: 2.501 − 0.002361 T; 2.49 ≈ 5 °C, 2.43 ≈ 30 °C).
-- `Monica_Internal_Reference_Evapotranspiration`: MONICA's own equation as an evapotranspiration
+- In the main line since 2026-11-27 (`simplify_copilot` 036d28b4, EvapoTranspirationModels main
+  a6de6be): lambda (`LatentHeatOfVaporization`, crop module parameter next to `ReferenceAlbedo`,
+  and in all three MONICA Crop2ML packages); 0 (the default) = MONICA's constants (0.408 = 1/2.45,
+  0.000665 × pressure), so MONICA's results are unchanged. FAO-56's 2.45 MJ/kg is lambda at ~20 °C
+  (eq. 3-1: 2.501 − 0.002361 T; 2.49 ≈ 5 °C, 2.43 ≈ 30 °C).
+- Only on the branch: `fao56_et0` split into the intermediates and `fao56_penman_monteith` (the
+  equation itself); the psychrometric constant (`PsychrometricConstant`) as a crop module parameter;
+  `Monica_Internal_Reference_Evapotranspiration`, MONICA's own equation as an evapotranspiration
   module on given intermediates, so `monica-module` runs it and the Crop2ML package on the same
-  input file.
-- The Crop2ML package `Monica_Reference_Evapotranspiration` with optional lambda, slope and
+  input file; the Crop2ML package `Monica_Reference_Evapotranspiration` with optional slope and
   psychrometric constant (negative: calculated as before; 0 is a value: CAQC's rounded SLOPE is
-  0.00 on 21 days), on a local branch `amei-et-sensitivity` of EvapoTranspirationModels, the Odin
-  code regenerated from it (`versions.json` points at the local clone). Neither branch is pushed.
+  0.00 on 21 days), from EvapoTranspirationModels' branch `amei-et-sensitivity`.
 
 **Step 6, standardized inputs:** `monica-module`, one run per site and lambda: NETRAD, VPRSD,
 VPRSAT, SLOPE and TAVD from the weather file, WIND km/d -> m/s at 2 m, PSYCON and lambda from the
