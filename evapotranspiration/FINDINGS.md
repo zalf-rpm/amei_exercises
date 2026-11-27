@@ -545,6 +545,64 @@ winter?). The simulated winter biomass is also too high (2010-02-03: ~450 vs 181
 step 2's residuals: +0.1-0.2 x 3 t/ha on the winter dates), which makes the dilution worse.
 Open: the winter N uptake (MONICA), the initial soil N (estimated by the providers, comments).
 
+## Sensitivity analysis (protocol steps 6 and 7, `et-sensitivity`, 2026-11-27)
+
+```
+pixi run et-sensitivity --weather standardized   # step 6 -> out_sensitivity_standardized/
+pixi run et-sensitivity --weather actual         # step 7 -> out_sensitivity_actual/
+```
+
+27 treatments (ALPHA × ALBEDO × lambda/PSYCON, `Treatments.xlsx`) × 7 sites (USGA, DEMU, COCA,
+FRLU, USMA, FRMO, CAQC; 1991-2020, NASA POWER), result files in the template
+`3_Templates/Sensitivity_analysis/` (`results/`, gitignored, see `checksums.txt`; `summary.csv`:
+mean annual ET0 per site and treatment). ETOS, ETRS, ETP: NA (MONICA has only the FAO-56 grass
+reference). Script: `src/amei_exercises/evapotranspiration/sensitivity.py`.
+
+**MONICA build: monica_odin branch `amei-et-sensitivity`** (local, off `simplify_copilot`; for the
+exercise, not the main line):
+- `fao56_et0` split into the intermediates and `fao56_penman_monteith` (the equation itself).
+  lambda (`LatentHeatOfVaporization`) and the psychrometric constant (`PsychrometricConstant`)
+  are crop module parameters next to `ReferenceAlbedo`; 0 (the default) = MONICA's constants
+  (0.408 = 1/2.45, 0.000665 × pressure), so MONICA's results are unchanged (Odin tests pass).
+  FAO-56's 2.45 MJ/kg is lambda at ~20 °C (eq. 3-1: 2.501 − 0.002361 T; 2.49 ≈ 5 °C, 2.43 ≈ 30 °C).
+- `Monica_Internal_Reference_Evapotranspiration`: MONICA's own equation as an evapotranspiration
+  module on given intermediates, so `monica-module` runs it and the Crop2ML package on the same
+  input file.
+- The Crop2ML package `Monica_Reference_Evapotranspiration` with optional lambda, slope and
+  psychrometric constant (negative: calculated as before; 0 is a value: CAQC's rounded SLOPE is
+  0.00 on 21 days), on a local branch `amei-et-sensitivity` of EvapoTranspirationModels, the Odin
+  code regenerated from it (`versions.json` points at the local clone). Neither branch is pushed.
+
+**Step 6, standardized inputs:** `monica-module`, one run per site and lambda: NETRAD, VPRSD,
+VPRSAT, SLOPE and TAVD from the weather file, WIND km/d -> m/s at 2 m, PSYCON and lambda from the
+treatment, the FAO stomata resistance 100 s/m. `ETstudyOSAstand...` = MONICA's own equation,
+`ETstudyCSAstand...` = the Crop2ML package: **identical on every day** (max difference 0).
+
+**Step 7, actual weather:** MONICA without a crop (any soil), TMIN/TAVD/TMAX/SRAD/RH2M/WIND,
+latitude from `soil_temperature/sensitivity_analysis/input_data/WeatherMetadata_corr.csv`, the
+elevation NASA POWER's grid cell (25 / 54 / 794 / 128 / 434 / 86 / 332 m; the metadata have none;
+fitting the standardized NETRAD gives COCA 790, USMA 430 m, the others are poorly determined),
+ALBEDO as MONICA's reference albedo, lambda and PSYCON from the treatment. `ETstudySAactual...` =
+MONICA's own ET0; the Crop2ML package and the internal module as drivers give the same on every day.
+
+Mean annual ET0 (mm/a):
+
+| | CAQC | DEMU | FRLU | FRMO | USGA | COCA | USMA |
+|---|---|---|---|---|---|---|---|
+| standardized, lambda 2.45 | 545 | 752 | 827 | 1153 | 1204 | 1240 | 1998 |
+| actual, albedo 0.23, lambda 2.45 | 535 | 696 | 762 | 1087 | 1166 | 1148 | 1958 |
+| actual, albedo 0.12 / 0.19 | 626 / 568 | 774 / 724 | 860 / 797 | 1206 / 1130 | 1349 / 1233 | 1307 / 1206 | 2171 / 2035 |
+
+- **ALPHA has no effect** (Priestley-Taylor only), **ALBEDO only with actual weather** (the
+  standardized NETRAD is given; it was calculated with 0.23): 0.12 instead of 0.23 +11-16 %.
+  **lambda** 2.43 / 2.49 instead of 2.45: +0.4-0.6 % / -0.8-1.2 % (both 1/lambda and PSYCON).
+  PHTD and LAID aren't used (reference grass).
+- **MONICA's own intermediates give 1-7 % less ET0** than the standardized ones at the same
+  settings (CAQC -10, COCA -92 mm/a). Mostly the vapour pressure: MONICA takes RH × the mean
+  saturation vapour pressure (RH2M), the standardized VPRSD comes from TDEW (FAO-56 eq. 14); COCA:
+  2.48 vs 2.28 kPa, VPD 0.44 vs 0.64 kPa. Net radiation +0.16 MJ/m² (COCA), the slope -0.007 kPa/°C
+  (the standardized SLOPE is not from TAVD alone).
+
 ## Open questions
 
 By relevance for Bushland and Avignon (2026-11-16):

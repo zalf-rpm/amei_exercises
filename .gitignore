@@ -30,3 +30,7 @@ soil_temperature/calibration/*/work/
 
 # other frameworks' AMEI submissions (downloaded, not ours)
 soil_temperature/out_*_other_models/
+
+# the ET sensitivity analysis: 189 result files of 10958 days per setup (see checksums.txt) and the runs
+evapotranspiration/out_sensitivity_*/results/
+evapotranspiration/out_sensitivity_*/runs/

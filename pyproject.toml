@@ -94,4 +94,5 @@ run-st = { cmd = "python -m amei_exercises.soil_temperature.run_st" }
 evaluate-maricopa = { cmd = "python -m amei_exercises.soil_temperature.evaluate_maricopa" }
 evaluate-st = { cmd = "python -m amei_exercises.soil_temperature.evaluate_st" }
 compare-frameworks = { cmd = "python -m amei_exercises.soil_temperature.compare_frameworks" }
+et-sensitivity = { cmd = "python -m amei_exercises.evapotranspiration.sensitivity" }
 calibrate = { cmd = "python -m amei_exercises.calibrate" }
